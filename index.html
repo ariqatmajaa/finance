@@ -549,6 +549,7 @@ html,body{height:100%;overflow:hidden}
 .navi > button{flex:1}
 .hapt{position:absolute;inset:0;z-index:2;opacity:.011;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .hapt input{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;pointer-events:none}
+.vtest{cursor:pointer}.vtest input{flex:none;transform:scale(1.1)}
 </style>
 </head>
 <body>
@@ -680,6 +681,13 @@ html,body{height:100%;overflow:hidden}
       <div class="rows">
         <button type="button" class="kv act" id="setOpen"><span>Name, salary, categories &amp; budget</span><b>›</b></button>
       </div>
+    </div>
+    <div class="sec">
+      <h2>Vibration test</h2>
+      <div class="rows">
+        <label class="kv vtest"><span>Tap this switch — do you feel a vibration?</span><input type="checkbox" switch id="vtest"></label>
+      </div>
+      <p class="foot" id="vinfo"></p>
     </div>
     <div class="sec">
       <h2>Data</h2>
@@ -1557,6 +1565,9 @@ $("rsFile").addEventListener("change",async e=>{
   location.reload();
 });
 $("goRestore").onclick=()=>setTab("profil");
+// Info untuk tes getar
+(function(){ const m=navigator.userAgent.match(/OS (\d+)[_.](\d+)/); const st=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone;
+  $("vinfo").textContent = (m?"iOS "+m[1]+"."+m[2]:"Not iOS")+" · "+(st?"opened from Home Screen":"opened in browser"); })();
 
 // ===== Geser grafik: donat <-> batang harian =====
 (function(){
