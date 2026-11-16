@@ -795,6 +795,22 @@ function setTab(t){
   if(changed) $("app").scrollTop=0;
   if(t!=="tambah" && !$("sheet").hidden) closeSheet();
 }
+// ===== Getar halus saat menekan menu =====
+// Android: Vibration API. iPhone (iOS 18+): memicu getar sistem lewat sakelar tersembunyi.
+const _hapticEl=(()=>{
+  const l=document.createElement("label"); l.setAttribute("aria-hidden","true");
+  l.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
+  const i=document.createElement("input"); i.type="checkbox"; i.setAttribute("switch",""); i.tabIndex=-1;
+  l.appendChild(i); document.body.appendChild(l); return l;
+})();
+const _isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function haptic(){
+  try{
+    if(!_isIOS && navigator.vibrate){ navigator.vibrate(12); return; }
+    _hapticEl.click();
+  }catch(e){}
+}
+
 // Gulir ke atas, juga saat halaman masih meluncur (momentum scroll di iPhone)
 function scrollToTop(){
   // Halaman kini digulir di dalam #app, sehingga luncuran bisa dihentikan seketika
@@ -812,6 +828,7 @@ document.querySelectorAll(".bnav button[data-tab]").forEach(b=>{
   b.addEventListener("touchstart",()=>{ if(b.dataset.tab===tab){ b._top=Date.now(); scrollToTop(); } },{passive:true});
 });
 document.querySelectorAll(".bnav button[data-tab]").forEach(b=>b.onclick=()=>{
+  haptic();
   // Ketuk menu yang sedang dibuka -> gulir ke atas
   if(b.dataset.tab===tab){ if(!(b._top && Date.now()-b._top<600)) scrollToTop(); return; }
   setTab(b.dataset.tab);

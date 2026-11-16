@@ -1,5 +1,5 @@
 // Finance Ariq — service worker: aplikasi tetap bisa dibuka tanpa internet
-const VERSION = "fa-v10";
+const VERSION = "fa-v11";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
