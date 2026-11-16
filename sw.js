@@ -16,8 +16,11 @@ self.addEventListener("fetch", e => {
   const url = new URL(req.url);
   // Halaman utama: ambil versi terbaru kalau ada internet, kalau tidak pakai simpanan
   if (req.mode === "navigate") {
-    e.respondWith(fetch(req).then(res => { const c = res.clone(); caches.open(VERSION).then(x => x.put("./index.html", c)); return res; })
-      .catch(() => caches.match("./index.html")));
+    // Hanya simpan halaman yang berhasil dimuat; kalau gagal/404, pakai versi simpanan
+    e.respondWith(fetch(req).then(res => {
+        if (res.ok) { const c = res.clone(); caches.open(VERSION).then(x => x.put("./index.html", c)); return res; }
+        return caches.match("./index.html").then(hit => hit || res);
+      }).catch(() => caches.match("./index.html")));
     return;
   }
   // Font Google: simpan setelah pertama kali dimuat
