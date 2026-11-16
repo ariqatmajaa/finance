@@ -797,17 +797,19 @@ function setTab(t){
 }
 // ===== Getar halus saat menekan menu =====
 // Android: Vibration API. iPhone (iOS 18+): memicu getar sistem lewat sakelar tersembunyi.
-const _hapticEl=(()=>{
-  const l=document.createElement("label"); l.setAttribute("aria-hidden","true");
-  l.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
-  const i=document.createElement("input"); i.type="checkbox"; i.setAttribute("switch",""); i.tabIndex=-1;
-  l.appendChild(i); document.body.appendChild(l); return l;
-})();
 const _isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 function haptic(){
   try{
     if(!_isIOS && navigator.vibrate){ navigator.vibrate(12); return; }
-    _hapticEl.click();
+    // iPhone (iOS 18+): sakelar baru dibuat setiap kali, diklik, lalu dibuang -> getar sistem
+    const label=document.createElement("label");
+    label.setAttribute("aria-hidden","true"); label.style.display="none";
+    const input=document.createElement("input");
+    input.type="checkbox"; input.setAttribute("switch","");
+    label.appendChild(input);
+    document.head.appendChild(label);
+    label.click();
+    document.head.removeChild(label);
   }catch(e){}
 }
 
