@@ -947,7 +947,17 @@ function prevKey(k){let [y,m]=k.split("-").map(Number);m--;if(m<1){m=12;y--;}ret
 const isIncome = t => !!(CAT[t.cat]&&CAT[t.cat].income);
 const isSave = t => !!(CAT[t.cat]&&CAT[t.cat].save);
 function periodOut(k){let s=0;all.forEach(t=>{if(periodKey(t.date)===k)s+= isIncome(t) ? -t.amount : t.amount;});return s;}
-const START_KEY = "2026-10"; // periode pertama yang dicatat (28 Okt 2026)
+// Periode pertama pemakaian: diambil dari transaksi paling awal, atau periode saat aplikasi pertama dipakai.
+// Disimpan di HP agar gaji tidak dihitung untuk bulan-bulan sebelum mulai memakai aplikasi.
+const START_KEY = (()=>{
+  if(CFG.startKey) return CFG.startKey;
+  const tx=LocalDB.all();
+  const first = tx.length ? tx.map(t=>periodKey(t.date)).sort()[0] : periodKey(todayStr());
+  const carryKeys = Object.keys(CFG.carry||{}).sort();
+  const k = carryKeys.length && carryKeys[0] < first ? carryKeys[0] : first;
+  try{ localStorage.setItem(CFG_KEY, JSON.stringify(Object.assign({}, CFG, {startKey:k}))); }catch(e){}
+  return k;
+})();
 function carryOf(k){if(k in CARRY)return CARRY[k];if(k<=START_KEY)return 0;const p=prevKey(k);return GAJI+carryOf(p)-periodOut(p);}
 
 function render(){
