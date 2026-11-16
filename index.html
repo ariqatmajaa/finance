@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1513" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
-<style>html{-webkit-text-size-adjust:100%}body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
+<style>html,body,*{touch-action:manipulation}html{-webkit-text-size-adjust:100%}body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Finance Ariq</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -1191,6 +1191,12 @@ $("rsFile").addEventListener("change",async e=>{
   location.reload();
 });
 $("goRestore").onclick=()=>setTab("profil");
+
+// ===== Matikan zoom (cubit & ketuk dua kali) =====
+["gesturestart","gesturechange","gestureend"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+let _lastTouch=0;
+document.addEventListener("touchend",e=>{const now=Date.now(); if(now-_lastTouch<350 && !e.target.closest("input,textarea,select")) e.preventDefault(); _lastTouch=now;},{passive:false});
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
 // ===== Mode offline =====
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
