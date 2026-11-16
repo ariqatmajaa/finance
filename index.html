@@ -426,6 +426,21 @@ body.adding .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 .clrow .num{font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:no-preference){.clmodal:not([hidden]) .clbox{animation:up .24s cubic-bezier(.2,.8,.2,1)}}
 .lg .it,.donut .seg{cursor:pointer}
+
+/* ===== Revisi 16 Nov (2) ===== */
+#budget .bh{margin-bottom:-6px}
+.bpair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start}
+.bpair .sec{gap:8px;min-width:0}
+.bpair .sec h2{font-size:13px;color:var(--muted);font-weight:700}
+.bpair .row{padding:10px 12px;gap:5px}
+.bpair .row .h{flex-direction:column;align-items:flex-start;gap:1px}
+.bpair .row .n{font-size:13px;gap:6px;flex-wrap:nowrap;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bpair .row .nm{overflow:hidden;text-overflow:ellipsis}
+.bpair .row .a{font-size:11.5px}
+.bpair .row .pill{display:none}
+.bpair .row .bar{height:6px}
+.bpair .row .a em{font-size:11px}
+#p-grafik > .sec:first-child{gap:0}
 </style>
 </head>
 <body>
@@ -493,6 +508,13 @@ body.adding .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 
   <!-- 4. GRAFIK -->
   <section class="panel" id="p-grafik" role="tabpanel" aria-labelledby="t-grafik" hidden>
+    <div class="sec">
+      <div class="monthnav" id="gnav">
+        <button id="gprev" aria-label="Periode sebelumnya">‹</button>
+        <span id="gLabel">—</span>
+        <button id="gnext" aria-label="Periode berikutnya">›</button>
+      </div>
+    </div>
     <div class="sec">
       <h2>Pengeluaran per kategori</h2>
       <div class="card" id="chartCard"></div>
@@ -566,10 +588,10 @@ body.adding .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 
   <nav class="bnav" aria-label="Menu">
     <div class="bin">
+      <button type="button" data-tab="catat" id="t-catat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7" fill="none"></path><path d="M5 10v10h14V10" fill="none"></path><path d="M10 20v-6h4v6" fill="none"></path></svg><span>Home</span></button>
       <button type="button" data-tab="grafik" id="t-grafik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12A9 9 0 1 1 12 3v9z" fill="none"></path><path d="M15 3.5A9 9 0 0 1 20.5 9H15z" fill="none"></path></svg><span>Grafik</span></button>
-      <button type="button" data-tab="history" id="t-history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7" fill="none"></path><path d="M3 4v4h4" fill="none"></path><path d="M12 7v5l3 2" fill="none"></path></svg><span>History</span></button>
       <button type="button" data-tab="tambah" id="t-tambah" class="plus" aria-label="Tambah catatan"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none"></path></svg></i></button>
-      <button type="button" data-tab="catat" id="t-catat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" fill="none"></path><path d="M9 8h6M9 12h6" fill="none"></path></svg><span>Data</span></button>
+      <button type="button" data-tab="history" id="t-history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7" fill="none"></path><path d="M3 4v4h4" fill="none"></path><path d="M12 7v5l3 2" fill="none"></path></svg><span>History</span></button>
       <button type="button" data-tab="profil" id="t-profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6" fill="none"></path></svg><span>Profil</span></button>
     </div>
   </nav>
@@ -855,6 +877,9 @@ $("amt").addEventListener("input",()=>{
   try{el.setSelectionRange(p,p);}catch(e){}
 });
 
+let gcur = {y:cur.y, m:cur.m};
+$("gprev").onclick=()=>{gcur.m--; if(gcur.m<0){gcur.m=11;gcur.y--;} render();};
+$("gnext").onclick=()=>{gcur.m++; if(gcur.m>11){gcur.m=0;gcur.y++;} render();};
 $("prev").onclick=()=>{cur.m--; if(cur.m<0){cur.m=11;cur.y--;} showAll=false; render();};
 $("next").onclick=()=>{cur.m++; if(cur.m>11){cur.m=0;cur.y++;} showAll=false; render();};
 $("moreBtn").onclick=()=>{showAll=!showAll; render();};
@@ -881,8 +906,6 @@ function render(){
   const pre = mk < START_KEY;
   renderData(mk, txs, by, spend, save, extra, pre);
   renderHistory(txs);
-  renderCharts(txs, by, spend);
-  chartTx = txs;
   cur = keep;
   // History: periode yang dipilih
   $("monthLabel").textContent = periodLabel(cur.y,cur.m);
@@ -890,6 +913,10 @@ function render(){
   const htx = all.filter(t=>periodKey(t.date)===hk);
   renderHistory(htx, {list:"hList", title:"hTitle2", count:"hcount2"});
   let hOut=0,hSave=0,hIn=0; htx.forEach(t=>{ if(isIncome(t)) hIn+=t.amount; else if(isSave(t)) hSave+=t.amount; else hOut+=t.amount; });
+  // Grafik: periode pilihan sendiri
+  { const k2=cur; cur=gcur; const gk=monthKey(); const gtx=all.filter(t=>periodKey(t.date)===gk);
+    const gby={}; let gsp=0; gtx.forEach(t=>{ gby[t.cat]=(gby[t.cat]||0)+t.amount; if(!isIncome(t)&&!isSave(t)) gsp+=t.amount; });
+    renderCharts(gtx,gby,gsp); chartTx=gtx; $("gLabel").textContent=periodLabel(cur.y,cur.m); cur=k2; }
   $("hSum").innerHTML = '<div><span>Pengeluaran</span><b class="num">'+rp(hOut)+'</b></div><div><span>Ditabung</span><b class="num">'+rp(hSave)+'</b></div><div><span>Pemasukan lain</span><b class="num">'+rp(hIn)+'</b></div>';
 }
 
@@ -959,7 +986,8 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   // Anggaran per pos
   const b = $("budget"); b.innerHTML="";
   let g=null, box=null;
-  const GRP_TITLE={"Tetap":"Anggaran · Pengeluaran tetap","Fleksibel":"Anggaran · Pengeluaran fleksibel","Tabungan":"Anggaran · Tabungan & saham"};
+  const GRP_TITLE={"Tetap":"Tetap","Fleksibel":"Fleksibel","Tabungan":"Tabungan & saham"};
+  const bh=document.createElement("h2");bh.textContent="Anggaran";bh.className="bh";b.appendChild(bh);
   CATS.forEach(c=>{
     const used = by[c.id]||0;
     if(c.income) return;
@@ -969,7 +997,11 @@ function renderData(mk, txs, by, spend, save, extra, pre){
       const sec=document.createElement("div");sec.className="sec";
       const h=document.createElement("h2");h.textContent=GRP_TITLE[c.grp]||c.grp;
       box=document.createElement("div");box.className="rows";
-      sec.appendChild(h);sec.appendChild(box);b.appendChild(sec);
+      sec.appendChild(h);sec.appendChild(box);
+      if(c.grp==="Tetap"||c.grp==="Fleksibel"){
+        let pair=b.querySelector(".bpair"); if(!pair){pair=document.createElement("div");pair.className="bpair";b.appendChild(pair);}
+        sec.classList.add("half"); pair.appendChild(sec);
+      } else b.appendChild(sec);
     }
     const r=document.createElement("div");r.className="row";
     const pct = c.budget? used/c.budget*100 : (used?100:0);
@@ -1135,7 +1167,8 @@ $("f").addEventListener("submit",async e=>{
     // Panel tetap terbuka di kategori yang sama, siap isi berikutnya
     $("amt").value=""; $("note").value=""; $("sMsg").textContent="";
     showToast(CAT[doc.cat].name+" · "+(CAT[doc.cat].income?"+":"")+rp(amount));
-    try{$("amt").focus({preventScroll:true});}catch(e){}
+    try{$("amt").blur();}catch(e){}
+    setTab("catat");
   }catch(err){
     $("sMsg").textContent = err&&err.code==="quota_exceeded" ? "Penyimpanan penuh. Hapus beberapa catatan lama." : "Gagal menyimpan. Coba lagi sebentar.";
   }
