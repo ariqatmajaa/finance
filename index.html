@@ -446,6 +446,22 @@ body.adding .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 html,body{height:100%;overflow:hidden}
 #app{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;max-width:none!important;margin:0!important;
   padding-left:max(16px,env(safe-area-inset-left,0px),calc((100% - 608px)/2))!important;padding-right:max(16px,env(safe-area-inset-right,0px),calc((100% - 608px)/2))!important}
+
+/* ===== Settings ===== */
+.addbar .savebtn{justify-self:end;font-weight:800}
+.setform{display:flex;flex-direction:column;gap:12px}
+.setform input{height:46px}
+.setrow{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.setrow + .setrow{border-top:1px solid var(--line)}
+.seticon{width:38px;height:38px;border-radius:12px;border:0;flex:none;cursor:pointer;padding:0}
+.seticon svg{width:19px;height:19px}
+.setcolor{width:18px;height:18px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);flex:none;cursor:pointer;padding:0}
+.setfields{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.setfields input{height:38px;padding:0 10px;font-size:15px}
+.setdel{font:inherit;width:32px;height:32px;border:0;border-radius:50%;background:none;color:var(--muted);cursor:pointer;flex:none}
+.setdel:hover{background:var(--bad-soft);color:var(--bad)}
+.goal .gn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setfields .sl{display:grid;grid-template-columns:96px minmax(0,1fr);align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -543,43 +559,38 @@ html,body{height:100%;overflow:hidden}
     <div class="msg" id="msg">Loading…</div>
   </section>
 
+  <!-- PENGATURAN -->
+  <section class="panel" id="p-settings" hidden>
+    <div class="addbar"><button type="button" class="cancel" id="setCancel">Cancel</button><b>Settings</b><button type="button" class="cancel savebtn" id="setSave">Save</button></div>
+    <div class="sec">
+      <h2>Profile</h2>
+      <div class="card setform">
+        <label>Name<input id="setName" placeholder="Your name"></label>
+        <label>Salary per month (Rp)<input id="setGaji" class="num" inputmode="numeric" placeholder="0"></label>
+      </div>
+    </div>
+    <div id="setCats" class="panel" style="gap:18px"></div>
+    <p class="foot">Tap an icon to change it, tap the colour dot to change the colour. Settings are stored on this phone only.</p>
+  </section>
+
   <!-- 5. PROFIL -->
   <section class="panel" id="p-profil" role="tabpanel" aria-labelledby="t-profil" hidden>
     <div class="pcard">
-      <div class="pav">A</div>
-      <div><div class="pname">Ariq Atmaja Deza</div></div>
+      <div class="pav" id="pav">A</div>
+      <div><div class="pname" id="pname">—</div></div>
     </div>
     <span id="pfGaji" hidden></span><span id="pfPeriod" hidden></span>
     <div class="sec">
       <h2>Savings &amp; Assets</h2>
-      <div class="goals">
-        <div class="goal">
-          <div class="t"><span class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" fill="none"></path></svg></span>Dana Darurat</div>
-          <div class="v num" id="ddVal">Rp0</div>
-          <div class="bar"><i id="ddBar" style="width:0%"></i></div>
-          <div class="s num" id="ddSub">0 / 30 jt</div>
-        </div>
-        <div class="goal">
-          <div class="t"><span class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8" fill="none"></path><path d="M15 7h6v6" fill="none"></path></svg></span>Saham BMRI</div>
-          <div class="v num" id="lotVal">0 lot</div>
-          <div class="bar"><i id="lotBar" style="width:0%"></i></div>
-          <div class="s num" id="lotSub">0 / 2 lot periode ini</div>
-        </div>
-        <div class="goal">
-          <div class="t"><span class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="none"></path></svg></span>Tabungan Nikah</div>
-          <div class="v num" id="nkVal">Rp0</div>
-          <div class="bar"><i id="nkBar" style="width:0%"></i></div>
-          <div class="s num" id="nkSub">0 / 100 jt</div>
-        </div>
-        <div class="goal">
-          <div class="t"><span class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6" fill="none"></path></svg></span>Biaya Adek</div>
-          <div class="v num" id="adVal">Rp0</div>
-          <div class="bar"><i id="adBar" style="width:0%"></i></div>
-          <div class="s num" id="adSub">0 / 50 jt</div>
-        </div>
-      </div>
+      <div class="goals" id="goals"></div>
     </div>
     <div id="budget" class="panel" style="gap:18px"></div>
+    <div class="sec">
+      <h2>Settings</h2>
+      <div class="rows">
+        <button type="button" class="kv act" id="setOpen"><span>Name, salary, categories &amp; budget</span><b>›</b></button>
+      </div>
+    </div>
     <div class="sec">
       <h2>Data</h2>
       <div class="rows">
@@ -698,55 +709,58 @@ const LocalDB=(()=>{
   return {collection:()=>q,doc:()=>({onSnapshot(){return()=>{}},set:async()=>{}}),all:load,replace:save};
 })();
 const GAJI = CFG.gaji||0;
-const START = Object.assign({ dd: 0, lot: 0, nikah: 0, adek: 0 }, CFG.start||{});
+const START = CFG.start||{};   // saldo awal kategori tabungan (disimpan di HP)
 // Sisa uang dari periode sebelumnya yang ikut dipakai di periode ini (ditetapkan manual)
 const CARRY = CFG.carry||{};
-const DD_TARGET = 30000000, NK_TARGET = 100000000, AD_TARGET = 50000000, LOT_TARGET = 2;
-// Ringkas: 600 rb, 5 jt, 5,5 jt
-const short = n => n>=1e6 ? (Math.round(n/1e5)/10).toLocaleString("id-ID")+" jt" : n>=1e3 ? Math.round(n/1e3).toLocaleString("id-ID")+" rb" : String(Math.round(n));
 const pctW = (v,t) => Math.max(0,Math.min(100, v/t*100))+"%";
-const CATS = [
-  {id:"kos", name:"Kosan", budget:2000000, grp:"Tetap"},
-  {id:"listrik", name:"Listrik", budget:250000, grp:"Tetap"},
-  {id:"laundry", name:"Laundry", budget:200000, grp:"Tetap"},
-  {id:"bensin", name:"Bensin", budget:150000, grp:"Tetap"},
-  {id:"parkir", name:"E-money", budget:240000, grp:"Tetap"},
-  {id:"claude", name:"Claude Pro", budget:350000, grp:"Tetap"},
-  {id:"makan", name:"Makan", budget:1700000, grp:"Fleksibel"},
-  {id:"jajan", name:"Jajan", budget:500000, grp:"Fleksibel"},
-  {id:"fun", name:"Fun money", budget:200000, grp:"Fleksibel"},
-  {id:"shopping", name:"Shopping", budget:800000, grp:"Fleksibel"},
-  {id:"barber", name:"Barbershop", budget:180000, grp:"Fleksibel"},
-  {id:"lain", name:"Lain-lain", budget:0, grp:"Fleksibel"},
-  {id:"dd", name:"Dana Darurat", budget:2000000, grp:"Tabungan", save:true},
-  {id:"bmri", name:"Saham BMRI", budget:500000, grp:"Tabungan", save:true},
-  {id:"nikah", name:"Tabungan Nikah", budget:300000, grp:"Tabungan", save:true},
-  {id:"adek", name:"Biaya Adek", budget:200000, grp:"Tabungan", save:true},
-  {id:"masuk_lain", name:"Pemasukan lain", budget:0, grp:"Pemasukan", income:true}
-];
-const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
-// Ikon per kategori (garis, 24x24)
+// Ikon yang bisa dipilih untuk kategori (garis, 24x24)
 const ICON = {
-  kos:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
-  listrik:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
-  laundry:'<path d="M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
-  bensin:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M4 10h10"/><path d="M14 9l3 1v7a1.5 1.5 0 0 0 3 0V8l-3-3"/>',
-  parkir:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/>',
-  claude:'<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
-  makan:'<path d="M7 3v18"/><path d="M4 3v5a3 3 0 0 0 6 0V3"/><path d="M17 21V3c-2 1.5-3 4.5-3 8h3"/>',
-  jajan:'<path d="M6 8h12l-1.5 13h-9z"/><path d="M5 8h14"/><path d="M12 8V4l3-1"/>',
-  fun:'<path d="M6 9h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.5 1.6L15 14H9l-1.5 1.6A3 3 0 0 1 2 14v-1a4 4 0 0 1 4-4z"/><path d="M8 11v3"/><path d="M6.5 12.5h3"/><path d="M16 12h.01"/><path d="M18 13.5h.01"/>',
-  shopping:'<path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
-  barber:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5L20 20"/><path d="M8.5 15.5L20 4"/>',
-  lain:'<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
-  dd:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',
-  bmri:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
-  nikah:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
-  adek:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
-  masuk_lain:'<path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/>'
+  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  shirt:'<path d="M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
+  fuel:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M4 10h10"/><path d="M14 9l3 1v7a1.5 1.5 0 0 0 3 0V8l-3-3"/>',
+  card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/>',
+  sparkle:'<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
+  food:'<path d="M7 3v18"/><path d="M4 3v5a3 3 0 0 0 6 0V3"/><path d="M17 21V3c-2 1.5-3 4.5-3 8h3"/>',
+  cup:'<path d="M6 8h12l-1.5 13h-9z"/><path d="M5 8h14"/><path d="M12 8V4l3-1"/>',
+  game:'<path d="M6 9h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.5 1.6L15 14H9l-1.5 1.6A3 3 0 0 1 2 14v-1a4 4 0 0 1 4-4z"/><path d="M8 11v3"/><path d="M6.5 12.5h3"/><path d="M16 12h.01"/><path d="M18 13.5h.01"/>',
+  bag:'<path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5L20 20"/><path d="M8.5 15.5L20 4"/>',
+  car:'<path d="M5 17h14v-5l-2-5H7l-2 5z"/><path d="M5 12h14"/><circle cx="8" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/>',
+  phone:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/>',
+  health:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2"/><path d="M12 10.5v6M9 13.5h6"/>',
+  book:'<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/>',
+  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9"/><path d="M12 8v13"/><path d="M12 8c-2-4-6-3-5 0M12 8c2-4 6-3 5 0"/>',
+  dots:'<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
+  shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',
+  trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+  heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  person:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+  income:'<path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/>'
 };
-const catIcon = id => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICON[id]||ICON.lain)+'</svg>';
-const catColor = id => !CAT[id] ? "var(--muted)" : CAT[id].income ? "var(--accent)" : "var(--c-"+id+")";
+const ICON_KEYS = Object.keys(ICON);
+const PALETTE = ["#3b6fd8","#d39b00","#1f9fb0","#d64545","#8d6e63","#c2603a","#2e9d5b","#e06aa3","#8e5bd6","#ef8a1f","#6b8e23","#7f8c8d","#3f63d6","#1f9a7a","#d4588f","#7a52c7","#0d6b58"];
+// Kategori bawaan yang umum. Kategori pribadi diatur di Profile > Settings dan tersimpan di HP.
+const DEFAULT_CATS = [
+  {id:"rent", name:"Tempat tinggal", budget:0, grp:"Tetap", icon:"home", color:"#3b6fd8"},
+  {id:"bills", name:"Tagihan", budget:0, grp:"Tetap", icon:"bolt", color:"#d39b00"},
+  {id:"transport", name:"Transportasi", budget:0, grp:"Tetap", icon:"fuel", color:"#d64545"},
+  {id:"food", name:"Makan", budget:0, grp:"Fleksibel", icon:"food", color:"#2e9d5b"},
+  {id:"snack", name:"Jajan", budget:0, grp:"Fleksibel", icon:"cup", color:"#e06aa3"},
+  {id:"shop", name:"Belanja", budget:0, grp:"Fleksibel", icon:"bag", color:"#ef8a1f"},
+  {id:"fun", name:"Hiburan", budget:0, grp:"Fleksibel", icon:"game", color:"#8e5bd6"},
+  {id:"other", name:"Lain-lain", budget:0, grp:"Fleksibel", icon:"dots", color:"#7f8c8d"},
+  {id:"emergency", name:"Dana Darurat", budget:0, grp:"Tabungan", save:true, icon:"shield", color:"#3f63d6"},
+  {id:"saving", name:"Tabungan", budget:0, grp:"Tabungan", save:true, icon:"heart", color:"#d4588f"},
+  {id:"income", name:"Pemasukan lain", budget:0, grp:"Pemasukan", income:true, icon:"income", color:"#0d6b58"}
+];
+const CATS = (Array.isArray(CFG.cats)&&CFG.cats.length ? CFG.cats : DEFAULT_CATS).map(c=>Object.assign({budget:0},c));
+const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
+const USER_NAME = CFG.name || "My Finance";
+const catIcon = id => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICON[(CAT[id]||{}).icon]||ICON[id]||ICON.dots)+'</svg>';
+const iconSvg = k => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICON[k]||ICON.dots)+'</svg>';
+const catColor = id => !CAT[id] ? "var(--muted)" : (CAT[id].color || "var(--muted)");
+const catName = id => (CAT[id]||{name:"Deleted category"}).name;
 const BULAN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const BLN3=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const HARI=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -840,7 +854,7 @@ $("addCancel").onclick=()=>setTab(prevTab||"catat");
 
 // ---- Form
 let kind="out";
-const sel = {value:"makan"}; // kategori yang sedang diisi
+const sel = {value:null}; // kategori yang sedang diisi
 const doneCats = new Set();
 const GRID_TITLE={"Tetap":"Fixed expenses","Fleksibel":"Flexible expenses","Tabungan":"Savings & stocks","Pemasukan":"Income"};
 function fillCats(){
@@ -869,7 +883,7 @@ function openSheet(id){
   $("sIcon").style.setProperty("--cc",catColor(id)); $("sIcon").innerHTML=catIcon(id);
   $("sKind").textContent = c.income ? "Income" : c.save ? "Savings & stocks" : "Expense";
   $("sT").textContent=c.name;
-  $("lotWrap").hidden = id!=="bmri";
+  $("lotWrap").hidden = !c.lots;
   $("sMsg").textContent="";
   if(!wasOpen){
     $("amt").value=""; $("note").value="";
@@ -893,7 +907,7 @@ function setKind(k){
   kind=k;$("k-out").setAttribute("aria-pressed",k==="out");$("k-in").setAttribute("aria-pressed",k==="in");
   fillCats();
   if(!$("sheet").hidden && $("sDone").hidden){
-    if(k==="in"){ openSheet("masuk_lain"); }
+    if(k==="in"){ const ic=CATS.find(c=>c.income); if(ic) openSheet(ic.id); }
     else{ sel.value=null; $("sT").textContent="Choose a category"; $("sKind").textContent="Expense"; $("sIcon").innerHTML=""; $("lotWrap").hidden=true; $("save").disabled=true; dockPad(); }
   }
 }
@@ -1002,30 +1016,17 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   const pS = inc>0 ? Math.min(100, spend/inc*100) : 0, pV = inc>0 ? Math.min(100-pS, save/inc*100) : 0;
   $("stack").innerHTML = `<i style="width:${pS}%;background:var(--muted)"></i><i style="width:${pV}%;background:var(--accent)"></i>`;
 
-  // Tujuan: kumulatif sampai periode ini
-  let dd = START.dd, lot = START.lot, lotMonth = 0, nk = START.nikah, ad = START.adek, nkM = 0, adM = 0;
-  all.forEach(t=>{
-    const pk = periodKey(t.date);
-    { // total keseluruhan, tidak terikat periode
-      if(t.cat==="dd") dd += t.amount;
-      if(t.cat==="bmri") lot += (t.lot||0);
-      if(t.cat==="nikah") nk += t.amount;
-      if(t.cat==="adek") ad += t.amount;
-    }
-    if(pk===mk){ if(t.cat==="nikah") nkM += t.amount; if(t.cat==="adek") adM += t.amount; if(t.cat==="bmri") lotMonth += (t.lot||0); }
+  // Tabungan & Aset: total keseluruhan per kategori tabungan
+  const G=$("goals"); G.innerHTML="";
+  CATS.filter(c=>c.save).forEach(c=>{
+    let tot = c.lots ? (START[c.id+"_lot"]!=null ? START[c.id+"_lot"] : (START.lot||0)) : (START[c.id]||0);
+    all.forEach(t=>{ if(t.cat===c.id) tot += c.lots ? (t.lot||0) : t.amount; });
+    const el=document.createElement("div"); el.className="goal"; el.style.setProperty("--gc",c.color||"var(--accent)");
+    el.innerHTML='<div class="t"><span class="gi">'+catIcon(c.id)+'</span><span class="gn"></span></div><div class="v num"></div>';
+    el.querySelector(".gn").textContent=c.name;
+    el.querySelector(".v").textContent = c.lots ? tot+" lot" : rp(tot);
+    G.appendChild(el);
   });
-  $("ddVal").textContent = rp(dd);
-  $("ddBar").style.width = pctW(dd,DD_TARGET);
-  $("ddSub").textContent = plain(dd)+" / "+plain(DD_TARGET);
-  $("lotVal").textContent = lot+" lot";
-  $("lotBar").style.width = pctW(lotMonth,LOT_TARGET);
-  $("lotSub").textContent = lotMonth+" / "+LOT_TARGET+" Lot";
-  $("nkVal").textContent = rp(nk);
-  $("nkBar").style.width = pctW(nk,NK_TARGET);
-  $("nkSub").textContent = plain(nk)+" / "+plain(NK_TARGET);
-  $("adVal").textContent = rp(ad);
-  $("adBar").style.width = pctW(ad,AD_TARGET);
-  $("adSub").textContent = plain(ad)+" / "+plain(AD_TARGET);
 
   // Anggaran per pos
   const b = $("budget"); b.innerHTML="";
@@ -1094,16 +1095,17 @@ function renderHistory(txs, ids){
       L.appendChild(box);
     }
     const el=document.createElement("div");el.className="tx";
-    const meta = (t.cat==="bmri"&&t.lot?t.lot+" lot":"") + (t.note?(t.cat==="bmri"&&t.lot?" · ":"")+t.note:"");
+    const isLot = CAT[t.cat]&&CAT[t.cat].lots&&t.lot;
+    const meta = (isLot?t.lot+" lot":"") + (t.note?(isLot?" · ":"")+t.note:"");
     el.innerHTML=`<div class="l"><span class="av" style="--cc:${catColor(t.cat)}">${catIcon(t.cat)}</span><div><div class="c"></div><div class="d"></div></div></div><div class="r"><span class="num"></span><button class="del" aria-label="Delete">×</button></div>`;
-    el.querySelector(".c").textContent=(CAT[t.cat]||{name:t.cat}).name;
+    el.querySelector(".c").textContent=catName(t.cat);
     el.querySelector(".d").textContent=meta;
     const n=el.querySelector(".num");
     n.textContent=(isIncome(t)?"+":"")+plain(t.amount);
     if(isIncome(t)) n.style.color="var(--accent)";
     const del=el.querySelector(".del");
     del.onclick=async()=>{
-      const ok=await askConfirm((CAT[t.cat]||{name:t.cat}).name, (isIncome(t)?"+":"")+rp(t.amount), dayLabel(t.date)+(meta?" · "+meta:""));
+      const ok=await askConfirm(catName(t.cat), (isIncome(t)?"+":"")+rp(t.amount), dayLabel(t.date)+(meta?" · "+meta:""));
       if(!ok) return;
       try{await db.collection("tx").doc(t.id).delete(); all=all.filter(x=>x.id!==t.id); render(); resync();}catch(e){del.textContent="Failed";}
     };
@@ -1198,7 +1200,7 @@ $("f").addEventListener("submit",async e=>{
   if(!isFinite(amount)||amount<=0){$("sMsg").textContent="Enter an amount.";return;}
   const date=$("date").value||todayStr();
   const doc={cat:sel.value,amount,date,month:periodKey(date),note:$("note").value.trim(),createdAt:new Date().toISOString()};
-  if(sel.value==="bmri") doc.lot=Math.max(0,parseInt($("lot").value||"0",10));
+  if(CAT[sel.value]&&CAT[sel.value].lots) doc.lot=Math.max(0,parseInt($("lot").value||"0",10));
   $("save").disabled=true;
   try{
     const ref = await db.collection("tx").add(doc);
@@ -1229,7 +1231,6 @@ $("modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeModal(fa
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("modal").hidden) closeModal(false); });
 
 (()=>{const d=new Date();$("hello").textContent=HARI[d.getDay()]+", "+d.getDate()+" "+BULAN[d.getMonth()]+" "+d.getFullYear();})();
-document.querySelectorAll(".goal").forEach((g,i)=>g.classList.add(["g-dd","g-bmri","g-nk","g-ad"][i]));
 
 // Cegah menu salin / tahan-lama di luar kolom isian
 document.addEventListener("contextmenu",e=>{ if(!e.target.closest("input,select,textarea")) e.preventDefault(); });
@@ -1315,7 +1316,16 @@ $("rsBtn").onclick=()=>$("rsFile").click();
 $("rsFile").addEventListener("change",async e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
   let data; try{ data=JSON.parse(await f.text()); }catch(err){ showToast("Couldn't read the file"); return; }
-  if(!data||data.app!=="finance-ariq"||!Array.isArray(data.tx)){ showToast("This is not a Finance Ariq backup file"); return; }
+  if(!data||data.app!=="finance-ariq"){ showToast("This is not a Finance Ariq backup file"); return; }
+  if(!Array.isArray(data.tx)){
+    if(!data.cfg){ showToast("This is not a Finance Ariq backup file"); return; }
+    $("mT").textContent="Apply settings?"; $("mYes").textContent="Yes, apply";
+    const ok2=await askConfirm("Settings","","Your name, categories and budgets will be updated. Transactions stay as they are.");
+    $("mT").textContent="Delete this entry?"; $("mYes").textContent="Yes, delete";
+    if(!ok2) return;
+    localStorage.setItem(CFG_KEY,JSON.stringify(Object.assign({},CFG,data.cfg)));
+    location.reload(); return;
+  }
   $("mT").textContent="Restore data?"; $("mYes").textContent="Yes, restore";
   const ok=await askConfirm(data.tx.length+" transactions", "", "Data on this phone will be replaced with the backup.");
   $("mT").textContent="Delete this entry?"; $("mYes").textContent="Yes, delete";
@@ -1325,6 +1335,95 @@ $("rsFile").addEventListener("change",async e=>{
   location.reload();
 });
 $("goRestore").onclick=()=>setTab("profil");
+
+// ===== Settings: nama, gaji, kategori & budget (disimpan di HP) =====
+$("pname").textContent = USER_NAME;
+$("pav").textContent = (USER_NAME.trim()[0]||"A").toUpperCase();
+let draft = [];
+const fmtNum = v => v ? Number(v).toLocaleString("id-ID") : "";
+const numOf = v => Number(String(v||"").replace(/\D/g,""))||0;
+function bindMoney(inp, onval){
+  inp.addEventListener("input",()=>{ const d=inp.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"").slice(0,12); inp.value=d?Number(d).toLocaleString("id-ID"):""; onval(numOf(inp.value)); });
+}
+function openSettings(){
+  draft = CATS.map(c=>Object.assign({},c));
+  $("setName").value = CFG.name||"";
+  $("setGaji").value = fmtNum(CFG.gaji||0);
+  drawSettings();
+  ["catat","history","tambah","grafik","profil"].forEach(x=>$("p-"+x).hidden=true);
+  $("p-settings").hidden=false; document.body.classList.add("adding");
+  $("app").scrollTop=0;
+}
+function closeSettings(){ $("p-settings").hidden=true; document.body.classList.remove("adding"); setTab("profil"); }
+const SET_GROUPS=[["Fleksibel","Flexible expenses"],["Tetap","Fixed expenses"],["Tabungan","Savings & assets"],["Pemasukan","Income"]];
+function drawSettings(){
+  const W=$("setCats"); W.innerHTML="";
+  SET_GROUPS.forEach(([g,title])=>{
+    const sec=document.createElement("div"); sec.className="sec";
+    const h=document.createElement("h2"); h.textContent=title; sec.appendChild(h);
+    const box=document.createElement("div"); box.className="rows setrows";
+    draft.filter(c=>c.grp===g).forEach(c=>{
+      const r=document.createElement("div"); r.className="setrow";
+      const showBudget = g!=="Pemasukan";
+      const showStart = g==="Tabungan";
+      r.innerHTML='<button type="button" class="av seticon" aria-label="Change icon"></button>'+
+        '<button type="button" class="setcolor" aria-label="Change colour"></button>'+
+        '<div class="setfields"><input class="setnm" placeholder="Category name">'+
+        (showBudget?'<label class="sl"><span>Budget</span><input class="setbg num" inputmode="numeric" placeholder="0"></label>':'')+
+        (showStart?'<label class="sl"><span>'+(c.lots?"Starting lots":"Starting balance")+'</span><input class="setst num" inputmode="numeric" placeholder="0"></label>':'')+
+        '</div><button type="button" class="setdel" aria-label="Delete category">✕</button>';
+      const ib=r.querySelector(".seticon"); ib.style.setProperty("--cc",c.color); ib.innerHTML=iconSvg(c.icon);
+      ib.onclick=()=>{ c.icon=ICON_KEYS[(ICON_KEYS.indexOf(c.icon)+1)%ICON_KEYS.length]; ib.innerHTML=iconSvg(c.icon); };
+      const cb=r.querySelector(".setcolor"); cb.style.background=c.color;
+      cb.onclick=()=>{ c.color=PALETTE[(PALETTE.indexOf(c.color)+1)%PALETTE.length]; cb.style.background=c.color; ib.style.setProperty("--cc",c.color); };
+      const nm=r.querySelector(".setnm"); nm.value=c.name||""; nm.oninput=()=>{c.name=nm.value;};
+      const bg=r.querySelector(".setbg"); if(bg){ bg.value=fmtNum(c.budget); bindMoney(bg,v=>{c.budget=v;}); }
+      const st=r.querySelector(".setst");
+      if(st){
+        const key=c.lots?c.id+"_lot":c.id;
+        const cur0 = c.lots ? (START[key]!=null?START[key]:(START.lot||0)) : (START[key]||0);
+        if(c._start==null) c._start=cur0;
+        st.value = c.lots ? (c._start||"") : fmtNum(c._start);
+        if(c.lots) st.oninput=()=>{ st.value=st.value.replace(/\D/g,""); c._start=Number(st.value)||0; };
+        else bindMoney(st,v=>{c._start=v;});
+      }
+      r.querySelector(".setdel").onclick=async()=>{
+        const used=all.some(t=>t.cat===c.id);
+        $("mT").textContent="Delete category?"; $("mYes").textContent="Yes, delete";
+        const ok=await askConfirm(c.name||"Category","", used?"Existing transactions stay in your history.":"This category has no transactions.");
+        $("mT").textContent="Delete this entry?";
+        if(!ok) return;
+        draft=draft.filter(x=>x!==c); drawSettings();
+      };
+      box.appendChild(r);
+    });
+    sec.appendChild(box);
+    const add=document.createElement("button"); add.type="button"; add.className="more"; add.textContent="+ Add category";
+    add.onclick=()=>{
+      const used=draft.map(x=>x.color);
+      const color=PALETTE.find(p=>!used.includes(p))||PALETTE[draft.length%PALETTE.length];
+      const c={id:"c"+Date.now().toString(36),name:"",budget:0,grp:g,icon:g==="Pemasukan"?"income":g==="Tabungan"?"shield":"dots",color};
+      if(g==="Tabungan") c.save=true; if(g==="Pemasukan") c.income=true;
+      draft.push(c); drawSettings();
+      const rows=$("setCats").querySelectorAll(".setrow .setnm"); const last=[...rows].find(i=>i.closest(".setrow") && i.value==="" ); if(last) last.focus();
+    };
+    sec.appendChild(add);
+    W.appendChild(sec);
+  });
+}
+$("setOpen").onclick=openSettings;
+$("setCancel").onclick=closeSettings;
+$("setSave").onclick=()=>{
+  const empty=draft.find(c=>!String(c.name||"").trim());
+  if(empty){ showToast("Every category needs a name"); return; }
+  if(!draft.some(c=>!c.save&&!c.income)){ showToast("Keep at least one expense category"); return; }
+  const start=Object.assign({},START);
+  draft.forEach(c=>{ if(c.save && c._start!=null){ start[c.lots?c.id+"_lot":c.id]=c._start; } });
+  const cats=draft.map(c=>{ const o={id:c.id,name:c.name.trim(),budget:c.grp==="Pemasukan"?0:(c.budget||0),grp:c.grp,icon:c.icon,color:c.color}; if(c.save)o.save=true; if(c.income)o.income=true; if(c.lots)o.lots=true; return o; });
+  const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),cats,start});
+  localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+  location.reload();
+};
 
 // ===== Panel isian ikut naik di atas keyboard
 (function(){
