@@ -788,9 +788,23 @@ function setTab(t){
   if(changed) window.scrollTo(0,0);
   if(t!=="tambah" && !$("sheet").hidden) closeSheet();
 }
+// Gulir ke atas, juga saat halaman masih meluncur (momentum scroll di iPhone)
+function scrollToTop(){
+  const el=document.scrollingElement||document.documentElement;
+  el.style.overflow="hidden";            // hentikan luncuran
+  requestAnimationFrame(()=>{
+    el.style.overflow="";
+    const smooth=!matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({top:0,behavior:smooth?"smooth":"auto"});
+  });
+}
+document.querySelectorAll(".bnav button[data-tab]").forEach(b=>{
+  // touchstart tetap diterima walau layar sedang meluncur (click tidak)
+  b.addEventListener("touchstart",()=>{ if(b.dataset.tab===tab){ b._top=Date.now(); scrollToTop(); } },{passive:true});
+});
 document.querySelectorAll(".bnav button[data-tab]").forEach(b=>b.onclick=()=>{
   // Ketuk menu yang sedang dibuka -> gulir ke atas
-  if(b.dataset.tab===tab){ window.scrollTo({top:0,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); return; }
+  if(b.dataset.tab===tab){ if(!(b._top && Date.now()-b._top<600)) scrollToTop(); return; }
   setTab(b.dataset.tab);
 });
 setTab(tab);
