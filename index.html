@@ -534,6 +534,15 @@ html,body{height:100%;overflow:hidden}
 #chartCard .ring{width:14px;height:14px;border-radius:50%;border:4px solid var(--cc);flex:none;box-sizing:border-box}
 #chartCard .dn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 #chartCard .dp{font-weight:600;color:var(--muted);white-space:nowrap}
+
+/* Edit saldo */
+.hbtns{display:flex;gap:8px;flex:none}
+.balbox{gap:12px;display:flex;flex-direction:column}
+.ballbl{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:var(--muted)}
+.ballbl input{height:52px;font-size:22px!important;font-weight:700;padding:0 14px!important;border-radius:12px}
+.balnote{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+.balbox .mbtns .btn{height:44px;border-radius:12px}
+#balModal{padding-bottom:var(--kb,0px)}
 </style>
 </head>
 <body>
@@ -566,7 +575,7 @@ html,body{height:100%;overflow:hidden}
         <span class="hchip" id="heroDays">—</span>
       </div>
       <div>
-        <div class="bigrow"><div class="big num" id="sisa">Rp0</div><button type="button" class="eye" id="eyeBtn" aria-label="Hide balance"></button></div>
+        <div class="bigrow"><div class="big num" id="sisa">Rp0</div><span class="hbtns"><button type="button" class="eye" id="editBal" aria-label="Edit balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z" fill="none"></path><path d="M13.5 6.5l4 4" fill="none"></path></svg></button><button type="button" class="eye" id="eyeBtn" aria-label="Hide balance"></button></span></div>
         <div class="hdaily" id="heroDaily"></div>
         <div class="label" id="carryNote" hidden></div>
       </div>
@@ -743,6 +752,15 @@ html,body{height:100%;overflow:hidden}
   </div>
 </div>
 
+<div class="clmodal" id="balModal" hidden role="dialog" aria-modal="true" aria-labelledby="balT">
+  <div class="clbox balbox">
+    <div class="clhead"><div class="stx"><div class="st" id="balT">Edit balance</div><div class="sk">Set how much money you have right now</div></div><button type="button" class="sx" id="balClose" aria-label="Close">✕</button></div>
+    <label class="ballbl">Current balance (Rp)<input id="balInput" class="num amtbig" inputmode="numeric" placeholder="0"></label>
+    <p class="balnote" id="balNote"></p>
+    <div class="mbtns"><button type="button" class="mno" id="balCancel">Cancel</button><button type="button" class="btn" id="balSave">Save</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden role="status" aria-live="polite">
   <span class="tic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none"></path></svg></span>
   <div class="ttx"><b>Saved</b><span id="toastTxt"></span></div>
@@ -872,6 +890,7 @@ let db = null;
 let showAll = false;
 let chartTx = [];
 let hideBal = _hideInit;
+let balCtx = null; // dipakai untuk edit saldo
 const EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" fill="none"></path><circle cx="12" cy="12" r="3" fill="none"></circle></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.1 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7c1.8 0 3.4-.5 4.8-1.3" fill="none"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" fill="none"></path><path d="M3 3l18 18" fill="none"></path></svg>';
 const monthKey = () => cur.y+"-"+pad(cur.m+1);
@@ -1067,6 +1086,7 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   const gajiNow = pre ? 0 : GAJI;
   const carry = carryOf(mk), inc = gajiNow + carry + extra;
   const sisa = inc - spend - save;
+  balCtx = {mk, base: gajiNow + extra - spend - save, sisa};
   $("gajiL").textContent = extra ? "Salary & Other" : "Salary";
   $("gaji").textContent = plain(gajiNow+extra);
   $("carryV").textContent = (carry<0?"−":"")+plain(Math.abs(carry));
@@ -1384,6 +1404,32 @@ render();
 $("app").hidden=false; // tanpa PIN: langsung tampil
 
 $("eyeBtn").onclick=()=>{ hideBal=!hideBal; render(); };
+
+// ===== Edit saldo saat ini =====
+// Saldo diatur lewat "Last Month" periode berjalan, jadi transaksi tidak berubah.
+function closeBal(){ $("balModal").hidden=true; }
+$("editBal").onclick=()=>{
+  if(!balCtx) return;
+  const v=Math.round(balCtx.sisa);
+  $("balInput").value = v>0 ? v.toLocaleString("id-ID") : "";
+  $("balNote").textContent = "Your transactions stay the same. The difference is applied to Last Month for this period.";
+  $("balModal").hidden=false;
+  try{ $("balInput").focus(); }catch(e){}
+};
+$("balInput").addEventListener("input",()=>{ const el=$("balInput"); const neg=el.value.trim().startsWith("-"); const d=el.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"").slice(0,12); el.value=(neg?"-":"")+(d?Number(d).toLocaleString("id-ID"):""); });
+$("balClose").onclick=closeBal; $("balCancel").onclick=closeBal;
+$("balModal").addEventListener("click",e=>{ if(e.target.id==="balModal") closeBal(); });
+$("balSave").onclick=()=>{
+  if(!balCtx) return;
+  const raw=$("balInput").value.trim(); const neg=raw.startsWith("-");
+  const digits=raw.replace(/\D/g,""); if(!digits){ showToast("Enter your current balance"); return; }
+  const target=(neg?-1:1)*Number(digits);
+  const carry=target - balCtx.base;
+  CARRY[balCtx.mk]=carry;
+  const cfg=Object.assign({},CFG,{carry:Object.assign({},CFG.carry||{},{[balCtx.mk]:carry})});
+  localStorage.setItem(CFG_KEY,JSON.stringify(cfg)); CFG.carry=cfg.carry;
+  closeBal(); render(); showToast("Balance updated · "+rp(target));
+};
 $("mNo").onclick=()=>closeModal(false);
 $("mYes").onclick=()=>closeModal(true);
 $("modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeModal(false); });
