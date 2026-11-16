@@ -470,6 +470,40 @@ html,body{height:100%;overflow:hidden}
 .themebtn svg{width:20px;height:20px}
 .themebtn:active{transform:scale(.92)}
 @media (prefers-reduced-motion:no-preference){body,.rows,.card,.goal,.tabs,.monthnav,.bnav{transition:background-color .25s ease,border-color .25s ease,color .25s ease}}
+
+/* ===== History: grafik & kategori ===== */
+.catcard{padding:6px 16px}
+.catcard .lg{margin-top:0;gap:0}
+.catcard .lg .it{padding:12px 0;border-top:1px solid var(--line);border-radius:0}
+.catcard .lg .it:first-child{border-top:0}
+.av.mini{width:28px;height:28px;border-radius:9px}
+.av.mini svg{width:15px;height:15px}
+/* ===== Health ===== */
+.hscore{display:flex;align-items:center;gap:16px;padding:18px}
+.sring{position:relative;width:104px;height:104px;flex:none}
+.sring svg{width:100%;height:100%}
+.sarc.good{stroke:var(--accent)} .sarc.warn{stroke:var(--warn)} .sarc.bad{stroke:var(--bad)}
+.sval{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.sval b{font-size:30px;font-weight:700}
+.sval span{font-size:11px;color:var(--muted);margin-top:3px}
+.stx2{display:flex;flex-direction:column;gap:4px;min-width:0}
+.stx2 b{font-size:17px;font-weight:800}
+.stx2 > span:last-child{font-size:12px;color:var(--muted)}
+.spill{align-self:flex-start;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
+.spill.good{background:var(--accent-soft);color:var(--accent)}
+.spill.warn{background:var(--warn-soft);color:var(--warn)}
+.spill.bad{background:var(--bad-soft);color:var(--bad)}
+.hgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.hcheck{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;min-width:0}
+.hcheck .hh{display:flex;justify-content:space-between;align-items:center}
+.hcheck .gi{--gc:var(--accent)} .hcheck .gi.warn{--gc:var(--warn)} .hcheck .gi.bad{--gc:var(--bad)}
+.hcheck .ht{font-size:13px;font-weight:700;color:var(--muted)}
+.hcheck .hv{font-size:22px;font-weight:700}
+.hcheck .bar{height:6px}
+.hcheck .bar i.good{background:var(--accent)} .hcheck .bar i.warn{background:var(--warn)} .hcheck .bar i.bad{background:var(--bad)}
+.hcheck .hd{font-size:12px;color:var(--muted);line-height:1.35}
+.tip{padding:13px 16px;font-size:14px;line-height:1.45}
+.tip + .tip{border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -529,30 +563,28 @@ html,body{height:100%;overflow:hidden}
     <span id="monthLabel">—</span>
     <button id="next" aria-label="Next period">›</button>
     </div>
-    <div class="hsum" id="hSum"></div>
     <div class="sec">
-      <div class="shead"><h2 id="hTitle2">Transactions</h2><span id="hcount2"></span></div>
-      <div class="days" id="hList"></div>
-    </div>
-  </section>
-
-  <!-- 4. GRAFIK -->
-  <section class="panel" id="p-grafik" role="tabpanel" aria-labelledby="t-grafik" hidden>
-    <div class="sec">
-      <div class="monthnav" id="gnav">
-        <button id="gprev" aria-label="Previous period">‹</button>
-        <span id="gLabel">—</span>
-        <button id="gnext" aria-label="Next period">›</button>
-      </div>
-    </div>
-    <div class="sec">
-      <h2>Spending by category</h2>
+      <h2>Spending chart</h2>
       <div class="card" id="chartCard"></div>
     </div>
     <div class="sec">
-      <h2>Daily spending</h2>
-      <div class="card" id="dailyCard"></div>
+      <div class="shead"><h2>Categories</h2><span id="hTotal"></span></div>
+      <div class="card catcard"><div class="lg" id="hLg"></div></div>
     </div>
+  </section>
+
+  <!-- 4. HEALTH (cek kesehatan keuangan) -->
+  <section class="panel" id="p-grafik" role="tabpanel" aria-labelledby="t-grafik" hidden>
+    <div class="hscore card" id="hScore"></div>
+    <div class="sec">
+      <h2>Health check</h2>
+      <div class="hgrid" id="hChecks"></div>
+    </div>
+    <div class="sec">
+      <h2>Insights</h2>
+      <div class="rows" id="hTips"></div>
+    </div>
+    <p class="foot" id="hNote"></p>
   </section>
 
   <!-- 3. TAMBAH -->
@@ -576,7 +608,7 @@ html,body{height:100%;overflow:hidden}
       <div class="card setform">
         <label>Name<input id="setName" placeholder="Your name"></label>
         <label>Salary per month (Rp)<input id="setGaji" class="num" inputmode="numeric" placeholder="0"></label>
-        <label>Payday (date, 1–31)<input id="setPayday" class="num" inputmode="numeric" placeholder="1" maxlength="2"></label>
+        <label>Payday (date, 1–28)<input id="setPayday" class="num" inputmode="numeric" placeholder="1" maxlength="2"></label>
       </div>
     </div>
     <div id="setCats" class="panel" style="gap:18px"></div>
@@ -618,7 +650,7 @@ html,body{height:100%;overflow:hidden}
 <nav class="bnav" aria-label="Menu">
     <div class="bin">
       <button type="button" data-tab="catat" id="t-catat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7" fill="none"></path><path d="M5 10v10h14V10" fill="none"></path><path d="M10 20v-6h4v6" fill="none"></path></svg><span>Home</span></button>
-      <button type="button" data-tab="grafik" id="t-grafik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12A9 9 0 1 1 12 3v9z" fill="none"></path><path d="M15 3.5A9 9 0 0 1 20.5 9H15z" fill="none"></path></svg><span>Charts</span></button>
+      <button type="button" data-tab="grafik" id="t-grafik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="none"></path><path d="M7.5 12h2.5l1.2-2.2 1.8 4 1.2-1.8h2.3" fill="none"></path></svg><span>Health</span></button>
       <button type="button" data-tab="tambah" id="t-tambah" class="plus" aria-label="Add entry"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none"></path></svg></i></button>
       <button type="button" data-tab="history" id="t-history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7" fill="none"></path><path d="M3 4v4h4" fill="none"></path><path d="M12 7v5l3 2" fill="none"></path></svg><span>History</span></button>
       <button type="button" data-tab="profil" id="t-profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6" fill="none"></path></svg><span>Profile</span></button>
@@ -793,7 +825,7 @@ function parseAmount(s){
 
 // Periode gaji: dari tanggal gajian sampai sehari sebelum tanggal gajian bulan berikutnya.
 // Tanggal gajian diatur di Settings (1–28) dan tersimpan di HP. Kunci periode = bulan tempat periode dimulai.
-const PAYDAY = Math.min(31, Math.max(1, parseInt(CFG.payday,10) || (CFG.cats ? 28 : 1)));
+const PAYDAY = Math.min(28, Math.max(1, parseInt(CFG.payday,10) || (CFG.cats ? 28 : 1)));
 // Tanggal gajian di bulan tertentu; kalau bulannya lebih pendek (mis. tgl 30 di Februari) pakai hari terakhir bulan itu
 const lastDay = (y,m) => new Date(y,m+1,0).getDate();
 const startOf = (y,m) => new Date(y,m,Math.min(PAYDAY,lastDay(y,m)));
@@ -950,9 +982,6 @@ $("amt").addEventListener("input",()=>{
   try{el.setSelectionRange(p,p);}catch(e){}
 });
 
-let gcur = {y:cur.y, m:cur.m};
-$("gprev").onclick=()=>{gcur.m--; if(gcur.m<0){gcur.m=11;gcur.y--;} render();};
-$("gnext").onclick=()=>{gcur.m++; if(gcur.m>11){gcur.m=0;gcur.y++;} render();};
 $("prev").onclick=()=>{cur.m--; if(cur.m<0){cur.m=11;cur.y--;} showAll=false; render();};
 $("next").onclick=()=>{cur.m++; if(cur.m>11){cur.m=0;cur.y++;} showAll=false; render();};
 $("moreBtn").onclick=()=>{showAll=!showAll; render();};
@@ -989,18 +1018,15 @@ function render(){
   const pre = mk < START_KEY;
   renderData(mk, txs, by, spend, save, extra, pre);
   renderHistory(txs);
+  renderHealth(mk, txs, by, spend, save, extra, pre);
   cur = keep;
   // History: periode yang dipilih
   $("monthLabel").textContent = periodLabel(cur.y,cur.m);
   const hk = monthKey();
   const htx = all.filter(t=>periodKey(t.date)===hk);
-  renderHistory(htx, {list:"hList", title:"hTitle2", count:"hcount2"});
-  let hOut=0,hSave=0,hIn=0; htx.forEach(t=>{ if(isIncome(t)) hIn+=t.amount; else if(isSave(t)) hSave+=t.amount; else hOut+=t.amount; });
-  // Grafik: periode pilihan sendiri
-  { const k2=cur; cur=gcur; const gk=monthKey(); const gtx=all.filter(t=>periodKey(t.date)===gk);
-    const gby={}; let gsp=0; gtx.forEach(t=>{ gby[t.cat]=(gby[t.cat]||0)+t.amount; if(!isIncome(t)&&!isSave(t)) gsp+=t.amount; });
-    renderCharts(gtx,gby,gsp); chartTx=gtx; $("gLabel").textContent=periodLabel(cur.y,cur.m); cur=k2; }
-  $("hSum").innerHTML = '<div><span>Spent</span><b class="num">'+rp(hOut)+'</b></div><div><span>Saved</span><b class="num">'+rp(hSave)+'</b></div><div><span>Other income</span><b class="num">'+rp(hIn)+'</b></div>';
+  const hby={}; let hsp=0; htx.forEach(t=>{ hby[t.cat]=(hby[t.cat]||0)+t.amount; if(!isIncome(t)&&!isSave(t)) hsp+=t.amount; });
+  renderCharts(htx,hby,hsp); chartTx=htx;
+  $("hTotal").textContent = "Total spent "+rp(hsp);
 }
 
 function renderData(mk, txs, by, spend, save, extra, pre){
@@ -1060,7 +1086,7 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   const bh=document.createElement("h2");bh.textContent="Budget";bh.className="bh";b.appendChild(bh);
   CATS.forEach(c=>{
     const used = by[c.id]||0;
-    if(c.income) return;
+    if(c.income || c.save) return;
     if(c.budget===0 && used===0) return;
     if(c.grp!==g){
       g=c.grp;
@@ -1140,11 +1166,85 @@ function renderHistory(txs, ids){
   M.hidden = true;
 }
 
+// ===== Cek kesehatan keuangan (periode berjalan) =====
+function renderHealth(mk, txs, by, spend, save, extra, pre){
+  const days=periodDays(cur.y,cur.m), today=todayStr(), idx=days.indexOf(today);
+  const frac = idx>=0 ? (idx+1)/days.length : 1;
+  const expCats = CATS.filter(c=>!c.save&&!c.income);
+  const B = expCats.reduce((a,c)=>a+(c.budget||0),0);
+  const income = (pre?0:GAJI) + extra;
+  const sisa = (pre?0:GAJI) + carryOf(mk) + extra - spend - save;
+  const checks=[], tips=[];
+  const st = sc => sc>=80?["good","Good"]:sc>=50?["warn","Fair"]:["bad","Needs work"];
+  const clamp = v => Math.max(0,Math.min(100,Math.round(v)));
+  // 1. Rasio menabung
+  if(income>0){
+    const r=save/income, sc=clamp(r/0.2*100);
+    checks.push({icon:"heart",title:"Savings rate",value:Math.round(r*100)+"%",sc,desc:"of income saved this period · aim for 20%+"});
+    if(r<0.2) tips.push("Saving "+rp(Math.max(0,Math.ceil((income*0.2-save)/1000)*1000))+" more this period would reach a 20% savings rate.");
+  }
+  // 2. Disiplin anggaran
+  const budgeted = expCats.filter(c=>c.budget>0);
+  if(budgeted.length){
+    const over = budgeted.filter(c=>(by[c.id]||0)>c.budget);
+    const sc=clamp((1-over.length/budgeted.length)*100);
+    checks.push({icon:"card",title:"Budget discipline",value:(budgeted.length-over.length)+"/"+budgeted.length,sc,desc:"categories within budget"});
+    over.sort((a,b)=>((by[b.id]||0)-b.budget)-((by[a.id]||0)-a.budget)).slice(0,3)
+      .forEach(c=>tips.push(c.name+" is over budget by "+rp((by[c.id]||0)-c.budget)+"."));
+  }
+  // 3. Kecepatan belanja
+  if(B>0 && idx>=0){
+    const used=spend/B, r=used/frac, sc=clamp(r<=1?100:(1.5-r)/0.5*100);
+    checks.push({icon:"trend",title:"Spending pace",value:Math.round(used*100)+"%",sc,desc:"of budget used · "+Math.round(frac*100)+"% of period passed"});
+    if(r>1.05){ const left=days.length-idx; tips.push("To stay on budget, keep spending under "+rp(Math.max(0,Math.floor((B-spend)/left/1000)*1000))+" per day until payday."); }
+  }
+  // 4. Dana darurat
+  const ef = CATS.find(c=>c.save && (c.icon==="shield" || /darurat|emergency/i.test(c.name)));
+  const need = B>0 ? B : spend;
+  if(ef && need>0){
+    let tot = START[ef.id]||0; all.forEach(t=>{ if(t.cat===ef.id) tot+=t.amount; });
+    const months=tot/need, sc=clamp(months/6*100);
+    checks.push({icon:"shield",title:"Emergency fund",value:(Math.round(months*10)/10).toLocaleString("en-US")+" mo",sc,desc:"of monthly expenses covered · aim for 6"});
+    if(months<6) tips.push(ef.name+" covers "+(Math.round(months*10)/10)+" months. "+rp(Math.ceil((need*6-tot)/100000)*100000)+" more reaches 6 months.");
+  }
+  // Wawasan tambahan
+  const top = expCats.map(c=>({c,v:by[c.id]||0})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v)[0];
+  if(top && spend>0) tips.push("Biggest spending: "+top.c.name+" ("+Math.round(top.v/spend*100)+"% of this period).");
+  if(sisa<0) tips.unshift("Your balance is negative by "+rp(-sisa)+". Hold off on non-essential spending until payday.");
+
+  // Skor keseluruhan
+  const H=$("hScore");
+  if(!checks.length){
+    H.innerHTML='<div class="empty">Add your salary and budgets in Profile → Settings to see your financial health.</div>';
+    $("hChecks").innerHTML=""; $("hTips").innerHTML=""; $("hNote").textContent=""; return;
+  }
+  const score=Math.round(checks.reduce((a,c)=>a+c.sc,0)/checks.length);
+  const lab = score>=80?["good","Healthy"]:score>=60?["warn","Fair"]:score>=40?["warn","Needs attention"]:["bad","At risk"];
+  const R=46, C2=2*Math.PI*R;
+  H.innerHTML='<div class="sring"><svg viewBox="0 0 110 110" aria-hidden="true"><circle cx="55" cy="55" r="'+R+'" fill="none" stroke="var(--track)" stroke-width="10"></circle>'+
+    '<circle cx="55" cy="55" r="'+R+'" fill="none" class="sarc '+lab[0]+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+(C2*score/100)+' '+C2+'" transform="rotate(-90 55 55)"></circle></svg>'+
+    '<div class="sval"><b class="num">'+score+'</b><span>/100</span></div></div>'+
+    '<div class="stx2"><span class="spill '+lab[0]+'">'+lab[1]+'</span><b>Financial health</b><span>'+periodLabel(cur.y,cur.m)+' · based on '+checks.length+' checks</span></div>';
+  const W=$("hChecks"); W.innerHTML="";
+  checks.forEach(c=>{
+    const [cls,txt]=st(c.sc);
+    const el=document.createElement("div"); el.className="hcheck";
+    el.innerHTML='<div class="hh"><span class="gi '+cls+'">'+iconSvg(c.icon)+'</span><span class="spill '+cls+'">'+txt+'</span></div>'+
+      '<div class="ht"></div><div class="hv num"></div><div class="bar"><i class="'+cls+'" style="width:'+c.sc+'%"></i></div><div class="hd"></div>';
+    el.querySelector(".ht").textContent=c.title; el.querySelector(".hv").textContent=c.value; el.querySelector(".hd").textContent=c.desc;
+    W.appendChild(el);
+  });
+  const T=$("hTips"); T.innerHTML="";
+  (tips.length?tips:["Everything looks on track this period. Keep it up."]).forEach(t=>{ const r=document.createElement("div"); r.className="tip"; r.textContent=t; T.appendChild(r); });
+  $("hNote").textContent="Score updates automatically as you record transactions.";
+}
+
 function renderCharts(txs, by, spend){
   // Donat per kategori
   const C=$("chartCard");
   const items = CATS.filter(c=>!c.save && !c.income && (by[c.id]||0)>0).map(c=>({c, v:by[c.id]})).sort((a,b)=>b.v-a.v);
-  if(!items.length){ C.innerHTML='<div class="empty">No spending in this period.</div>'; }
+  const lg=$("hLg"); lg.innerHTML=""; lg.classList.remove("act");
+  if(!items.length){ C.innerHTML='<div class="empty">No spending in this period.</div>'; lg.innerHTML='<div class="empty">No categories yet.</div>'; }
   else{
     const R=78, CIRC=2*Math.PI*R, GAP= items.length>1 ? 2 : 0;
     let off=0, segs="";
@@ -1162,8 +1262,7 @@ function renderCharts(txs, by, spend){
       <text id="dcV" x="110" y="122" text-anchor="middle" font-size="18" font-weight="800" font-family="Plus Jakarta Sans, system-ui, sans-serif">${plain(spend)}</text>
       <text id="dcP" x="110" y="140" text-anchor="middle" class="sub" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif"></text>
       </g>
-    </svg></div><div class="lg"></div>`;
-    const lg=C.querySelector(".lg");
+    </svg></div>`;
     const svg=C.querySelector(".donut"), segEls=[...svg.querySelectorAll(".seg")];
     let active=-1;
     const showCat=i=>{
@@ -1187,34 +1286,13 @@ function renderCharts(txs, by, spend){
     setTimeout(()=>[...lg.children].forEach((el,k)=>bindHold(el,k)),0);
     items.forEach(({c,v})=>{
       const it=document.createElement("div");it.className="it";
-      it.innerHTML=`<div class="h"><span class="n"><i class="sw" style="background:${catColor(c.id)}"></i><span class="nm"></span></span><span class="a num">${plain(v)}</span><span class="pc num">${Math.round(v/spend*100)}%</span></div><div class="bar"><i style="width:${v/max*100}%;background:${catColor(c.id)}"></i></div>`;
+      it.innerHTML=`<div class="h"><span class="n"><span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="nm"></span></span><span class="a num">${plain(v)}</span><span class="pc num">${Math.round(v/spend*100)}%</span></div><div class="bar"><i style="width:${v/max*100}%;background:${catColor(c.id)}"></i></div>`;
       it.querySelector(".nm").textContent=c.name;
       lg.appendChild(it);
     });
   }
 
-  // Batang harian bertumpuk per kategori
-  const D=$("dailyCard");
-  const days=periodDays(cur.y,cur.m);
-  const exp=txs.filter(t=>!isIncome(t)&&!isSave(t));
-  if(!exp.length){ D.innerHTML='<div class="empty">No spending in this period.</div>'; return; }
-  const per={}; exp.forEach(t=>{ (per[t.date]=per[t.date]||{}); per[t.date][t.cat]=(per[t.date][t.cat]||0)+t.amount; });
-  const tot=d=>Object.values(per[d]||{}).reduce((a,b)=>a+b,0);
-  const maxDay=Math.max(...days.map(tot));
-  const step = maxDay>2000000?1000000: maxDay>500000?250000: maxDay>200000?100000:50000;
-  const top = Math.ceil(maxDay/step)*step || step;
-  const today=todayStr();
-  let cols="";
-  days.forEach(d=>{
-    const segsH = CATS.filter(c=>per[d]&&per[d][c.id]).map(c=>`<i style="height:${per[d][c.id]/top*150}px;background:${catColor(c.id)}"></i>`).join("");
-    cols+=`<div class="col${d===today?" today":""}" title="${dayLabel(d)}: ${plain(tot(d))}">${segsH}</div>`;
-  });
-  let grid="";
-  for(let v=step; v<=top; v+=step){ if(top/step>4 && (v/step)%2) continue; grid+=`<div class="gl" style="bottom:${v/top*150}px"><span class="num">${v>=1e6?(v/1e6).toLocaleString("id-ID")+" jt":(v/1e3)+" rb"}</span></div>`; }
-  const xl = days.map((d,i)=>{const dd=+d.slice(8);return `<span>${(i%7===0||i===days.length-1)?dd+(i===0||dd===1?" "+BLN3[+d.slice(5,7)-1]:""):""}</span>`;}).join("");
-  const used = CATS.filter(c=>exp.some(t=>t.cat===c.id));
-  D.innerHTML=`<div class="daily"><div class="cols">${grid}${cols}</div><div class="xl">${xl}</div>
-    <div class="legend" style="margin-top:8px">${used.map(c=>`<span><b style="background:${catColor(c.id)}"></b>${c.name}</span>`).join("")}</div></div>`;
+  // (grafik batang harian tidak dipakai lagi)
 }
 
 $("f").addEventListener("submit",async e=>{
@@ -1467,7 +1545,7 @@ $("setSave").onclick=()=>{
   draft.forEach(c=>{ if(c.save && c._start!=null){ start[c.lots?c.id+"_lot":c.id]=c._start; } });
   const cats=draft.map(c=>{ const o={id:c.id,name:c.name.trim(),budget:c.grp==="Pemasukan"?0:(c.budget||0),grp:c.grp,icon:c.icon,color:c.color}; if(c.save)o.save=true; if(c.income)o.income=true; if(c.lots)o.lots=true; return o; });
   const pd=parseInt($("setPayday").value,10);
-  if(!(pd>=1&&pd<=31)){ showToast("Payday must be between 1 and 31"); return; }
+  if(!(pd>=1&&pd<=28)){ showToast("Payday must be between 1 and 28"); return; }
   const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),payday:pd,cats,start});
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
   location.reload();
