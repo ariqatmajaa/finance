@@ -519,6 +519,12 @@ html,body{height:100%;overflow:hidden}
 .av svg{filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
 .ctile .av{border-radius:15px}
 .ctile.sel{background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+
+/* Grafik lingkaran lebih besar & di tengah kartu */
+#chartCard{display:flex;align-items:center;justify-content:center;min-height:100%}
+#chartCard .donutwrap{width:100%}
+#chartCard .donut{width:min(100%,300px);margin:0 auto}
+.lg.act .it{opacity:1}
 </style>
 </head>
 <body>
@@ -1301,7 +1307,8 @@ function renderCharts(txs, by, spend){
       el.addEventListener("click",()=>openCatList(items[i].c.id));
     };
     segEls.forEach(s=>bindHold(s,+s.dataset.i));
-    setTimeout(()=>[...lg.children].forEach((el,k)=>bindHold(el,k)),0);
+    // Daftar kategori: cukup ketuk untuk melihat transaksinya (tanpa efek tahan)
+    setTimeout(()=>[...lg.children].forEach((el,k)=>el.addEventListener("click",()=>openCatList(items[k].c.id))),0);
     items.forEach(({c,v})=>{
       const it=document.createElement("div");it.className="it";
       it.innerHTML=`<div class="h"><span class="n"><span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="nm"></span></span><span class="a num">${plain(v)}</span><span class="pc num">${Math.round(v/spend*100)}%</span></div><div class="bar"><i style="width:${v/max*100}%;background:${catColor(c.id)}"></i></div>`;
