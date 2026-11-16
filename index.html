@@ -576,7 +576,7 @@ html,body{height:100%;overflow:hidden}
       <div class="card setform">
         <label>Name<input id="setName" placeholder="Your name"></label>
         <label>Salary per month (Rp)<input id="setGaji" class="num" inputmode="numeric" placeholder="0"></label>
-        <label>Payday (date, 1–28)<input id="setPayday" class="num" inputmode="numeric" placeholder="1" maxlength="2"></label>
+        <label>Payday (date, 1–31)<input id="setPayday" class="num" inputmode="numeric" placeholder="1" maxlength="2"></label>
       </div>
     </div>
     <div id="setCats" class="panel" style="gap:18px"></div>
@@ -793,10 +793,13 @@ function parseAmount(s){
 
 // Periode gaji: dari tanggal gajian sampai sehari sebelum tanggal gajian bulan berikutnya.
 // Tanggal gajian diatur di Settings (1–28) dan tersimpan di HP. Kunci periode = bulan tempat periode dimulai.
-const PAYDAY = Math.min(28, Math.max(1, parseInt(CFG.payday,10) || (CFG.cats ? 28 : 1)));
-function periodKey(ds){const [y,m,d]=ds.split("-").map(Number);let Y=y,M=m-1;if(d<PAYDAY){M--;if(M<0){M=11;Y--;}}return Y+"-"+pad(M+1);}
-function periodLabel(y,m){const a=new Date(y,m,PAYDAY), b=new Date(y,m+1,PAYDAY-1);return a.getDate()+" "+BLN3[a.getMonth()]+(a.getFullYear()!==b.getFullYear()?" "+a.getFullYear():"")+" – "+b.getDate()+" "+BLN3[b.getMonth()]+" "+b.getFullYear();}
-function periodDays(y,m){const out=[];const d=new Date(y,m,PAYDAY);const end=new Date(y,m+1,PAYDAY-1);while(d<=end){out.push(dstr(d));d.setDate(d.getDate()+1);}return out;}
+const PAYDAY = Math.min(31, Math.max(1, parseInt(CFG.payday,10) || (CFG.cats ? 28 : 1)));
+// Tanggal gajian di bulan tertentu; kalau bulannya lebih pendek (mis. tgl 30 di Februari) pakai hari terakhir bulan itu
+const lastDay = (y,m) => new Date(y,m+1,0).getDate();
+const startOf = (y,m) => new Date(y,m,Math.min(PAYDAY,lastDay(y,m)));
+function periodKey(ds){const [y,m,d]=ds.split("-").map(Number);let Y=y,M=m-1;if(d<Math.min(PAYDAY,lastDay(y,m-1))){M--;if(M<0){M=11;Y--;}}return Y+"-"+pad(M+1);}
+function periodLabel(y,m){const a=startOf(y,m), b=startOf(y,m+1); b.setDate(b.getDate()-1);return a.getDate()+" "+BLN3[a.getMonth()]+(a.getFullYear()!==b.getFullYear()?" "+a.getFullYear():"")+" – "+b.getDate()+" "+BLN3[b.getMonth()]+" "+b.getFullYear();}
+function periodDays(y,m){const out=[];const d=startOf(y,m);const end=startOf(y,m+1);end.setDate(end.getDate()-1);while(d<=end){out.push(dstr(d));d.setDate(d.getDate()+1);}return out;}
 let cur = (()=>{const [y,m]=periodKey(todayStr()).split("-").map(Number);return {y,m:m-1};})();
 let all = [];
 let db = null;
@@ -1464,7 +1467,7 @@ $("setSave").onclick=()=>{
   draft.forEach(c=>{ if(c.save && c._start!=null){ start[c.lots?c.id+"_lot":c.id]=c._start; } });
   const cats=draft.map(c=>{ const o={id:c.id,name:c.name.trim(),budget:c.grp==="Pemasukan"?0:(c.budget||0),grp:c.grp,icon:c.icon,color:c.color}; if(c.save)o.save=true; if(c.income)o.income=true; if(c.lots)o.lots=true; return o; });
   const pd=parseInt($("setPayday").value,10);
-  if(!(pd>=1&&pd<=28)){ showToast("Payday must be between 1 and 28"); return; }
+  if(!(pd>=1&&pd<=31)){ showToast("Payday must be between 1 and 31"); return; }
   const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),payday:pd,cats,start});
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
   location.reload();
