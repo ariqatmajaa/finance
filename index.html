@@ -789,6 +789,8 @@ function setTab(t){
   if(t!=="tambah" && !$("sheet").hidden) closeSheet();
 }
 document.querySelectorAll(".bnav button[data-tab]").forEach(b=>b.onclick=()=>{
+  // Ketuk menu yang sedang dibuka -> gulir ke atas
+  if(b.dataset.tab===tab){ window.scrollTo({top:0,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); return; }
   setTab(b.dataset.tab);
 });
 setTab(tab);
