@@ -1,4 +1,4 @@
-# Finance Ariq
+# Finance
 
 Aplikasi catatan keuangan pribadi yang berjalan di HP tanpa internet (Progressive Web App).
 
@@ -8,7 +8,7 @@ Aplikasi catatan keuangan pribadi yang berjalan di HP tanpa internet (Progressiv
 ## Pasang di iPhone
 1. Buka alamat GitHub Pages aplikasi ini di **Safari**.
 2. Ketuk **Share** → **Add to Home Screen** → **Add**.
-3. Buka dari ikon *Finance Ariq* di layar utama.
+3. Buka dari ikon *Finance* di layar utama.
 
 ## Pasang di Android
 Buka di Chrome → menu ⋮ → **Install app / Add to Home screen**.

@@ -8,12 +8,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Finance Ariq">
+<meta name="apple-mobile-web-app-title" content="Finance">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <style>html,body,*{touch-action:manipulation}html{-webkit-text-size-adjust:100%}body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
-<title>Finance Ariq</title>
+<title>Finance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -467,7 +467,7 @@ html,body{height:100%;overflow:hidden}
 <body>
 <div class="lock" id="lock" hidden>
   <div class="lockbox">
-    <div class="lt" id="lockTitle">Finance Ariq</div>
+    <div class="lt" id="lockTitle">Finance</div>
     <div class="ls" id="lockSub">Memuat…</div>
     <div class="dots" id="dots"></div>
     <div class="pad" id="pad" hidden></div>
@@ -483,7 +483,7 @@ html,body{height:100%;overflow:hidden}
   <!-- 1. CATAT -->
   <section class="panel" id="p-catat" role="tabpanel" aria-labelledby="t-catat">
     <div class="welcome" id="welcome" hidden>
-      <b>Welcome to Finance Ariq</b>
+      <b>Welcome to Finance</b>
       <span>No data on this phone yet. Restore a backup file to bring in your previous data.</span>
       <button type="button" class="btn" id="goRestore">Go to Profile to restore</button>
     </div>
@@ -1315,7 +1315,7 @@ function initLock(){
 $("pfGaji").textContent = rp(GAJI);
 function backupData(){
   const data={app:"finance-ariq",version:1,exportedAt:new Date().toISOString(),cfg:CFG,tx:LocalDB.all()};
-  const d=new Date(); const name="finance-ariq-backup-"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+".json";
+  const d=new Date(); const name="finance-backup-"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+".json";
   const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});
   const file=new File([blob],name,{type:"application/json"});
   if(navigator.canShare && navigator.canShare({files:[file]})){ navigator.share({files:[file],title:name}).catch(()=>{}); return; }
@@ -1326,9 +1326,9 @@ $("rsBtn").onclick=()=>$("rsFile").click();
 $("rsFile").addEventListener("change",async e=>{
   const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
   let data; try{ data=JSON.parse(await f.text()); }catch(err){ showToast("Couldn't read the file"); return; }
-  if(!data||data.app!=="finance-ariq"){ showToast("This is not a Finance Ariq backup file"); return; }
+  if(!data||data.app!=="finance-ariq"){ showToast("This is not a Finance backup file"); return; }
   if(!Array.isArray(data.tx)){
-    if(!data.cfg){ showToast("This is not a Finance Ariq backup file"); return; }
+    if(!data.cfg){ showToast("This is not a Finance backup file"); return; }
     $("mT").textContent="Apply settings?"; $("mYes").textContent="Yes, apply";
     const ok2=await askConfirm("Settings","","Your name, categories and budgets will be updated. Transactions stay as they are.");
     $("mT").textContent="Delete this entry?"; $("mYes").textContent="Yes, delete";
