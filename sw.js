@@ -1,5 +1,5 @@
 // Finance — service worker: aplikasi tetap bisa dibuka tanpa internet
-const VERSION = "fa-v20";
+const VERSION = "fa-v21";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 

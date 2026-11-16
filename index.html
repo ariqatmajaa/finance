@@ -504,6 +504,21 @@ html,body{height:100%;overflow:hidden}
 .hcheck .hd{font-size:12px;color:var(--muted);line-height:1.35}
 .tip{padding:13px 16px;font-size:14px;line-height:1.45}
 .tip + .tip{border-top:1px solid var(--line)}
+
+/* ===== Geser grafik ===== */
+.slides{display:grid;grid-auto-flow:column;grid-auto-columns:100%;gap:14px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;padding-bottom:8px;margin-bottom:-8px;-webkit-overflow-scrolling:touch}
+.slides::-webkit-scrollbar{display:none}
+.slide{scroll-snap-align:start;scroll-snap-stop:always;min-width:0}
+.slide .card{height:100%}
+.sdots{display:flex;gap:6px;align-items:center}
+.sdots button{width:7px;height:7px;border-radius:999px;border:0;padding:0;background:var(--line);cursor:pointer;transition:width .2s ease,background .2s ease}
+.sdots button.on{width:18px;background:var(--accent)}
+/* ===== Ikon kategori lebih hidup: ubin berwarna + ikon putih ===== */
+.av{background:linear-gradient(150deg,color-mix(in srgb,var(--cc) 82%,#fff),var(--cc) 55%,color-mix(in srgb,var(--cc) 78%,#000))!important;color:#fff!important;
+  box-shadow:0 6px 14px -8px var(--cc),inset 0 1px 0 rgba(255,255,255,.28)}
+.av svg{filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
+.ctile .av{border-radius:15px}
+.ctile.sel{background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 </style>
 </head>
 <body>
@@ -564,8 +579,11 @@ html,body{height:100%;overflow:hidden}
     <button id="next" aria-label="Next period">›</button>
     </div>
     <div class="sec">
-      <h2>Spending chart</h2>
-      <div class="card" id="chartCard"></div>
+      <div class="shead"><h2 id="slideTitle">Spending by category</h2><span class="sdots" id="sdots"><button type="button" class="on" aria-label="Category chart"></button><button type="button" aria-label="Daily chart"></button></span></div>
+      <div class="slides" id="slides">
+        <div class="slide"><div class="card" id="chartCard"></div></div>
+        <div class="slide"><div class="card" id="dailyCard"></div></div>
+      </div>
     </div>
     <div class="sec">
       <div class="shead"><h2>Categories</h2><span id="hTotal"></span></div>
@@ -1292,7 +1310,28 @@ function renderCharts(txs, by, spend){
     });
   }
 
-  // (grafik batang harian tidak dipakai lagi)
+  // Batang harian bertumpuk per kategori
+  const D=$("dailyCard");
+  const days=periodDays(cur.y,cur.m);
+  const exp=txs.filter(t=>!isIncome(t)&&!isSave(t));
+  if(!exp.length){ D.innerHTML='<div class="empty">No spending in this period.</div>'; return; }
+  const per={}; exp.forEach(t=>{ (per[t.date]=per[t.date]||{}); per[t.date][t.cat]=(per[t.date][t.cat]||0)+t.amount; });
+  const tot=d=>Object.values(per[d]||{}).reduce((a,b)=>a+b,0);
+  const maxDay=Math.max(...days.map(tot));
+  const step = maxDay>2000000?1000000: maxDay>500000?250000: maxDay>200000?100000:50000;
+  const top = Math.ceil(maxDay/step)*step || step;
+  const today=todayStr();
+  let cols="";
+  days.forEach(d=>{
+    const segsH = CATS.filter(c=>per[d]&&per[d][c.id]).map(c=>`<i style="height:${per[d][c.id]/top*150}px;background:${catColor(c.id)}"></i>`).join("");
+    cols+=`<div class="col${d===today?" today":""}" title="${dayLabel(d)}: ${plain(tot(d))}">${segsH}</div>`;
+  });
+  let grid="";
+  for(let v=step; v<=top; v+=step){ if(top/step>4 && (v/step)%2) continue; grid+=`<div class="gl" style="bottom:${v/top*150}px"><span class="num">${v>=1e6?(v/1e6).toLocaleString("id-ID")+" jt":(v/1e3)+" rb"}</span></div>`; }
+  const xl = days.map((d,i)=>{const dd=+d.slice(8);return `<span>${(i%7===0||i===days.length-1)?dd+(i===0||dd===1?" "+BLN3[+d.slice(5,7)-1]:""):""}</span>`;}).join("");
+  const used = CATS.filter(c=>exp.some(t=>t.cat===c.id));
+  D.innerHTML=`<div class="daily"><div class="cols">${grid}${cols}</div><div class="xl">${xl}</div>
+    <div class="legend" style="margin-top:8px">${used.map(c=>`<span><b style="background:${catColor(c.id)}"></b>${c.name}</span>`).join("")}</div></div>`;
 }
 
 $("f").addEventListener("submit",async e=>{
@@ -1438,6 +1477,16 @@ $("rsFile").addEventListener("change",async e=>{
   location.reload();
 });
 $("goRestore").onclick=()=>setTab("profil");
+
+// ===== Geser grafik: donat <-> batang harian =====
+(function(){
+  const S=$("slides"), dots=[...$("sdots").children], titles=["Spending by category","Daily spending"];
+  let cur=0;
+  const upd=()=>{ const i=Math.round(S.scrollLeft/Math.max(1,S.clientWidth)); if(i===cur) return; cur=i;
+    dots.forEach((d,k)=>d.classList.toggle("on",k===i)); $("slideTitle").textContent=titles[i]||titles[0]; };
+  S.addEventListener("scroll",()=>requestAnimationFrame(upd),{passive:true});
+  dots.forEach((d,k)=>d.onclick=()=>S.scrollTo({left:k*S.clientWidth,behavior:"smooth"}));
+})();
 
 // ===== Mode terang / gelap =====
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none"></path></svg>';
