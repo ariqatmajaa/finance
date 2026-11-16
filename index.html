@@ -543,6 +543,12 @@ html,body{height:100%;overflow:hidden}
 .balnote{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
 .balbox .mbtns .btn{height:44px;border-radius:12px}
 #balModal{padding-bottom:var(--kb,0px)}
+
+/* Lapisan sakelar tak terlihat untuk getar di iPhone */
+.navi{position:relative;display:flex;min-width:0}
+.navi > button{flex:1}
+.hapt{position:absolute;inset:0;z-index:2;opacity:.011;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hapt input{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;pointer-events:none}
 </style>
 </head>
 <body>
@@ -944,10 +950,21 @@ document.querySelectorAll(".bnav button[data-tab]").forEach(b=>{
   b.addEventListener("touchstart",()=>{ if(b.dataset.tab===tab){ b._top=Date.now(); scrollToTop(); } },{passive:true});
 });
 document.querySelectorAll(".bnav button[data-tab]").forEach(b=>b.onclick=()=>{
-  haptic();
   // Ketuk menu yang sedang dibuka -> gulir ke atas
   if(b.dataset.tab===tab){ if(!(b._top && Date.now()-b._top<600)) scrollToTop(); return; }
   setTab(b.dataset.tab);
+});
+// ===== Getar di iPhone: sakelar sistem tak terlihat di atas tiap tombol menu =====
+// Saat jari benar-benar mengetuk sakelar (input type=checkbox switch), iOS 18+ memberi getar bawaan.
+document.querySelectorAll(".bnav button[data-tab]").forEach(b=>{
+  const wrap=document.createElement("span"); wrap.className="navi";
+  b.parentNode.insertBefore(wrap,b); wrap.appendChild(b);
+  const lab=document.createElement("label"); lab.className="hapt"; lab.setAttribute("aria-hidden","true");
+  const inp=document.createElement("input"); inp.type="checkbox"; inp.setAttribute("switch",""); inp.tabIndex=-1;
+  lab.appendChild(inp); wrap.appendChild(lab);
+  inp.addEventListener("touchstart",()=>{ if(b.dataset.tab===tab){ b._top=Date.now(); scrollToTop(); } },{passive:true});
+  inp.addEventListener("click",e=>{ e.stopPropagation(); b.onclick(); });
+  lab.addEventListener("click",e=>{ if(e.target!==inp) e.stopPropagation(); });
 });
 setTab(tab);
 $("addCancel").onclick=()=>setTab(prevTab||"catat");
