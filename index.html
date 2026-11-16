@@ -1194,9 +1194,7 @@ $("goRestore").onclick=()=>setTab("profil");
 
 // ===== Matikan zoom (cubit & ketuk dua kali) =====
 ["gesturestart","gesturechange","gestureend"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
-let _lastTouch=0;
-document.addEventListener("touchend",e=>{const now=Date.now(); if(now-_lastTouch<350 && !e.target.closest("input,textarea,select")) e.preventDefault(); _lastTouch=now;},{passive:false});
-document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
+// Ketuk dua kali tidak lagi memperbesar karena touch-action: manipulation (tanpa menahan ketukan)
 
 // ===== Mode offline =====
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
