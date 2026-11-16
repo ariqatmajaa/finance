@@ -441,6 +441,11 @@ body.adding .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 .bpair .row .bar{height:6px}
 .bpair .row .a em{font-size:11px}
 #p-grafik > .sec:first-child{gap:0}
+
+/* ===== Gulir di dalam #app (agar bisa dihentikan & kembali ke atas kapan saja) ===== */
+html,body{height:100%;overflow:hidden}
+#app{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;max-width:none!important;margin:0!important;
+  padding-left:max(16px,env(safe-area-inset-left,0px),calc((100% - 608px)/2))!important;padding-right:max(16px,env(safe-area-inset-right,0px),calc((100% - 608px)/2))!important}
 </style>
 </head>
 <body>
@@ -785,17 +790,19 @@ function setTab(t){
   if(t!=="tambah") ls.set("kas_tab",t);
   document.body.classList.toggle("adding", t==="tambah");
   TABS.forEach(x=>{ $("p-"+x).hidden = x!==t; if(x===t) $("t-"+x).setAttribute("aria-current","page"); else $("t-"+x).removeAttribute("aria-current"); });
-  if(changed) window.scrollTo(0,0);
+  if(changed) $("app").scrollTop=0;
   if(t!=="tambah" && !$("sheet").hidden) closeSheet();
 }
 // Gulir ke atas, juga saat halaman masih meluncur (momentum scroll di iPhone)
 function scrollToTop(){
-  const el=document.scrollingElement||document.documentElement;
-  el.style.overflow="hidden";            // hentikan luncuran
+  // Halaman kini digulir di dalam #app, sehingga luncuran bisa dihentikan seketika
+  const el=$("app");
+  el.style.overflowY="hidden";             // hentikan luncuran (momentum) iPhone
+  el.scrollTop=el.scrollTop;
   requestAnimationFrame(()=>{
-    el.style.overflow="";
+    el.style.overflowY="";
     const smooth=!matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({top:0,behavior:smooth?"smooth":"auto"});
+    el.scrollTo({top:0,behavior:smooth?"smooth":"auto"});
   });
 }
 document.querySelectorAll(".bnav button[data-tab]").forEach(b=>{
