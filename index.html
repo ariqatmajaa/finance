@@ -392,6 +392,40 @@ html,body{overscroll-behavior-y:none}
 .welcome b{font-size:16px}
 .welcome span{color:var(--muted);font-size:14px}
 .welcome .btn{margin-top:4px}
+
+/* ===== Revisi 16 Nov ===== */
+.hero .big{font-weight:500!important;letter-spacing:-.015em!important}
+.hero .split{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* History */
+.hsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hsum div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);min-width:0}
+.hsum span{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.hsum b{display:block;font-size:13px;font-weight:700;margin-top:2px;overflow-wrap:anywhere}
+/* Halaman tambah: layar penuh tanpa bottom bar */
+body.adding .bnav{display:none}
+body.adding .top{display:none}
+body.adding .wrap{padding-top:calc(8px + env(safe-area-inset-top,0px))}
+.addbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:44px}
+.addbar b{font-size:17px;font-weight:800}
+.addbar .cancel{justify-self:start;font:inherit;font-size:16px;font-weight:600;color:var(--accent);background:none;border:0;padding:8px 4px;cursor:pointer}
+body.adding .sheet{bottom:var(--kb,0px)!important;padding-bottom:env(safe-area-inset-bottom,0px)}
+body.adding.docked .wrap{padding-bottom:calc(var(--dockh,300px) + 24px + env(safe-area-inset-bottom,0px))}
+body.adding .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+/* Daftar transaksi per kategori */
+.clmodal{position:fixed;inset:0;z-index:46;background:rgba(10,16,14,.45);display:flex;align-items:flex-end;justify-content:center}
+.clbox{width:100%;max-width:560px;max-height:78vh;display:flex;flex-direction:column;background:var(--surface);border-radius:22px 22px 0 0;padding:16px 18px calc(16px + env(safe-area-inset-bottom,0px))}
+.clhead{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.clhead .av{width:40px;height:40px;border-radius:13px}
+.clhead .av svg{width:20px;height:20px}
+.cllist{overflow:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
+.clrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.clrow:first-child{border-top:0}
+.clrow .l{display:flex;flex-direction:column;min-width:0}
+.clrow .l b{font-weight:600;overflow-wrap:anywhere}
+.clrow .l span{font-size:12px;color:var(--muted)}
+.clrow .num{font-weight:600;white-space:nowrap}
+@media (prefers-reduced-motion:no-preference){.clmodal:not([hidden]) .clbox{animation:up .24s cubic-bezier(.2,.8,.2,1)}}
+.lg .it,.donut .seg{cursor:pointer}
 </style>
 </head>
 <body>
@@ -407,13 +441,7 @@ html,body{overscroll-behavior-y:none}
 
 <div class="wrap" id="app" hidden>
   <div class="top">
-    <div><div class="hello" id="hello"></div><h1>Finance Ariq</h1></div>
-  </div>
-
-  <div class="monthnav" id="monthnav">
-    <button id="prev" aria-label="Periode sebelumnya">‹</button>
-    <span id="monthLabel">—</span>
-    <button id="next" aria-label="Periode berikutnya">›</button>
+    <div><div class="hello" id="hello"></div></div>
   </div>
 
   <!-- 1. CATAT -->
@@ -436,7 +464,7 @@ html,body{overscroll-behavior-y:none}
       <div class="ptrack" aria-hidden="true"><i id="heroProg"></i></div>
       <div class="stack" id="stack" hidden></div>
       <div class="split">
-        <div><div class="label" id="gajiL">Gaji</div><div class="v num" id="gaji">0</div></div>
+        <div hidden><div class="label" id="gajiL">Gaji</div><div class="v num" id="gaji">0</div></div>
         <div><div class="label">Sisa Bulan Lalu</div><div class="v num" id="carryV">0</div></div>
         <div><div class="label">Terpakai</div><div class="v num" id="pakai">0</div></div>
       </div>
@@ -449,9 +477,18 @@ html,body{overscroll-behavior-y:none}
     </div>
   </section>
 
-  <!-- 2. ASET -->
-  <section class="panel" id="p-aset" role="tabpanel" aria-labelledby="t-aset" hidden>
-    <div id="budget" class="panel" style="gap:18px"></div>
+  <!-- 2. HISTORY -->
+  <section class="panel" id="p-history" role="tabpanel" aria-labelledby="t-history" hidden>
+    <div class="monthnav" id="monthnav">
+    <button id="prev" aria-label="Periode sebelumnya">‹</button>
+    <span id="monthLabel">—</span>
+    <button id="next" aria-label="Periode berikutnya">›</button>
+    </div>
+    <div class="hsum" id="hSum"></div>
+    <div class="sec">
+      <div class="shead"><h2 id="hTitle2">Riwayat transaksi</h2><span id="hcount2"></span></div>
+      <div class="days" id="hList"></div>
+    </div>
   </section>
 
   <!-- 4. GRAFIK -->
@@ -468,8 +505,8 @@ html,body{overscroll-behavior-y:none}
 
   <!-- 3. TAMBAH -->
   <section class="panel" id="p-tambah" role="tabpanel" aria-labelledby="t-tambah" hidden>
+    <div class="addbar"><button type="button" class="cancel" id="addCancel">Cancel</button><b>Tambah</b><span></span></div>
     <div class="sec">
-      <h2>Tambah catatan</h2>
       <div class="kind" role="group" aria-label="Jenis">
         <button type="button" id="k-out" aria-pressed="true">Pengeluaran</button>
         <button type="button" id="k-in" aria-pressed="false">Pemasukan</button>
@@ -483,16 +520,9 @@ html,body{overscroll-behavior-y:none}
   <section class="panel" id="p-profil" role="tabpanel" aria-labelledby="t-profil" hidden>
     <div class="pcard">
       <div class="pav">A</div>
-      <div><div class="pname">Ariq</div><div class="psub">Gajian setiap tanggal 28</div></div>
+      <div><div class="pname">Ariq Atmaja Deza</div></div>
     </div>
-    <div class="sec">
-      <h2>Pengaturan keuangan</h2>
-      <div class="rows">
-        <div class="kv"><span>Gaji per bulan</span><b class="num" id="pfGaji">Rp0</b></div>
-        <div class="kv"><span>Tanggal gajian</span><b>Setiap tanggal 28</b></div>
-        <div class="kv"><span>Periode berjalan</span><b id="pfPeriod">—</b></div>
-      </div>
-    </div>
+    <span id="pfGaji" hidden></span><span id="pfPeriod" hidden></span>
     <div class="sec">
       <h2>Tabungan &amp; Aset</h2>
       <div class="goals">
@@ -522,6 +552,7 @@ html,body{overscroll-behavior-y:none}
         </div>
       </div>
     </div>
+    <div id="budget" class="panel" style="gap:18px"></div>
     <div class="sec">
       <h2>Data</h2>
       <div class="rows">
@@ -536,7 +567,7 @@ html,body{overscroll-behavior-y:none}
   <nav class="bnav" aria-label="Menu">
     <div class="bin">
       <button type="button" data-tab="grafik" id="t-grafik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12A9 9 0 1 1 12 3v9z" fill="none"></path><path d="M15 3.5A9 9 0 0 1 20.5 9H15z" fill="none"></path></svg><span>Grafik</span></button>
-      <button type="button" data-tab="aset" id="t-aset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none"></path><path d="M3 7l12-4v4" fill="none"></path><path d="M16 14h2" fill="none"></path></svg><span>Anggaran</span></button>
+      <button type="button" data-tab="history" id="t-history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7" fill="none"></path><path d="M3 4v4h4" fill="none"></path><path d="M12 7v5l3 2" fill="none"></path></svg><span>History</span></button>
       <button type="button" data-tab="tambah" id="t-tambah" class="plus" aria-label="Tambah catatan"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none"></path></svg></i></button>
       <button type="button" data-tab="catat" id="t-catat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" fill="none"></path><path d="M9 8h6M9 12h6" fill="none"></path></svg><span>Data</span></button>
       <button type="button" data-tab="profil" id="t-profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6" fill="none"></path></svg><span>Profil</span></button>
@@ -554,17 +585,17 @@ html,body{overscroll-behavior-y:none}
         <button type="button" class="sx" id="sClose" aria-label="Tutup">✕</button>
       </div>
       <form id="f" autocomplete="off">
-        <label>Nominal (Rp)
+        <label class="full">Nominal (Rp)
           <input id="amt" class="num amtbig" inputmode="numeric" placeholder="0" required>
-        </label>
-        <label>Tanggal
-          <span class="datebox"><span id="dateText">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none"></rect><path d="M3 10h18M8 3v4M16 3v4" fill="none"></path></svg><input id="date" type="date" required aria-label="Tanggal"></span>
         </label>
         <label id="lotWrap" class="full" hidden>Jumlah lot
           <input id="lot" type="number" inputmode="numeric" min="0" step="1" value="1">
         </label>
-        <label class="full">Catatan (opsional)
+        <label>Catatan
           <input id="note" placeholder="Tambahkan catatan">
+        </label>
+        <label>Tanggal
+          <span class="datebox"><span id="dateText">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none"></rect><path d="M3 10h18M8 3v4M16 3v4" fill="none"></path></svg><input id="date" type="date" required aria-label="Tanggal"></span>
         </label>
         <button class="btn full" id="save" type="submit" disabled>Simpan</button>
         <div class="msg full" id="sMsg"></div>
@@ -583,6 +614,17 @@ html,body{overscroll-behavior-y:none}
     <div class="mt" id="mT">Yakin mau dihapus?</div>
     <div class="mi"><div class="r1"><span id="mN"></span><span class="num" id="mA"></span></div><div class="r2" id="mD"></div></div>
     <div class="mbtns"><button class="myes" id="mYes" type="button">Ya, hapus</button><button class="mno" id="mNo" type="button">Tidak</button></div>
+  </div>
+</div>
+
+<div class="clmodal" id="catList" hidden role="dialog" aria-modal="true" aria-labelledby="clName">
+  <div class="clbox">
+    <div class="clhead">
+      <span class="av" id="clIcon"></span>
+      <div class="stx"><div class="st" id="clName">—</div><div class="sk" id="clSub"></div></div>
+      <button type="button" class="sx" id="clClose" aria-label="Tutup">✕</button>
+    </div>
+    <div class="cllist" id="clList"></div>
   </div>
 </div>
 
@@ -704,29 +746,31 @@ let cur = (()=>{const [y,m]=periodKey(todayStr()).split("-").map(Number);return 
 let all = [];
 let db = null;
 let showAll = false;
+let chartTx = [];
 let hideBal = _hideInit;
 const EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" fill="none"></path><circle cx="12" cy="12" r="3" fill="none"></circle></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.1 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7c1.8 0 3.4-.5 4.8-1.3" fill="none"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" fill="none"></path><path d="M3 3l18 18" fill="none"></path></svg>';
 const monthKey = () => cur.y+"-"+pad(cur.m+1);
 
 // ---- Tab
-const TABS=["catat","aset","tambah","grafik","profil"];
-let tab = ["catat","aset","grafik","profil"].includes(ls.get("kas_tab")) ? ls.get("kas_tab") : "catat";
+const TABS=["catat","history","tambah","grafik","profil"];
+let tab = ["catat","history","grafik","profil"].includes(ls.get("kas_tab")) ? ls.get("kas_tab") : "catat";
+let prevTab = tab;
 function setTab(t){
-  const changed = t!==tab; tab=t;
+  const changed = t!==tab;
+  if(t==="tambah" && tab!=="tambah") prevTab = tab;
+  tab=t;
   if(t!=="tambah") ls.set("kas_tab",t);
+  document.body.classList.toggle("adding", t==="tambah");
   TABS.forEach(x=>{ $("p-"+x).hidden = x!==t; if(x===t) $("t-"+x).setAttribute("aria-current","page"); else $("t-"+x).removeAttribute("aria-current"); });
-  $("monthnav").hidden = (t==="tambah"||t==="profil");
   if(changed) window.scrollTo(0,0);
   if(t!=="tambah" && !$("sheet").hidden) closeSheet();
-  $("t-tambah").setAttribute("aria-label", t==="tambah" ? "Tutup, kembali ke Data" : "Tambah catatan");
 }
 document.querySelectorAll(".bnav button[data-tab]").forEach(b=>b.onclick=()=>{
-  // Tombol × (saat di halaman tambah) kembali ke menu Data
-  if(b.dataset.tab==="tambah" && tab==="tambah"){ setTab("catat"); return; }
   setTab(b.dataset.tab);
 });
 setTab(tab);
+$("addCancel").onclick=()=>setTab(prevTab||"catat");
 
 // ---- Form
 let kind="out";
@@ -766,10 +810,10 @@ function openSheet(id){
     $("date").value=todayStr(); syncDate(); $("lot").value="1";
     $("sForm").hidden=false; $("sDone").hidden=true;
     $("sheet").hidden=false;
-    setTimeout(()=>{try{$("amt").focus({preventScroll:true});}catch(e){}},200);
   }
   $("save").disabled = !db;
   markSel(); dockPad();
+  if(!wasOpen){ try{$("amt").focus();}catch(e){} }
 }
 function markSel(){ const open=!$("sheet").hidden; document.querySelectorAll(".ctile").forEach(t=>t.classList.toggle("sel", open && t.dataset.cat===sel.value)); }
 function dockPad(){ const open=!$("sheet").hidden; document.body.classList.toggle("docked",open); if(open) document.body.style.setProperty("--dockh",$("sheet").querySelector(".sbox").offsetHeight+"px"); }
@@ -824,8 +868,10 @@ const START_KEY = "2026-10"; // periode pertama yang dicatat (28 Okt 2026)
 function carryOf(k){if(k in CARRY)return CARRY[k];if(k<=START_KEY)return 0;const p=prevKey(k);return GAJI+carryOf(p)-periodOut(p);}
 
 function render(){
-  $("monthLabel").textContent = periodLabel(cur.y,cur.m);
-  (()=>{const [y,m]=periodKey(todayStr()).split("-").map(Number);$("pfPeriod").textContent=periodLabel(y,m-1);})();
+  // Periode berjalan untuk Data, Grafik, Profil
+  const keep = cur;
+  const [ny,nm] = periodKey(todayStr()).split("-").map(Number);
+  cur = {y:ny, m:nm-1};
   const mk = monthKey();
   const txs = all.filter(t=>periodKey(t.date)===mk);
   const by = {};
@@ -836,6 +882,15 @@ function render(){
   renderData(mk, txs, by, spend, save, extra, pre);
   renderHistory(txs);
   renderCharts(txs, by, spend);
+  chartTx = txs;
+  cur = keep;
+  // History: periode yang dipilih
+  $("monthLabel").textContent = periodLabel(cur.y,cur.m);
+  const hk = monthKey();
+  const htx = all.filter(t=>periodKey(t.date)===hk);
+  renderHistory(htx, {list:"hList", title:"hTitle2", count:"hcount2"});
+  let hOut=0,hSave=0,hIn=0; htx.forEach(t=>{ if(isIncome(t)) hIn+=t.amount; else if(isSave(t)) hSave+=t.amount; else hOut+=t.amount; });
+  $("hSum").innerHTML = '<div><span>Pengeluaran</span><b class="num">'+rp(hOut)+'</b></div><div><span>Ditabung</span><b class="num">'+rp(hSave)+'</b></div><div><span>Pemasukan lain</span><b class="num">'+rp(hIn)+'</b></div>';
 }
 
 function renderData(mk, txs, by, spend, save, extra, pre){
@@ -855,7 +910,7 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   if(idx>=0){
     const left = pDays.length - idx; // termasuk hari ini
     $("heroDays").textContent = left===1 ? "Besok gajian" : (left)+" hari lagi gajian";
-    $("heroDaily").innerHTML = sisa>0 ? "Aman dipakai ≈ <b class=\"num\">"+rp(Math.floor(sisa/left/1000)*1000)+"</b> / hari" : "Sudah melewati batas periode ini";
+    $("heroDaily").innerHTML = sisa>0 ? "Safe to spend <b class=\"num\">"+rp(Math.floor(sisa/left/1000)*1000)+"</b> / day" : "Over budget for this period";
     $("heroProg").style.width = ((idx+1)/pDays.length*100)+"%";
   }else{
     const past = pDays[pDays.length-1] < today;
@@ -931,11 +986,12 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   });
 }
 
-function renderHistory(txs){
-  const L=$("list"), M=$("moreBtn");
+function renderHistory(txs, ids){
+  ids = ids || {list:"list", title:"hTitle", count:"hcount"};
+  const L=$(ids.list), M=$("moreBtn");
   L.innerHTML="";
   if(!txs.length){
-    $("hTitle").textContent="Riwayat"; $("hcount").textContent="";
+    $(ids.title).textContent="Riwayat"; $(ids.count).textContent="";
     L.innerHTML='<div class="rows"><div class="empty">Belum ada catatan di periode ini.</div></div>';
     M.hidden=true; return;
   }
@@ -944,9 +1000,9 @@ function renderHistory(txs){
   const today = todayStr();
   const focus = days.includes(today) ? today : days[0];
   const shown = sorted;
-  $("hTitle").textContent = "Riwayat transaksi";
+  $(ids.title).textContent = "Riwayat transaksi";
   const totOut = txs.filter(t=>!isIncome(t)&&!isSave(t)).reduce((a,t)=>a+t.amount,0);
-  $("hcount").textContent = "Total keluar "+rp(totOut);
+  $(ids.count).textContent = "Total keluar "+rp(totOut);
   let box=null;
   const dayTot={}; txs.forEach(t=>{ if(!dayTot[t.date]) dayTot[t.date]=0; if(!isIncome(t)&&!isSave(t)) dayTot[t.date]+=t.amount; });
   let lastD=null;
@@ -1022,6 +1078,7 @@ function renderCharts(txs, by, spend){
       el.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")showCat(i);});
       ["pointerup","pointercancel","pointerleave"].forEach(ev=>el.addEventListener(ev,()=>{if(active===i)showCat(-1);}));
       el.addEventListener("contextmenu",e=>e.preventDefault());
+      el.addEventListener("click",()=>openCatList(items[i].c.id));
     };
     segEls.forEach(s=>bindHold(s,+s.dataset.i));
     setTimeout(()=>[...lg.children].forEach((el,k)=>bindHold(el,k)),0);
@@ -1191,6 +1248,35 @@ $("rsFile").addEventListener("change",async e=>{
   location.reload();
 });
 $("goRestore").onclick=()=>setTab("profil");
+
+// ===== Panel isian ikut naik di atas keyboard
+(function(){
+  const vv=window.visualViewport; if(!vv) return;
+  const upd=()=>{ const kb=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); document.body.style.setProperty("--kb", kb+"px"); };
+  vv.addEventListener("resize",upd); vv.addEventListener("scroll",upd); upd();
+})();
+
+// ===== Daftar transaksi per kategori (dari Grafik)
+function openCatList(id){
+  const c=CAT[id]; const list=chartTx.filter(t=>t.cat===id).sort((a,b)=>(b.date+(b.createdAt||"")).localeCompare(a.date+(a.createdAt||"")));
+  const tot=list.reduce((a,t)=>a+t.amount,0);
+  $("clIcon").style.setProperty("--cc",catColor(id)); $("clIcon").innerHTML=catIcon(id);
+  $("clName").textContent=c.name;
+  $("clSub").textContent=list.length+" transaksi \u00b7 "+rp(tot);
+  const box=$("clList"); box.innerHTML="";
+  list.forEach(t=>{
+    const r=document.createElement("div"); r.className="clrow";
+    r.innerHTML='<div class="l"><b></b><span></span></div><span class="num"></span>';
+    r.querySelector("b").textContent=t.note||c.name;
+    r.querySelector(".l span").textContent=dayLabel(t.date);
+    r.querySelector(".num").textContent=plain(t.amount);
+    box.appendChild(r);
+  });
+  if(!list.length) box.innerHTML='<div class="empty">Belum ada transaksi.</div>';
+  $("catList").hidden=false;
+}
+$("clClose").onclick=()=>{$("catList").hidden=true;};
+$("catList").addEventListener("click",e=>{ if(e.target.id==="catList") $("catList").hidden=true; });
 
 // ===== Matikan zoom (cubit & ketuk dua kali) =====
 ["gesturestart","gesturechange","gestureend"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
