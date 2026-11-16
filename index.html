@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f3f5f2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1513" media="(prefers-color-scheme: dark)">
+<script>try{var t=localStorage.getItem("fa_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -462,6 +463,13 @@ html,body{height:100%;overflow:hidden}
 .setdel:hover{background:var(--bad-soft);color:var(--bad)}
 .goal .gn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .setfields .sl{display:grid;grid-template-columns:96px minmax(0,1fr);align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted)}
+
+/* ===== Tombol tema ===== */
+.top{min-height:40px}
+.themebtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none;box-shadow:var(--shadow)}
+.themebtn svg{width:20px;height:20px}
+.themebtn:active{transform:scale(.92)}
+@media (prefers-reduced-motion:no-preference){body,.rows,.card,.goal,.tabs,.monthnav,.bnav{transition:background-color .25s ease,border-color .25s ease,color .25s ease}}
 </style>
 </head>
 <body>
@@ -478,6 +486,7 @@ html,body{height:100%;overflow:hidden}
 <div class="wrap" id="app" hidden>
   <div class="top">
     <div><div class="hello" id="hello"></div></div>
+    <button type="button" class="themebtn" id="themeBtn" aria-label="Switch theme"></button>
   </div>
 
   <!-- 1. CATAT -->
@@ -567,6 +576,7 @@ html,body{height:100%;overflow:hidden}
       <div class="card setform">
         <label>Name<input id="setName" placeholder="Your name"></label>
         <label>Salary per month (Rp)<input id="setGaji" class="num" inputmode="numeric" placeholder="0"></label>
+        <label>Payday (date, 1–28)<input id="setPayday" class="num" inputmode="numeric" placeholder="1" maxlength="2"></label>
       </div>
     </div>
     <div id="setCats" class="panel" style="gap:18px"></div>
@@ -781,10 +791,12 @@ function parseAmount(s){
   return digits ? Number(digits) : NaN;
 }
 
-// Periode gaji: tanggal 28 sampai tanggal 27 bulan berikutnya. Kunci periode = bulan tempat tanggal 28-nya.
-function periodKey(ds){const [y,m,d]=ds.split("-").map(Number);let Y=y,M=m-1;if(d<28){M--;if(M<0){M=11;Y--;}}return Y+"-"+pad(M+1);}
-function periodLabel(y,m){const ny=m===11?y+1:y,nm=(m+1)%12;return "28 "+BLN3[m]+(ny!==y?" "+y:"")+" – 27 "+BLN3[nm]+" "+ny;}
-function periodDays(y,m){const out=[];const d=new Date(y,m,28);const end=new Date(y,m+1,27);while(d<=end){out.push(dstr(d));d.setDate(d.getDate()+1);}return out;}
+// Periode gaji: dari tanggal gajian sampai sehari sebelum tanggal gajian bulan berikutnya.
+// Tanggal gajian diatur di Settings (1–28) dan tersimpan di HP. Kunci periode = bulan tempat periode dimulai.
+const PAYDAY = Math.min(28, Math.max(1, parseInt(CFG.payday,10) || (CFG.cats ? 28 : 1)));
+function periodKey(ds){const [y,m,d]=ds.split("-").map(Number);let Y=y,M=m-1;if(d<PAYDAY){M--;if(M<0){M=11;Y--;}}return Y+"-"+pad(M+1);}
+function periodLabel(y,m){const a=new Date(y,m,PAYDAY), b=new Date(y,m+1,PAYDAY-1);return a.getDate()+" "+BLN3[a.getMonth()]+(a.getFullYear()!==b.getFullYear()?" "+a.getFullYear():"")+" – "+b.getDate()+" "+BLN3[b.getMonth()]+" "+b.getFullYear();}
+function periodDays(y,m){const out=[];const d=new Date(y,m,PAYDAY);const end=new Date(y,m+1,PAYDAY-1);while(d<=end){out.push(dstr(d));d.setDate(d.getDate()+1);}return out;}
 let cur = (()=>{const [y,m]=periodKey(todayStr()).split("-").map(Number);return {y,m:m-1};})();
 let all = [];
 let db = null;
@@ -1346,6 +1358,25 @@ $("rsFile").addEventListener("change",async e=>{
 });
 $("goRestore").onclick=()=>setTab("profil");
 
+// ===== Mode terang / gelap =====
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none"></path></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none"></path></svg>';
+const isDark=()=>{ const t=document.documentElement.getAttribute("data-theme"); return t ? t==="dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+function drawThemeBtn(){
+  const d=isDark();
+  $("themeBtn").innerHTML = d ? SUN : MOON;          // ikon = mode yang akan dipilih
+  $("themeBtn").setAttribute("aria-label", d ? "Switch to light mode" : "Switch to dark mode");
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute("content", d ? "#0f1513" : "#f3f5f2"));
+}
+$("themeBtn").onclick=()=>{
+  const next = isDark() ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  ls.set("fa_theme", next);
+  drawThemeBtn();
+};
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",drawThemeBtn);
+drawThemeBtn();
+
 // ===== Settings: nama, gaji, kategori & budget (disimpan di HP) =====
 $("pname").textContent = USER_NAME;
 $("pav").textContent = (USER_NAME.trim()[0]||"A").toUpperCase();
@@ -1359,6 +1390,7 @@ function openSettings(){
   draft = CATS.map(c=>Object.assign({},c));
   $("setName").value = CFG.name||"";
   $("setGaji").value = fmtNum(CFG.gaji||0);
+  $("setPayday").value = PAYDAY;
   drawSettings();
   ["catat","history","tambah","grafik","profil"].forEach(x=>$("p-"+x).hidden=true);
   $("p-settings").hidden=false; document.body.classList.add("adding");
@@ -1423,6 +1455,7 @@ function drawSettings(){
 }
 $("setOpen").onclick=openSettings;
 $("setCancel").onclick=closeSettings;
+$("setPayday").addEventListener("input",()=>{ $("setPayday").value=$("setPayday").value.replace(/\D/g,"").slice(0,2); });
 $("setSave").onclick=()=>{
   const empty=draft.find(c=>!String(c.name||"").trim());
   if(empty){ showToast("Every category needs a name"); return; }
@@ -1430,7 +1463,9 @@ $("setSave").onclick=()=>{
   const start=Object.assign({},START);
   draft.forEach(c=>{ if(c.save && c._start!=null){ start[c.lots?c.id+"_lot":c.id]=c._start; } });
   const cats=draft.map(c=>{ const o={id:c.id,name:c.name.trim(),budget:c.grp==="Pemasukan"?0:(c.budget||0),grp:c.grp,icon:c.icon,color:c.color}; if(c.save)o.save=true; if(c.income)o.income=true; if(c.lots)o.lots=true; return o; });
-  const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),cats,start});
+  const pd=parseInt($("setPayday").value,10);
+  if(!(pd>=1&&pd<=28)){ showToast("Payday must be between 1 and 28"); return; }
+  const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),payday:pd,cats,start});
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
   location.reload();
 };
