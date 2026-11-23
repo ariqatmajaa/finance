@@ -393,37 +393,53 @@ body.docked #msg{visibility:hidden}
 .bcard.warn .bar i{background:var(--yel)!important}
 .bcard.bad .bar i{background:var(--bad)!important}
 /* Goals */
-#gSum{padding:18px}
+.gsum{position:relative;overflow:hidden;border-radius:24px;padding:20px;border:1px solid var(--line);background:radial-gradient(130% 120% at 100% 0%,color-mix(in srgb,var(--accent) 30%,transparent),transparent 58%),radial-gradient(90% 90% at 0% 100%,color-mix(in srgb,#5b8cff 18%,transparent),transparent 60%),var(--surface)}
 .gsk{font-size:13px;color:var(--muted)}
-.gsv2{font-size:26px;font-weight:500;letter-spacing:-.01em;margin-top:2px}
-.gsv2 em{font-style:normal;font-size:15px;color:var(--muted)}
-#gSum .bar,.gcard .bar{height:8px;margin:12px 0 8px}
-#gSum .bar i,.gcard .bar i{background:var(--accent)}
-.gnext{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)}
-.gnext b{color:var(--ink);font-weight:600;text-align:right}
-.glist{display:flex;flex-direction:column;gap:10px}
-.gcard{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;cursor:pointer}
+.gsv2{font-size:30px;font-weight:500;letter-spacing:-.015em;margin:2px 0 4px}
+.gchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gchips span{font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent);border:1px solid var(--line)}
+.gsum .gtrk{height:10px;border-radius:6px;background:var(--track);overflow:hidden;margin:14px 0 8px}
+.gsum .gtrk i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#5b8cff,var(--accent));box-shadow:0 0 12px color-mix(in srgb,var(--accent) 60%,transparent)}
+.gnext{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+.gnext b{color:var(--ink);font-weight:600}
+.glist{display:flex;flex-direction:column;gap:12px}
+.gcard{position:relative;overflow:hidden;display:block;width:100%;text-align:left;font:inherit;color:var(--ink);border:1px solid color-mix(in srgb,var(--cc) 28%,var(--line));border-radius:22px;padding:16px;cursor:pointer;background:radial-gradient(120% 140% at 100% 0%,color-mix(in srgb,var(--cc) 24%,transparent),transparent 55%),var(--surface)}
 .gch{display:flex;align-items:center;gap:12px}
-.gch .av{width:40px;height:40px;border-radius:13px;flex:none}
-.gch .av svg{width:20px;height:20px}
-.gcn{flex:1;min-width:0}
-.gcn b{display:block;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gcn span{font-size:13px;color:var(--muted)}
-.gpc{font-size:15px;font-weight:700}
-.gest{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
-.gest b{font-weight:600;color:var(--ink)}
-.gchip{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--surface2);color:var(--muted)}
+.gch .av{width:44px;height:44px;border-radius:14px;flex:none}
+.gch .av svg{width:22px;height:22px}
+.gcn{flex:1;min-width:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gbal{margin:14px 0 2px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.gbal b{font-size:24px;font-weight:600;letter-spacing:-.01em}
+.gbal span{font-size:13px;color:var(--muted)}
+.gtrk2{position:relative;height:12px;border-radius:7px;background:var(--track);margin:12px 0 4px}
+.gtrk2 i{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:linear-gradient(90deg,color-mix(in srgb,var(--cc) 55%,#fff),var(--cc));box-shadow:0 0 12px color-mix(in srgb,var(--cc) 55%,transparent)}
+.gtrk2 s{position:absolute;top:3px;bottom:3px;width:2px;border-radius:1px;background:color-mix(in srgb,var(--bg) 60%,transparent)}
+.gpcl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.gpcl b{color:var(--ink)}
+.gstats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.gstats div{background:color-mix(in srgb,var(--ink) 5%,transparent);border:1px solid var(--line);border-radius:14px;padding:9px 11px;min-width:0}
+.gstats small{display:block;font-size:11.5px;color:var(--muted)}
+.gstats b{display:block;font-size:14px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gstats b + small{margin-top:1px}
+.gset{margin-top:12px;font-size:13px;font-weight:700;color:var(--cc);text-align:center;padding:11px;border-radius:14px;border:1px dashed color-mix(in srgb,var(--cc) 55%,transparent);background:color-mix(in srgb,var(--cc) 8%,transparent)}
+.gchip{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;background:var(--surface2);color:var(--muted)}
 .gchip.ok{background:var(--accent-soft);color:var(--accent)}
 .gchip.warn{background:color-mix(in srgb,var(--yel) 16%,transparent);color:var(--yel)}
 .gchip.bad{background:var(--bad-soft);color:var(--bad)}
+.gneed{margin-top:10px;font-size:12.5px;color:var(--muted)}
+.gneed b{color:var(--ink)}
 .gadd{font:inherit;font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent);border-radius:14px;padding:13px;cursor:pointer}
+.gehead{display:flex;align-items:center;gap:12px;padding:4px 2px}
+.gehead .av{width:48px;height:48px;border-radius:15px}
+.gehead .av svg{width:24px;height:24px}
+.gehead b{display:block;font-size:18px;font-weight:700}
+.gehead span{font-size:13px;color:var(--muted)}
 .gnrow{display:flex;align-items:flex-end;gap:10px}
 .gnrow label{flex:1;min-width:0}
 .gnrow .ipbtn{padding:0}
 .setform select{font:inherit;font-size:15px;height:46px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:0 10px;width:100%}
 .gdue{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.gauto{font-size:13px;color:var(--muted)}
-.gauto b{color:var(--ink)}
+.gtx{background:var(--surface);border:1px solid var(--line)!important;border-radius:16px}
 .gdel{font:inherit;font-size:15px;font-weight:700;color:var(--bad);background:var(--bad-soft);border:0;border-radius:14px;padding:14px;cursor:pointer}
 </style>
 
@@ -841,42 +857,36 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
     </div>
   </section>
 
-  <!-- 4. GOALS (target tabungan) -->
+  <!-- 4. GOALS (tabungan & aset dengan target) -->
   <section class="panel" id="p-grafik" role="tabpanel" aria-labelledby="t-grafik" hidden>
-    <div class="card" id="gSum"></div>
+    <div class="gsum" id="gSum"></div>
     <div class="sec">
-      <div class="shead"><h2>Your goals</h2><span id="gCount"></span></div>
+      <div class="shead"><h2>Savings &amp; assets</h2><span id="gCount"></span></div>
       <div class="glist" id="gList"></div>
       <button type="button" class="gadd" id="gNew">+ Add a goal</button>
     </div>
-    <p class="foot">Tap a goal to set its target, monthly saving and date. Stored on this phone only.</p>
+    <p class="foot">Balances update automatically from what you record. Tap a goal to set its target.</p>
   </section>
 
   <!-- EDIT GOAL -->
   <section class="panel" id="p-goals" hidden>
     <div class="addbar"><button type="button" class="cancel" id="gCancel">Cancel</button><b id="gTitle">Goal</b><button type="button" class="cancel savebtn" id="gSave">Save</button></div>
-    <div class="sec">
+    <div class="gehead" id="gHead"></div>
+    <div class="sec" id="gNewWrap">
       <div class="card setform">
-        <div class="gnrow"><button type="button" class="ipbtn" id="gIcon" aria-label="Change icon"></button><label>Name<input id="gName" placeholder="Goal name" maxlength="30"></label></div>
-        <label>Target amount (Rp)<input id="gTarget" class="num" inputmode="numeric" placeholder="0"></label>
+        <div class="gnrow"><button type="button" class="ipbtn" id="gIcon" aria-label="Change icon"></button><label>Name<input id="gName" placeholder="e.g. Liburan" maxlength="30"></label></div>
       </div>
     </div>
     <div class="sec">
-      <h2>Saved so far</h2>
+      <h2>Target</h2>
       <div class="card setform">
-        <label>Count from<select id="gLink"></select></label>
-        <label id="gSavedWrap">Amount saved (Rp)<input id="gSaved" class="num" inputmode="numeric" placeholder="0"></label>
-        <div class="gauto" id="gAuto"></div>
-      </div>
-    </div>
-    <div class="sec">
-      <h2>Plan</h2>
-      <div class="card setform">
-        <label>Saving per month (Rp)<input id="gMonthly" class="num" inputmode="numeric" placeholder="0"></label>
+        <label><span id="gTLabel">Target amount (Rp)</span><input id="gTarget" class="num" inputmode="numeric" placeholder="0"></label>
+        <label><span id="gMLabel">Saving per month (Rp)</span><input id="gMonthly" class="num" inputmode="numeric" placeholder="0"></label>
         <label>Target date (optional)<span class="gdue"><select id="gDueM"></select><select id="gDueY"></select></span></label>
       </div>
     </div>
-    <button type="button" class="gdel" id="gDel">Delete goal</button>
+    <button type="button" class="kv act gtx" id="gHist"><span>See transactions</span><b>›</b></button>
+    <button type="button" class="gdel" id="gDel">Remove target</button>
   </section>
 
   <!-- 3. TAMBAH -->
@@ -914,10 +924,6 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
       <div><div class="pname" id="pname">—</div></div>
     </div>
     <span id="pfGaji" hidden></span><span id="pfPeriod" hidden></span>
-    <div class="sec">
-      <h2>Savings &amp; Assets</h2>
-      <div class="goals" id="goals"></div>
-    </div>
     <div id="budget" class="panel" style="gap:18px"></div>
     <div class="sec">
       <h2>Settings</h2>
@@ -1430,18 +1436,6 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   const pS = inc>0 ? Math.min(100, spend/inc*100) : 0, pV = inc>0 ? Math.min(100-pS, save/inc*100) : 0;
   $("stack").innerHTML = `<i style="width:${pS}%;background:var(--muted)"></i><i style="width:${pV}%;background:var(--accent)"></i>`;
 
-  // Tabungan & Aset: total keseluruhan per kategori tabungan
-  const G=$("goals"); G.innerHTML="";
-  CATS.filter(c=>c.save).forEach(c=>{
-    let tot = c.lots ? (START[c.id+"_lot"]!=null ? START[c.id+"_lot"] : (START.lot||0)) : (START[c.id]||0);
-    all.forEach(t=>{ if(t.cat===c.id) tot += c.lots ? (t.lot||0) : t.amount; });
-    const el=document.createElement("div"); el.className="goal"; el.style.setProperty("--gc",c.color||"var(--accent)");
-    el.innerHTML='<div class="t"><span class="gi">'+catIcon(c.id)+'</span><span class="gn"></span></div><div class="v num"></div>';
-    el.querySelector(".gn").textContent=c.name;
-    el.querySelector(".v").textContent = c.lots ? tot+" lot" : rp(tot);
-    G.appendChild(el);
-  });
-
   // Anggaran per pos: kartu dengan grafik kecil, bisa diketuk untuk melihat transaksinya
   const b = $("budget"); b.innerHTML="";
   const bh=document.createElement("h2");bh.textContent="Budget";bh.className="bh";b.appendChild(bh);
@@ -1801,7 +1795,7 @@ function initLock(){
 $("pfGaji").textContent = rp(GAJI);
 function backupData(){
   const data={app:"finance-ariq",version:1,exportedAt:new Date().toISOString(),cfg:CFG,tx:LocalDB.all()};
-  try{ const g=localStorage.getItem("fa_goals_v2"); if(g) data.goals=JSON.parse(g); }catch(e){}
+  try{ const g=localStorage.getItem("fa_goals_v3"); if(g) data.goals=JSON.parse(g); }catch(e){}
   const d=new Date(); const name="finance-backup-"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+".json";
   const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});
   const file=new File([blob],name,{type:"application/json"});
@@ -1821,7 +1815,7 @@ $("rsFile").addEventListener("change",async e=>{
     $("mT").textContent="Delete this entry?"; $("mYes").textContent="Yes, delete";
     if(!ok2) return;
     localStorage.setItem(CFG_KEY,JSON.stringify(Object.assign({},CFG,data.cfg)));
-    if(data.goals) localStorage.setItem("fa_goals_v2",JSON.stringify(data.goals));
+    if(data.goals&&!Array.isArray(data.goals)) localStorage.setItem("fa_goals_v3",JSON.stringify(data.goals));
     location.reload(); return;
   }
   $("mT").textContent="Restore data?"; $("mYes").textContent="Yes, restore";
@@ -1830,7 +1824,7 @@ $("rsFile").addEventListener("change",async e=>{
   if(!ok) return;
   localStorage.setItem(CFG_KEY,JSON.stringify(data.cfg||{}));
   localStorage.setItem(TX_KEY,JSON.stringify(data.tx));
-  if(data.goals) localStorage.setItem("fa_goals_v2",JSON.stringify(data.goals));
+  if(data.goals&&!Array.isArray(data.goals)) localStorage.setItem("fa_goals_v3",JSON.stringify(data.goals));
   location.reload();
 });
 $("goRestore").onclick=()=>setTab("profil");
@@ -2041,107 +2035,133 @@ $("catList").addEventListener("click",e=>{ if(e.target.id==="catList") $("catLis
 // ===== Mode offline =====
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
 
-// ===== Goals: target tabungan =====
-const GOAL_KEY="fa_goals_v2";
-const GOAL_PRESETS=[["Dana Darurat","shield","#3f63d6",/darurat/i],["Tabungan Menikah","heart","#d4588f",/nikah/i],["Beli Rumah","home","#1f9a7a",null],["Liburan","plane","#ef8a1f",null],["Sertifikasi","star","#d39b00",null],["Pendidikan","grad","#7a52c7",null]];
-const linkable=()=>CATS.filter(c=>c.save&&!c.lots);
-function loadGoals(){
-  let g=null; try{ g=JSON.parse(localStorage.getItem(GOAL_KEY)); }catch(e){}
-  if(Array.isArray(g)) return g;
-  return GOAL_PRESETS.map(([name,icon,color,re],i)=>{
-    const c=re?linkable().find(x=>re.test(x.name)):null;
-    return {id:"g"+i,name,icon,color,target:0,saved:0,link:c?c.id:"",monthly:c?(c.budget||0):0,due:""};
-  });
-}
-let GOALS=loadGoals();
+// ===== Goals: kategori Tabungan & Aset + target =====
+const GOAL_KEY="fa_goals_v3";
+let GOALS={}; try{ GOALS=JSON.parse(localStorage.getItem(GOAL_KEY))||{}; }catch(e){}
+try{ const v2=JSON.parse(localStorage.getItem("fa_goals_v2")); if(Array.isArray(v2)&&!localStorage.getItem(GOAL_KEY)) v2.forEach(g=>{ if(g.link&&g.target) GOALS[g.link]={target:g.target,due:g.due||"",monthly:g.monthly||0}; }); }catch(e){}
 const saveGoals=()=>localStorage.setItem(GOAL_KEY,JSON.stringify(GOALS));
-const catBal=id=>{ let t=START[id]||0; all.forEach(x=>{ if(x.cat===id) t+=x.amount; }); return t; };
-const goalSaved=g=> g.link&&CAT[g.link] ? catBal(g.link) : (g.saved||0);
 const nowKey=()=>todayStr().slice(0,7);
 const mAdd=(k,n)=>{ let [y,m]=k.split("-").map(Number); m+=n; y+=Math.floor((m-1)/12); m=((m-1)%12+12)%12+1; return y+"-"+pad(m); };
 const mDiff=(a,b)=>{ const [y1,m1]=a.split("-").map(Number),[y2,m2]=b.split("-").map(Number); return (y2-y1)*12+(m2-m1); };
 const mLabel=k=>BLN3[+k.slice(5)-1]+" "+k.slice(0,4);
-const dur=n=>{ const y=Math.floor(n/12), m=n%12; return (y?y+(y>1?" yrs":" yr"):"")+(y&&m?" ":"")+(m?m+" mo":"")||"this month"; };
-function goalInfo(g){
-  const saved=goalSaved(g), left=Math.max(0,g.target-saved), pc=g.target?Math.min(100,saved/g.target*100):0;
-  const o={saved,left,pc};
-  if(!g.target){ o.text="Set a target"; o.chip=["","No target"]; return o; }
-  if(left<=0){ o.text="Target reached"; o.chip=["ok","Reached"]; o.months=0; return o; }
-  const now=nowKey(), dueIn = g.due ? Math.max(1,mDiff(now,g.due)) : null;
-  if(g.monthly>0){
-    o.months=Math.ceil(left/g.monthly); o.when=mAdd(now,o.months);
-    o.text="≈ <b>"+dur(o.months)+"</b> · by "+mLabel(o.when);
-  } else o.text="Set a monthly saving to see the estimate";
+const dur=n=>{ const y=Math.floor(n/12), m=n%12; return ((y?y+(y>1?" yrs":" yr"):"")+(y&&m?" ":"")+(m?m+" mo":""))||"this month"; };
+const lotNum=v=>{ const n=parseFloat(String(v||"").replace(",",".")); return isFinite(n)&&n>0?Math.round(n*10)/10:0; };
+function catBal(c){
+  if(c.lots){ let t=START[c.id+"_lot"]!=null?START[c.id+"_lot"]:(START.lot||0); all.forEach(x=>{ if(x.cat===c.id) t+=x.lot||0; }); return t; }
+  let t=START[c.id]||0; all.forEach(x=>{ if(x.cat===c.id) t+=x.amount; }); return t;
+}
+function lotPrice(c){ let a=0,l=0; all.forEach(x=>{ if(x.cat===c.id&&x.lot>0){ a+=x.amount; l+=x.lot; } }); return l?a/l:0; }
+function goalMonthly(c){
+  const g=GOALS[c.id]||{};
+  if(g.monthly) return g.monthly;
+  if(c.lots){ const p=lotPrice(c); return p&&c.budget ? Math.round(c.budget/p*10)/10 : 0; }
+  return c.budget||0;
+}
+const fmtV=(c,v)=> c.lots ? (Math.round(v*10)/10).toLocaleString("id-ID")+" lot" : rp(v);
+function goalInfo(c){
+  const g=GOALS[c.id]||{}, bal=catBal(c), target=g.target||0, monthly=goalMonthly(c);
+  const o={bal,target,monthly,left:Math.max(0,target-bal),pc:target?Math.min(100,bal/target*100):0,chip:null};
+  if(!target) return o;
+  if(o.left<=0){ o.chip=["ok","Reached"]; o.months=0; return o; }
+  const now=nowKey();
+  if(monthly>0){ o.months=Math.ceil(o.left/monthly); o.when=mAdd(now,o.months); }
   if(g.due){
-    const need=Math.ceil(left/dueIn/1000)*1000;
+    const dueIn=Math.max(1,mDiff(now,g.due)); o.due=g.due;
     if(o.months!=null && o.months<=dueIn) o.chip=["ok","On track"];
-    else { o.chip=[o.months!=null && o.months<=dueIn*1.25?"warn":"bad","Behind"]; o.text+=(g.monthly>0?"<br>":"")+"Save <b>"+rp(need)+"/mo</b> to reach it by "+mLabel(g.due); }
-  } else o.chip = g.monthly>0 ? ["ok","Estimate"] : ["","No plan"];
+    else { o.chip=[o.months!=null&&o.months<=dueIn*1.25?"warn":"bad","Behind"]; o.need = c.lots ? Math.ceil(o.left/dueIn*10)/10 : Math.ceil(o.left/dueIn/1000)*1000; }
+  } else o.chip = monthly>0 ? ["ok","In progress"] : ["","No plan"];
   return o;
 }
 function renderGoals(){
-  const L=$("gList"); L.innerHTML="";
-  let tS=0,tT=0, next=null;
-  GOALS.forEach((g,i)=>{
-    const o=goalInfo(g); tT+=g.target||0; tS+=Math.min(o.saved,g.target||o.saved);
-    if(o.months>0 && (!next||o.months<next.m)) next={g,m:o.months,when:o.when};
-    const el=document.createElement("button"); el.type="button"; el.className="gcard";
-    el.innerHTML='<div class="gch"><span class="av" style="--cc:'+g.color+'">'+iconSvg(g.icon)+'</span><span class="gcn"><b></b><span class="num">'+plain(o.saved)+(g.target?' / '+plain(g.target):'')+'</span></span><span class="gpc num">'+(g.target?Math.floor(o.pc)+'%':'')+'</span></div>'+
-      '<div class="bar"><i style="width:'+o.pc+'%"></i></div>'+
-      '<div class="gest"><span>'+o.text+'</span><span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span></div>';
-    el.querySelector(".gcn b").textContent=g.name;
-    el.onclick=()=>openGoal(i);
+  const cats=CATS.filter(c=>c.save), L=$("gList"); L.innerHTML="";
+  let tot=0, tS=0, tT=0, next=null; const lots=[];
+  cats.forEach(c=>{
+    const o=goalInfo(c);
+    if(c.lots) lots.push(fmtV(c,o.bal)+" "+c.name.replace(/^saham\s+/i,"")); else { tot+=o.bal; if(o.target){ tS+=Math.min(o.bal,o.target); tT+=o.target; } }
+    if(o.months>0 && (!next||o.months<next.m)) next={c,m:o.months,when:o.when};
+    const el=document.createElement("button"); el.type="button"; el.className="gcard"; el.style.setProperty("--cc",c.color||"var(--accent)");
+    let h='<div class="gch"><span class="av" style="--cc:'+(c.color||"var(--accent)")+'">'+catIcon(c.id)+'</span><span class="gcn"></span>'+(o.chip?'<span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span>':'')+'</div>'+
+      '<div class="gbal"><b class="num">'+fmtV(c,o.bal)+'</b>'+(o.target?'<span class="num">of '+fmtV(c,o.target)+'</span>':'')+'</div>';
+    if(o.target){
+      h+='<div class="gtrk2"><i style="width:'+o.pc+'%"></i><s style="left:25%"></s><s style="left:50%"></s><s style="left:75%"></s></div>'+
+        '<div class="gpcl"><span><b class="num">'+Math.floor(o.pc)+'%</b> reached</span><span class="num">'+(o.left>0?fmtV(c,o.left)+' to go':'Done')+'</span></div>'+
+        '<div class="gstats"><div><small>Per month</small><b class="num">'+(o.monthly?fmtV(c,o.monthly):'—')+'</b></div>'+
+        '<div><small>'+(o.left<=0?'Status':'Estimated')+'</small><b>'+(o.left<=0?'Target reached':o.when?mLabel(o.when):'—')+'</b>'+(o.left>0&&o.when?'<small>in '+dur(o.months)+'</small>':'')+'</div></div>'+
+        (o.need?'<div class="gneed">Save <b class="num">'+fmtV(c,o.need)+'/mo</b> to reach it by '+mLabel(o.due)+'</div>':'');
+    } else h+='<div class="gset">Set a target</div>';
+    el.innerHTML=h; el.querySelector(".gcn").textContent=c.name;
+    el.onclick=()=>openGoal(c.id);
     L.appendChild(el);
   });
-  $("gCount").textContent=GOALS.length+(GOALS.length===1?" goal":" goals");
+  $("gCount").textContent=cats.length+(cats.length===1?" goal":" goals");
   const pc=tT?tS/tT*100:0;
-  $("gSum").innerHTML='<div class="gsk">Saved toward your goals</div><div class="gsv2 num">'+rp(tS)+(tT?' <em>of '+rp(tT)+'</em>':'')+'</div>'+
-    '<div class="bar"><i style="width:'+Math.min(100,pc)+'%"></i></div>'+
-    '<div class="gnext"><span>'+(tT?Math.floor(pc)+'% of all targets':'Set targets to track progress')+'</span>'+(next?'<b></b>':'')+'</div>';
-  if(next) $("gSum").querySelector(".gnext b").textContent="Next: "+next.g.name+" · "+mLabel(next.when);
+  $("gSum").innerHTML='<div class="gsk">Total savings &amp; assets</div><div class="gsv2 num">'+rp(tot)+'</div>'+
+    (lots.length?'<div class="gchips">'+lots.map(x=>'<span class="num"></span>').join("")+'</div>':'')+
+    (tT?'<div class="gtrk"><i style="width:'+Math.min(100,pc)+'%"></i></div><div class="gnext"><span class="num">'+Math.floor(pc)+'% of '+rp(tT)+'</span>'+(next?'<b></b>':'')+'</div>'
+       :'<div class="gnext" style="margin-top:12px"><span>Tap a goal below to set a target</span></div>');
+  $("gSum").querySelectorAll(".gchips span").forEach((e,i)=>e.textContent=lots[i]);
+  const nb=$("gSum").querySelector(".gnext b"); if(nb&&next) nb.textContent="Next: "+next.c.name+" · "+mLabel(next.when);
 }
 // editor
-let gEdit=null, gIdx=-1;
-function openGoal(i){
-  gIdx=i; gEdit = i>=0 ? Object.assign({},GOALS[i]) : {id:"g"+Date.now(),name:"",icon:"star",color:"#1f9fb0",target:0,saved:0,link:"",monthly:0,due:""};
-  $("gTitle").textContent = i>=0 ? "Edit goal" : "New goal";
-  $("gIcon").innerHTML='<span class="av" style="--cc:'+gEdit.color+'">'+iconSvg(gEdit.icon)+'</span>';
-  $("gName").value=gEdit.name; $("gTarget").value=fmtNum(gEdit.target); $("gSaved").value=fmtNum(gEdit.saved); $("gMonthly").value=fmtNum(gEdit.monthly);
-  $("gLink").innerHTML='<option value="">Enter manually</option>'+linkable().map(c=>'<option value="'+c.id+'">Category: '+c.name.replace(/</g,"&lt;")+'</option>').join("");
-  $("gLink").value = gEdit.link&&CAT[gEdit.link] ? gEdit.link : "";
+let gCat=null, gNewIcon="star";
+const NEW_COLORS=["#ef8a1f","#1f9fb0","#d39b00","#7a52c7","#2e9d5b","#d64545","#3b6fd8"];
+function openGoal(id){
+  gCat = id ? CAT[id] : null;
+  const g = id ? (GOALS[id]||{}) : {}, lots = !!(gCat&&gCat.lots);
+  $("gTitle").textContent = id ? "Goal" : "New goal";
+  $("gNewWrap").hidden = !!id; $("gHead").hidden = !id; $("gHist").hidden = !id; $("gDel").hidden = !(id&&g.target);
+  if(id){ const o=goalInfo(gCat); $("gHead").innerHTML='<span class="av" style="--cc:'+(gCat.color||"var(--accent)")+'">'+catIcon(id)+'</span><div><b></b><span class="num">Balance '+fmtV(gCat,o.bal)+'</span></div>'; $("gHead").querySelector("b").textContent=gCat.name; }
+  else { gNewIcon="star"; $("gName").value=""; drawNewIcon(); }
+  $("gTLabel").textContent = lots ? "Target (lot)" : "Target amount (Rp)";
+  $("gMLabel").textContent = lots ? "Lots per month" : "Saving per month (Rp)";
+  ["gTarget","gMonthly"].forEach(k=>{ $(k).setAttribute("inputmode", lots?"decimal":"numeric"); });
+  $("gTarget").value = lots ? (g.target||"") : fmtNum(g.target||0);
+  const m = id ? goalMonthly(gCat) : 0;
+  $("gMonthly").value = lots ? (m?String(m).replace(".",","):"") : fmtNum(m);
   const y0=+todayStr().slice(0,4);
-  $("gDueM").innerHTML='<option value="">No date</option>'+BLN3.map((m,j)=>'<option value="'+pad(j+1)+'">'+m+'</option>').join("");
+  $("gDueM").innerHTML='<option value="">No date</option>'+BLN3.map((x,j)=>'<option value="'+pad(j+1)+'">'+x+'</option>').join("");
   $("gDueY").innerHTML=Array.from({length:21},(_,k)=>'<option>'+(y0+k)+'</option>').join("");
-  $("gDueM").value = gEdit.due ? gEdit.due.slice(5) : ""; $("gDueY").value = gEdit.due ? gEdit.due.slice(0,4) : String(y0+1);
-  syncLink();
-  $("gDel").hidden = i<0;
+  $("gDueM").value = g.due ? g.due.slice(5) : ""; $("gDueY").value = g.due ? g.due.slice(0,4) : String(y0+1);
+  $("gDueY").disabled=!$("gDueM").value;
   ["catat","history","tambah","grafik","profil"].forEach(x=>$("p-"+x).hidden=true);
   $("p-goals").hidden=false; document.body.classList.add("adding"); $("app").scrollTop=0;
 }
-function syncLink(){
-  const id=$("gLink").value; $("gSavedWrap").hidden=!!id; $("gAuto").hidden=!id;
-  if(id) $("gAuto").innerHTML='Balance of this category: <b class="num">'+rp(catBal(id))+'</b>. Updates automatically when you record savings.';
-  $("gDueY").disabled=!$("gDueM").value;
-}
-$("gLink").onchange=()=>{ syncLink(); const c=CAT[$("gLink").value]; if(c && !numOf($("gMonthly").value)) $("gMonthly").value=fmtNum(c.budget||0); };
-$("gDueM").onchange=syncLink;
-["gTarget","gSaved","gMonthly"].forEach(id=>bindMoney($(id),()=>{}));
-$("gIcon").onclick=()=>openIconPicker(gEdit.icon,gEdit.color,k=>{ gEdit.icon=k; $("gIcon").innerHTML='<span class="av" style="--cc:'+gEdit.color+'">'+iconSvg(k)+'</span>'; });
+function drawNewIcon(){ $("gIcon").innerHTML='<span class="av" style="--cc:'+NEW_COLORS[0]+'">'+iconSvg(gNewIcon)+'</span>'; }
+$("gIcon").onclick=()=>openIconPicker(gNewIcon,NEW_COLORS[0],k=>{ gNewIcon=k; drawNewIcon(); });
+$("gDueM").onchange=()=>{ $("gDueY").disabled=!$("gDueM").value; };
+["gTarget","gMonthly"].forEach(id=>$(id).addEventListener("input",()=>{
+  const el=$(id);
+  if(gCat&&gCat.lots){ el.value=el.value.replace(/[^\d,\.]/g,""); return; }
+  const d=el.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"").slice(0,13); el.value=d?Number(d).toLocaleString("id-ID"):"";
+}));
 function closeGoal(){ $("p-goals").hidden=true; document.body.classList.remove("adding"); setTab("grafik"); }
 $("gCancel").onclick=closeGoal;
 $("gSave").onclick=()=>{
-  const name=$("gName").value.trim(); if(!name){ showToast("Give your goal a name"); $("gName").focus(); return; }
-  Object.assign(gEdit,{name,target:numOf($("gTarget").value),saved:numOf($("gSaved").value),link:$("gLink").value,monthly:numOf($("gMonthly").value),
-    due:$("gDueM").value?$("gDueY").value+"-"+$("gDueM").value:""});
-  if(gIdx>=0) GOALS[gIdx]=gEdit; else GOALS.push(gEdit);
+  const lots=!!(gCat&&gCat.lots);
+  const target = lots ? lotNum($("gTarget").value) : numOf($("gTarget").value);
+  const monthly = lots ? lotNum($("gMonthly").value) : numOf($("gMonthly").value);
+  const due = $("gDueM").value ? $("gDueY").value+"-"+$("gDueM").value : "";
+  if(!gCat){
+    // goal baru = kategori Tabungan baru, supaya otomatis terisi saat mencatat
+    const name=$("gName").value.trim(); if(!name){ showToast("Give your goal a name"); $("gName").focus(); return; }
+    const id="s"+Date.now().toString(36);
+    const cats=(Array.isArray(CFG.cats)&&CFG.cats.length?CFG.cats:CATS).map(c=>Object.assign({},c));
+    const used=new Set(cats.map(c=>c.color)); const color=NEW_COLORS.find(c=>!used.has(c))||NEW_COLORS[0];
+    cats.push({id,name,budget:monthly,grp:"Tabungan",icon:gNewIcon,color,save:true});
+    localStorage.setItem(CFG_KEY,JSON.stringify(Object.assign({},CFG,{cats})));
+    GOALS[id]={target,due,monthly:0}; saveGoals(); location.reload(); return;
+  }
+  const def = (()=>{ const g=GOALS[gCat.id]; GOALS[gCat.id]={}; const d=goalMonthly(gCat); GOALS[gCat.id]=g; return d; })();
+  GOALS[gCat.id]={target,due,monthly: monthly===def?0:monthly};
   saveGoals(); closeGoal(); renderGoals(); showToast("Goal saved");
 };
 $("gDel").onclick=async()=>{
-  $("mT").textContent="Delete this goal?"; $("mYes").textContent="Yes, delete";
-  const ok=await askConfirm(gEdit.name||"Goal","",""); $("mT").textContent="Delete this entry?";
-  if(!ok) return; GOALS.splice(gIdx,1); saveGoals(); closeGoal(); renderGoals(); showToast("Deleted");
+  $("mT").textContent="Remove this target?"; $("mYes").textContent="Yes, remove";
+  const ok=await askConfirm(gCat.name,"","The category and its balance stay."); $("mT").textContent="Delete this entry?"; $("mYes").textContent="Yes, delete";
+  if(!ok) return; delete GOALS[gCat.id]; saveGoals(); closeGoal(); renderGoals(); showToast("Target removed");
 };
-$("gNew").onclick=()=>openGoal(-1);
+$("gHist").onclick=()=>{ if(gCat) openCatList(gCat.id, all.filter(t=>t.cat===gCat.id)); };
+$("gNew").onclick=()=>openGoal(null);
 window._gReady=true; renderGoals();
 </script>
 
