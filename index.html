@@ -441,6 +441,27 @@ body.docked #msg{visibility:hidden}
 .gdue{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .gtx{background:var(--surface);border:1px solid var(--line)!important;border-radius:16px}
 .gdel{font:inherit;font-size:15px;font-weight:700;color:var(--bad);background:var(--bad-soft);border:0;border-radius:14px;padding:14px;cursor:pointer}
+
+/* Goals: daftar ringkas */
+.gsum{padding:22px}
+.gsv2{font-size:34px}
+.glist.card{display:block;padding:0 16px}
+.glist .gcard{background:none;border:0;border-radius:0;padding:14px 0;border-top:1px solid var(--line)}
+.glist .gcard:first-child{border-top:0}
+.glist .gch{gap:10px}
+.glist .gch .av.mini{width:30px;height:30px;border-radius:10px}
+.glist .gch .av.mini svg{width:16px;height:16px}
+.glist .gcn{font-size:14.5px;font-weight:600}
+.gbv{font-size:14.5px;font-weight:700;white-space:nowrap}
+.glist .gtrk2{height:5px;border-radius:3px;margin:10px 0 7px 40px}
+.glist .gtrk2 i{border-radius:3px;box-shadow:none}
+.gsub2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-left:40px;font-size:12px;color:var(--muted)}
+.glist .gtrk2 + .gsub2{margin-top:0}
+.gch + .gsub2{margin-top:4px}
+.gsl{display:flex;gap:4px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gsetl{color:var(--accent);font-weight:600}
+.gsub2 .gchip{font-size:10.5px;padding:2px 8px}
+.glist .gneed{margin:6px 0 0 40px;font-size:12px}
 </style>
 
 <style>
@@ -862,7 +883,7 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
     <div class="gsum" id="gSum"></div>
     <div class="sec">
       <div class="shead"><h2>Savings &amp; assets</h2><span id="gCount"></span></div>
-      <div class="glist" id="gList"></div>
+      <div class="glist card" id="gList"></div>
       <button type="button" class="gadd" id="gNew">+ Add a goal</button>
     </div>
     <p class="foot">Balances update automatically from what you record. Tap a goal to set its target.</p>
@@ -1451,7 +1472,7 @@ function renderData(mk, txs, by, spend, save, extra, pre){
     cats.forEach(c=>{
       const used=by[c.id]||0;
       const pct = c.budget ? used/c.budget*100 : 0;
-      const tone = !c.budget ? "ok" : pct>100 ? "bad" : pct>=90 ? "warn" : "ok";
+      const tone = !c.budget ? "ok" : pct>=100 ? "bad" : pct>=90 ? "warn" : "ok";
       // kumulatif per hari untuk garis kecil
       const per={}; txs.forEach(t=>{ if(t.cat===c.id) per[t.date]=(per[t.date]||0)+t.amount; });
       let acc=0; const cum=pdays.map((d,i)=>{ acc+=per[d]||0; return i<=lastI?acc:null; }).filter(v=>v!==null);
@@ -2080,15 +2101,13 @@ function renderGoals(){
     if(c.lots) lots.push(fmtV(c,o.bal)+" "+c.name.replace(/^saham\s+/i,"")); else { tot+=o.bal; if(o.target){ tS+=Math.min(o.bal,o.target); tT+=o.target; } }
     if(o.months>0 && (!next||o.months<next.m)) next={c,m:o.months,when:o.when};
     const el=document.createElement("button"); el.type="button"; el.className="gcard"; el.style.setProperty("--cc",c.color||"var(--accent)");
-    let h='<div class="gch"><span class="av" style="--cc:'+(c.color||"var(--accent)")+'">'+catIcon(c.id)+'</span><span class="gcn"></span>'+(o.chip?'<span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span>':'')+'</div>'+
-      '<div class="gbal"><b class="num">'+fmtV(c,o.bal)+'</b>'+(o.target?'<span class="num">of '+fmtV(c,o.target)+'</span>':'')+'</div>';
-    if(o.target){
-      h+='<div class="gtrk2"><i style="width:'+o.pc+'%"></i><s style="left:25%"></s><s style="left:50%"></s><s style="left:75%"></s></div>'+
-        '<div class="gpcl"><span><b class="num">'+Math.floor(o.pc)+'%</b> reached</span><span class="num">'+(o.left>0?fmtV(c,o.left)+' to go':'Done')+'</span></div>'+
-        '<div class="gstats"><div><small>Per month</small><b class="num">'+(o.monthly?fmtV(c,o.monthly):'—')+'</b></div>'+
-        '<div><small>'+(o.left<=0?'Status':'Estimated')+'</small><b>'+(o.left<=0?'Target reached':o.when?mLabel(o.when):'—')+'</b>'+(o.left>0&&o.when?'<small>in '+dur(o.months)+'</small>':'')+'</div></div>'+
-        (o.need?'<div class="gneed">Save <b class="num">'+fmtV(c,o.need)+'/mo</b> to reach it by '+mLabel(o.due)+'</div>':'');
-    } else h+='<div class="gset">Set a target</div>';
+    const sub = !o.target ? '<span class="gsetl">Set a target</span>'
+      : o.left<=0 ? '<span class="num">Target '+fmtV(c,o.target)+'</span>'
+      : '<span class="num">'+Math.floor(o.pc)+'% of '+fmtV(c,o.target)+'</span>'+(o.when?'<span>· '+mLabel(o.when)+'</span>':'');
+    let h='<div class="gch"><span class="av mini" style="--cc:'+(c.color||"var(--accent)")+'">'+catIcon(c.id)+'</span><span class="gcn"></span><b class="gbv num">'+fmtV(c,o.bal)+'</b></div>'+
+      (o.target?'<div class="gtrk2"><i style="width:'+o.pc+'%"></i></div>':'')+
+      '<div class="gsub2"><span class="gsl">'+sub+'</span>'+(o.chip&&o.target?'<span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span>':'')+'</div>'+
+      (o.need?'<div class="gneed">Save <b class="num">'+fmtV(c,o.need)+'/mo</b> to reach it by '+mLabel(o.due)+'</div>':'');
     el.innerHTML=h; el.querySelector(".gcn").textContent=c.name;
     el.onclick=()=>openGoal(c.id);
     L.appendChild(el);
@@ -2096,11 +2115,8 @@ function renderGoals(){
   $("gCount").textContent=cats.length+(cats.length===1?" goal":" goals");
   const pc=tT?tS/tT*100:0;
   $("gSum").innerHTML='<div class="gsk">Total savings &amp; assets</div><div class="gsv2 num">'+rp(tot)+'</div>'+
-    (lots.length?'<div class="gchips">'+lots.map(x=>'<span class="num"></span>').join("")+'</div>':'')+
-    (tT?'<div class="gtrk"><i style="width:'+Math.min(100,pc)+'%"></i></div><div class="gnext"><span class="num">'+Math.floor(pc)+'% of '+rp(tT)+'</span>'+(next?'<b></b>':'')+'</div>'
-       :'<div class="gnext" style="margin-top:12px"><span>Tap a goal below to set a target</span></div>');
+    (lots.length?'<div class="gchips">'+lots.map(x=>'<span class="num"></span>').join("")+'</div>':'');
   $("gSum").querySelectorAll(".gchips span").forEach((e,i)=>e.textContent=lots[i]);
-  const nb=$("gSum").querySelector(".gnext b"); if(nb&&next) nb.textContent="Next: "+next.c.name+" · "+mLabel(next.when);
 }
 // editor
 let gCat=null, gNewIcon="star";
