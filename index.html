@@ -692,6 +692,32 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
 .hero .big{font-size:clamp(30px,8.6vw,40px)!important}
 .hbtns .eye{width:38px!important;height:38px!important}
 .hbtns{gap:6px}
+
+/* ===== Revisi 23 Nov ===== */
+/* ikon duotone */
+.av svg .f,.gi svg .f,.ipbtn svg .f{fill:currentColor;fill-opacity:.32;stroke:none}
+/* tinggi grafik menyesuaikan */
+.slides{align-items:start;transition:height .25s ease}
+.slide .card{height:auto!important}
+#chartCard{min-height:0!important;padding:18px}
+#chartCard .donut .seg{stroke-linecap:butt}
+/* kartu anggaran ringkas */
+.bgrid .bcard{padding:12px 14px;gap:8px}
+.bcard .bc-f b{font-size:22px}
+.bcard .bar{height:6px;margin-top:2px}
+.bcard .bar i{background:var(--cc)}
+.bcard.bad .bar i{background:var(--bad)}
+.bcard.warn .bar i{background:var(--warn)}
+/* urutkan daftar */
+.clsort{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px;border-radius:14px;background:var(--track);margin:0 0 10px}
+.clsort button{font:inherit;font-size:13px;font-weight:600;height:34px;border:0;border-radius:10px;background:none;color:var(--muted);cursor:pointer}
+.clsort button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+/* pemilih ikon */
+.ipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:10px;padding:4px 0 8px}
+.ipbtn{border:0;background:none;padding:6px;border-radius:16px;cursor:pointer;display:flex;justify-content:center}
+.ipbtn .av{width:46px;height:46px;border-radius:15px}
+.ipbtn .av svg{width:22px;height:22px}
+.ipbtn.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
 </style>
 </head>
 <body>
@@ -890,12 +916,24 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
   </div>
 </div>
 
+<div class="clmodal" id="iconPick" hidden role="dialog" aria-modal="true" aria-labelledby="ipT">
+  <div class="clbox">
+    <div class="clhead"><div class="stx"><div class="st" id="ipT">Choose an icon</div></div><button type="button" class="sx" id="ipClose" aria-label="Close">✕</button></div>
+    <div class="cllist"><div class="ipgrid" id="ipGrid"></div></div>
+  </div>
+</div>
+
 <div class="clmodal" id="catList" hidden role="dialog" aria-modal="true" aria-labelledby="clName">
   <div class="clbox">
     <div class="clhead">
       <span class="av" id="clIcon"></span>
       <div class="stx"><div class="st" id="clName">—</div><div class="sk" id="clSub"></div></div>
       <button type="button" class="sx" id="clClose" aria-label="Close">✕</button>
+    </div>
+    <div class="clsort" role="group" aria-label="Sort">
+      <button type="button" data-sort="date" aria-pressed="true">Newest</button>
+      <button type="button" data-sort="high" aria-pressed="false">Highest</button>
+      <button type="button" data-sort="low" aria-pressed="false">Lowest</button>
     </div>
     <div class="cllist" id="clList"></div>
   </div>
@@ -957,28 +995,63 @@ const CARRY = CFG.carry||{};
 const pctW = (v,t) => Math.max(0,Math.min(100, v/t*100))+"%";
 // Ikon yang bisa dipilih untuk kategori (garis, 24x24)
 const ICON = {
-  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
-  bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
-  shirt:'<path d="M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
-  fuel:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M4 10h10"/><path d="M14 9l3 1v7a1.5 1.5 0 0 0 3 0V8l-3-3"/>',
-  card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/>',
-  sparkle:'<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
-  food:'<path d="M7 3v18"/><path d="M4 3v5a3 3 0 0 0 6 0V3"/><path d="M17 21V3c-2 1.5-3 4.5-3 8h3"/>',
-  cup:'<path d="M6 8h12l-1.5 13h-9z"/><path d="M5 8h14"/><path d="M12 8V4l3-1"/>',
-  game:'<path d="M6 9h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.5 1.6L15 14H9l-1.5 1.6A3 3 0 0 1 2 14v-1a4 4 0 0 1 4-4z"/><path d="M8 11v3"/><path d="M6.5 12.5h3"/><path d="M16 12h.01"/><path d="M18 13.5h.01"/>',
-  bag:'<path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
-  scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5L20 20"/><path d="M8.5 15.5L20 4"/>',
-  car:'<path d="M5 17h14v-5l-2-5H7l-2 5z"/><path d="M5 12h14"/><circle cx="8" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/>',
-  phone:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/>',
-  health:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2"/><path d="M12 10.5v6M9 13.5h6"/>',
-  book:'<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/>',
-  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9"/><path d="M12 8v13"/><path d="M12 8c-2-4-6-3-5 0M12 8c2-4 6-3 5 0"/>',
-  dots:'<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
-  shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',
-  trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
-  heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
-  person:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
-  income:'<path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/>'
+  home:'<path class="f" d="M5 10v10h14V10l-7-5.5z"/><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  bolt:'<path class="f" d="M13 2L4 14h7l-1 8 9-12h-7z"/><path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  shirt:'<path class="f" d="M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/><path d="M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
+  fuel:'<rect class="f" x="4" y="3" width="10" height="7" rx="1"/><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M4 10h10"/><path d="M14 9l3 1v7a1.5 1.5 0 0 0 3 0V8l-3-3"/>',
+  card:'<rect class="f" x="3" y="6" width="18" height="12" rx="2"/><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/>',
+  sparkle:'<path class="f" d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M19 3v4M17 5h4"/>',
+  food:'<path class="f" d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/>',
+  utensils:'<path d="M7 3v18"/><path d="M4 3v5a3 3 0 0 0 6 0V3"/><path class="f" d="M17 21V3c-2 1.5-3 4.5-3 8h3"/><path d="M17 21V3c-2 1.5-3 4.5-3 8h3"/>',
+  cup:'<path class="f" d="M6 8h12l-1.5 13h-9z"/><path d="M6 8h12l-1.5 13h-9z"/><path d="M5 8h14"/><path d="M12 8V4l3-1"/>',
+  coffee:'<path class="f" d="M4 9h12v6a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M4 9h12v6a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 3v3M10 3v3M13 3v3"/>',
+  burger:'<path class="f" d="M4 10a8 6 0 0 1 16 0z"/><path d="M4 10a8 6 0 0 1 16 0z"/><path d="M3 14h18"/><path class="f" d="M5 17h14a2 2 0 0 1-2 3H7a2 2 0 0 1-2-3z"/><path d="M5 17h14a2 2 0 0 1-2 3H7a2 2 0 0 1-2-3z"/>',
+  game:'<path class="f" d="M6 9h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.5 1.6L15 14H9l-1.5 1.6A3 3 0 0 1 2 14v-1a4 4 0 0 1 4-4z"/><path d="M6 9h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.5 1.6L15 14H9l-1.5 1.6A3 3 0 0 1 2 14v-1a4 4 0 0 1 4-4z"/><path d="M8 11v3"/><path d="M6.5 12.5h3"/><path d="M16 12h.01"/><path d="M18 13.5h.01"/>',
+  bag:'<path class="f" d="M5 8h14l-1 13H6z"/><path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  cart:'<path class="f" d="M6 6h15l-2 8H8z"/><path d="M3 3h2l3 11h11l2-8H6"/><circle cx="9" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/>',
+  scissors:'<circle class="f" cx="6" cy="6" r="3"/><circle class="f" cx="6" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5L20 20"/><path d="M8.5 15.5L20 4"/>',
+  beauty:'<rect class="f" x="8" y="13" width="8" height="8" rx="1"/><rect x="8" y="13" width="8" height="8" rx="1"/><path d="M9 13V8l6-4v9"/>',
+  car:'<path class="f" d="M5 17h14v-5l-2-5H7l-2 5z"/><path d="M5 17h14v-5l-2-5H7l-2 5z"/><path d="M5 12h14"/><circle cx="8" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/>',
+  motor:'<circle class="f" cx="5.5" cy="16.5" r="3.5"/><circle class="f" cx="18.5" cy="16.5" r="3.5"/><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5L9 10h5l4.5 6.5"/><path d="M13 6h3l2.5 10.5"/><path d="M9 10l3 6.5h3"/>',
+  bus:'<rect class="f" x="4" y="3" width="16" height="15" rx="3"/><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16"/><path d="M7 21v-3M17 21v-3"/><circle cx="8" cy="14.5" r=".9" fill="currentColor"/><circle cx="16" cy="14.5" r=".9" fill="currentColor"/>',
+  plane:'<path class="f" d="M10.5 3.5a1.5 1.5 0 0 1 3 0V10l8 4.5V17l-8-2.5V19l2.5 2v1.5L12 21.5l-4 1V21l2.5-2v-4.5L2.5 17v-2.5l8-4.5z"/><path d="M10.5 3.5a1.5 1.5 0 0 1 3 0V10l8 4.5V17l-8-2.5V19l2.5 2v1.5L12 21.5l-4 1V21l2.5-2v-4.5L2.5 17v-2.5l8-4.5z"/>',
+  phone:'<rect class="f" x="7" y="2.5" width="10" height="19" rx="2"/><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/>',
+  wifi:'<path class="f" d="M2 9a15 15 0 0 1 20 0L12 20z"/><path d="M2 9a15 15 0 0 1 20 0"/><path d="M5.5 12.5a10 10 0 0 1 13 0"/><path d="M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1.3" fill="currentColor"/>',
+  tv:'<rect class="f" x="3" y="6" width="18" height="12" rx="2"/><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 21h8"/><path d="M9 3l3 3 3-3"/>',
+  laptop:'<rect class="f" x="4" y="4" width="16" height="11" rx="1.5"/><rect x="4" y="4" width="16" height="11" rx="1.5"/><path d="M2 19h20"/>',
+  music:'<circle class="f" cx="7" cy="17" r="3"/><circle class="f" cx="17" cy="15" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="15" r="3"/><path d="M10 17V5l10-2v12"/>',
+  film:'<rect class="f" x="3" y="4" width="18" height="16" rx="2"/><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+  ticket:'<path class="f" d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z"/><path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z"/><path d="M14 8v1.5M14 11.25v1.5M14 14.5v1.5"/>',
+  camera:'<path class="f" d="M3 8h4l2-3h6l2 3h4v12H3z"/><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.5"/>',
+  dumbbell:'<rect class="f" x="3" y="8" width="4" height="8" rx="1"/><rect class="f" x="17" y="8" width="4" height="8" rx="1"/><rect x="3" y="8" width="4" height="8" rx="1"/><rect x="17" y="8" width="4" height="8" rx="1"/><path d="M7 12h10"/><path d="M1.5 10.5v3M22.5 10.5v3"/>',
+  ball:'<circle class="f" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><path d="M5.6 5.6c3.5 3 3.5 9.8 0 12.8M18.4 5.6c-3.5 3-3.5 9.8 0 12.8"/>',
+  health:'<rect class="f" x="3" y="7" width="18" height="13" rx="2"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2"/><path d="M12 10.5v6M9 13.5h6"/>',
+  pill:'<path class="f" d="M14.1 3.5a4.9 4.9 0 0 1 6.9 6.9L17.5 14 10 6.5z"/><path d="M10.5 20.5a4.9 4.9 0 0 1-7-7l7-7a4.9 4.9 0 0 1 7 7z"/><path d="M7 10l7 7"/>',
+  baby:'<circle class="f" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><circle cx="9" cy="11" r=".9" fill="currentColor"/><circle cx="15" cy="11" r=".9" fill="currentColor"/><path d="M9.5 15a3.5 3.5 0 0 0 5 0"/><path d="M12 3c-1 1.5 0 3 1.5 3"/>',
+  paw:'<ellipse class="f" cx="12" cy="16" rx="4.5" ry="3.8"/><ellipse cx="12" cy="16" rx="4.5" ry="3.8"/><circle cx="6" cy="10" r="2"/><circle cx="10" cy="6" r="2"/><circle cx="14" cy="6" r="2"/><circle cx="18" cy="10" r="2"/>',
+  book:'<path class="f" d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path class="f" d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/><path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/>',
+  grad:'<path class="f" d="M2 9l10-5 10 5-10 5z"/><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/><path d="M22 9v6"/>',
+  briefcase:'<rect class="f" x="3" y="7" width="18" height="13" rx="2"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/>',
+  wrench:'<path class="f" d="M14.5 3.5a5 5 0 0 0-5.6 6.9L3.5 15.8a2.1 2.1 0 0 0 3 3l5.4-5.4a5 5 0 0 0 6.9-5.6l-3 3-2.8-.7-.7-2.8z"/><path d="M14.5 3.5a5 5 0 0 0-5.6 6.9L3.5 15.8a2.1 2.1 0 0 0 3 3l5.4-5.4a5 5 0 0 0 6.9-5.6l-3 3-2.8-.7-.7-2.8z"/>',
+  drop:'<path class="f" d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/><path d="M9 14.5a3 3 0 0 0 3 3"/>',
+  bed:'<path class="f" d="M3 11h18v6H3z"/><path d="M3 6v13M21 11v8M3 17h18M3 11h18v6"/><circle cx="7" cy="8.5" r="1.6"/>',
+  plant:'<path class="f" d="M6 15h12l-1.5 6h-9z"/><path d="M6 15h12l-1.5 6h-9z"/><path d="M12 15V9"/><path class="f" d="M12 10C12 6 9 4 5 4c0 4 3 6 7 6z"/><path d="M12 10C12 6 9 4 5 4c0 4 3 6 7 6z"/><path class="f" d="M12 12c0-3 2.5-5 6-5 0 3-2.5 5-6 5z"/><path d="M12 12c0-3 2.5-5 6-5 0 3-2.5 5-6 5z"/>',
+  gift:'<rect class="f" x="3" y="8" width="18" height="4" rx="1"/><path class="f" d="M5 12v9h14v-9z"/><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9"/><path d="M12 8v13"/><path d="M12 8c-2-4-6-3-5 0M12 8c2-4 6-3 5 0"/>',
+  donate:'<path class="f" d="M12 4.5a2.8 2.8 0 0 1 4.5 3.2L12 12 7.5 7.7A2.8 2.8 0 0 1 12 4.5z"/><path d="M12 4.5a2.8 2.8 0 0 1 4.5 3.2L12 12 7.5 7.7A2.8 2.8 0 0 1 12 4.5z"/><path d="M2 14h3l4 2h4a1.5 1.5 0 0 1 0 3H9"/><path d="M5 14v6"/><path d="M13 18l6-3a1.6 1.6 0 0 1 2 2.4L14 21H5"/>',
+  star:'<path class="f" d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
+  calendar:'<rect class="f" x="3" y="5" width="18" height="16" rx="2"/><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  receipt:'<path class="f" d="M5 3h14v18l-2.3-1.5L14.3 21 12 19.5 9.7 21l-2.4-1.5L5 21z"/><path d="M5 3h14v18l-2.3-1.5L14.3 21 12 19.5 9.7 21l-2.4-1.5L5 21z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  cash:'<rect class="f" x="2" y="6" width="20" height="12" rx="2"/><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9.5v5M18 9.5v5"/>',
+  piggy:'<path class="f" d="M5 11a7 6 0 0 1 12-3h2v3l2 1v3l-2 1v3h-3v-2h-6v2H7v-3a6 6 0 0 1-2-5z"/><path d="M5 11a7 6 0 0 1 12-3h2v3l2 1v3l-2 1v3h-3v-2h-6v2H7v-3a6 6 0 0 1-2-5z"/><path d="M10 7.5h3"/><circle cx="16" cy="11" r=".8" fill="currentColor"/><path d="M5 11H3"/>',
+  bank:'<path class="f" d="M3 9l9-5 9 5z"/><path d="M3 9l9-5 9 5z"/><path d="M5 9v9M9.5 9v9M14.5 9v9M19 9v9"/><path d="M3 21h18M3 18h18"/>',
+  umbrella:'<path class="f" d="M2 12a10 10 0 0 1 20 0z"/><path d="M2 12a10 10 0 0 1 20 0z"/><path d="M12 12v6a2.5 2.5 0 0 1-5 0"/><path d="M12 2v1"/>',
+  pie:'<path class="f" d="M12 3a9 9 0 0 1 9 9h-9z"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/><path d="M10 5.2A8 8 0 1 0 18.8 14H10z"/>',
+  shield:'<path class="f" d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+  trend:'<path class="f" d="M3 17l6-6 4 4 8-8V20H3z"/><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+  heart:'<path class="f" d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  person:'<circle class="f" cx="12" cy="8" r="4"/><path class="f" d="M4 21c0-4 4-6 8-6s8 2 8 6z"/><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+  income:'<path class="f" d="M4 14h4l1.5 2.5h5L16 14h4v6H4z"/><path d="M12 3v10"/><path d="M8 9l4 4 4-4"/><path d="M4 14h4l1.5 2.5h5L16 14h4v6H4z"/>',
+  dots:'<circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/>'
 };
 const ICON_KEYS = Object.keys(ICON);
 const PALETTE = ["#3b6fd8","#d39b00","#1f9fb0","#d64545","#8d6e63","#c2603a","#2e9d5b","#e06aa3","#8e5bd6","#ef8a1f","#6b8e23","#7f8c8d","#3f63d6","#1f9a7a","#d4588f","#7a52c7","#0d6b58"];
@@ -1054,6 +1127,7 @@ function setTab(t){
   tab=t;
   if(t!=="tambah") ls.set("kas_tab",t);
   document.body.classList.toggle("adding", t==="tambah");
+  if(t==="history" && window.fitSlides) requestAnimationFrame(window.fitSlides);
   TABS.forEach(x=>{ $("p-"+x).hidden = x!==t; if(x===t) $("t-"+x).setAttribute("aria-current","page"); else $("t-"+x).removeAttribute("aria-current"); });
   if(changed) $("app").scrollTop=0;
   if(t!=="tambah" && !$("sheet").hidden) closeSheet();
@@ -1239,6 +1313,7 @@ function render(){
   const htx = all.filter(t=>periodKey(t.date)===hk);
   const hby={}; let hsp=0; htx.forEach(t=>{ hby[t.cat]=(hby[t.cat]||0)+t.amount; if(!isIncome(t)&&!isSave(t)) hsp+=t.amount; });
   renderCharts(htx,hby,hsp); chartTx=htx;
+  if(window.fitSlides) requestAnimationFrame(window.fitSlides);
   $("hTotal").textContent = "Total spent "+rp(hsp);
 }
 
@@ -1323,13 +1398,8 @@ function renderData(mk, txs, by, spend, save, extra, pre){
       const end = pts.length ? pts[pts.length-1] : null;
       const el=document.createElement("button"); el.type="button"; el.className="bcard "+tone; el.style.setProperty("--cc",catColor(c.id));
       el.innerHTML='<div class="bc-h"><span class="av mini" style="--cc:'+catColor(c.id)+'">'+catIcon(c.id)+'</span><span class="bc-n"></span></div>'+
-        '<svg class="bc-g" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'+
-          '<defs><linearGradient id="bg_'+c.id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="bc-s0"></stop><stop offset="1" class="bc-s1"></stop></linearGradient></defs>'+
-          (capY?'<line x1="0" x2="'+W+'" y1="'+capY+'" y2="'+capY+'" class="bc-cap"></line>':'')+
-          (area?'<path d="'+area+'" fill="url(#bg_'+c.id+')" stroke="none"></path><path d="'+line+'" class="bc-l" fill="none"></path>':'')+
-          (end?'<circle cx="'+end[0].toFixed(1)+'" cy="'+end[1].toFixed(1)+'" r="3.5" class="bc-d"></circle>':'')+
-        '</svg>'+
-        '<div class="bc-f"><b class="num">'+(c.budget?Math.round(pct)+"%":"—")+'</b><span class="num">'+plain(used)+(c.budget?'<em> / '+plain(c.budget)+'</em>':'<em> no limit</em>')+'</span></div>';
+        '<div class="bc-f"><b class="num">'+(c.budget?Math.round(pct)+"%":"—")+'</b><span class="num">'+plain(used)+(c.budget?'<em> / '+plain(c.budget)+'</em>':'<em> no limit</em>')+'</span></div>'+
+        '<div class="bar"><i style="width:'+Math.min(100,pct)+'%"></i></div>';
       el.querySelector(".bc-n").textContent=c.name;
       el.onclick=()=>openCatList(c.id, txs);
       grid.appendChild(el);
@@ -1475,12 +1545,12 @@ function renderCharts(txs, by, spend){
     items.forEach(({c,v},i)=>{
       const len=v/spend*CIRC;
       const draw=Math.max(0.5,len-GAP);
-      segs+=`<circle class="seg" data-i="${i}" cx="110" cy="110" r="${R}" fill="none" stroke="${catColor(c.id)}" stroke-width="30" stroke-dasharray="${draw} ${CIRC-draw}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)"></circle>`;
+      segs+=`<circle class="seg" data-i="${i}" cx="110" cy="110" r="${R}" fill="none" stroke="${catColor(c.id)}" stroke-width="26" stroke-dasharray="${draw} ${CIRC-draw}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)"></circle>`;
       off+=len;
     });
     const max=items[0].v;
     C.innerHTML = `<div class="dwrap"><div class="donutwrap"><svg class="donut" viewBox="0 0 220 220" role="img" aria-label="Spending by category, total ${rp(spend)}">
-      <circle cx="110" cy="110" r="${R}" fill="none" stroke="var(--track)" stroke-width="30"></circle>${segs}
+      <circle cx="110" cy="110" r="${R}" fill="none" stroke="var(--track)" stroke-width="26"></circle>${segs}
       <g class="ctr" id="dc">
       <text id="dcL" x="110" y="100" text-anchor="middle" class="sub" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif">Total spent</text>
       <text id="dcV" x="110" y="122" text-anchor="middle" font-size="18" font-weight="800" font-family="Plus Jakarta Sans, system-ui, sans-serif">${plain(spend)}</text>
@@ -1756,6 +1826,10 @@ $("goRestore").onclick=()=>setTab("profil");
     dots.forEach((d,k)=>d.classList.toggle("on",k===i)); $("slideTitle").textContent=titles[i]||titles[0]; };
   S.addEventListener("scroll",()=>requestAnimationFrame(upd),{passive:true});
   dots.forEach((d,k)=>d.onclick=()=>S.scrollTo({left:k*S.clientWidth,behavior:"smooth"}));
+  // tinggi area grafik mengikuti grafik yang sedang tampil
+  const fit=()=>{ const sl=S.children[cur]; if(sl&&sl.offsetHeight) S.style.height=sl.firstElementChild.offsetHeight+"px"; };
+  S.addEventListener("scroll",()=>requestAnimationFrame(fit),{passive:true});
+  window.fitSlides=fit; new ResizeObserver(fit).observe(S);
 })();
 
 // ===== Mode terang / gelap =====
@@ -1815,7 +1889,7 @@ function drawSettings(){
         (showStart?'<label class="sl"><span>'+(c.lots?"Starting lots":"Starting balance")+'</span><input class="setst num" inputmode="numeric" placeholder="0"></label>':'')+
         '</div><button type="button" class="setdel" aria-label="Delete category">✕</button>';
       const ib=r.querySelector(".seticon"); ib.style.setProperty("--cc",c.color); ib.innerHTML=iconSvg(c.icon);
-      ib.onclick=()=>{ c.icon=ICON_KEYS[(ICON_KEYS.indexOf(c.icon)+1)%ICON_KEYS.length]; ib.innerHTML=iconSvg(c.icon); };
+      ib.onclick=()=>openIconPicker(c.icon,c.color,k=>{ c.icon=k; ib.innerHTML=iconSvg(k); });
       const cb=r.querySelector(".setcolor"); cb.style.background=c.color;
       cb.onclick=()=>{ c.color=PALETTE[(PALETTE.indexOf(c.color)+1)%PALETTE.length]; cb.style.background=c.color; ib.style.setProperty("--cc",c.color); };
       const nm=r.querySelector(".setnm"); nm.value=c.name||""; nm.oninput=()=>{c.name=nm.value;};
@@ -1878,8 +1952,29 @@ $("setSave").onclick=()=>{
 })();
 
 // ===== Daftar transaksi per kategori (dari Grafik)
-function openCatList(id, src){
-  const c=CAT[id]; const list=(src||chartTx).filter(t=>t.cat===id).sort((a,b)=>(b.date+(b.createdAt||"")).localeCompare(a.date+(a.createdAt||"")));
+// ===== Pemilih ikon =====
+let _ipDone=null;
+function openIconPicker(current,color,done){
+  _ipDone=done; const G=$("ipGrid"); G.innerHTML="";
+  ICON_KEYS.forEach(k=>{
+    const b=document.createElement("button"); b.type="button"; b.className="ipbtn"+(k===current?" on":"");
+    b.innerHTML='<span class="av" style="--cc:'+(color||"#6fe08a")+'">'+iconSvg(k)+'</span>';
+    b.setAttribute("aria-label",k);
+    b.onclick=()=>{ $("iconPick").hidden=true; if(_ipDone) _ipDone(k); };
+    G.appendChild(b);
+  });
+  $("iconPick").hidden=false;
+}
+$("ipClose").onclick=()=>{$("iconPick").hidden=true;};
+$("iconPick").addEventListener("click",e=>{ if(e.target.id==="iconPick") $("iconPick").hidden=true; });
+
+let clSort="date", _clLast=null;
+function openCatList(id, src, keepSort){
+  if(!keepSort) clSort="date";
+  _clLast={id,src};
+  document.querySelectorAll(".clsort button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sort===clSort));
+  const c=CAT[id]; const list=(src||chartTx).filter(t=>t.cat===id).sort((a,b)=>
+    clSort==="high" ? b.amount-a.amount : clSort==="low" ? a.amount-b.amount : (b.date+(b.createdAt||"")).localeCompare(a.date+(a.createdAt||"")));
   const tot=list.reduce((a,t)=>a+t.amount,0);
   $("clIcon").style.setProperty("--cc",catColor(id)); $("clIcon").innerHTML=catIcon(id);
   $("clName").textContent=c.name;
@@ -1897,6 +1992,7 @@ function openCatList(id, src){
   $("catList").hidden=false;
 }
 $("clClose").onclick=()=>{$("catList").hidden=true;};
+document.querySelectorAll(".clsort button").forEach(b=>b.onclick=()=>{ clSort=b.dataset.sort; if(_clLast){ const keepScroll=0; openCatList(_clLast.id,_clLast.src,true); $("clList").scrollTop=keepScroll; } });
 $("catList").addEventListener("click",e=>{ if(e.target.id==="catList") $("catList").hidden=true; });
 
 // ===== Matikan zoom (cubit & ketuk dua kali) =====
