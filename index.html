@@ -462,6 +462,10 @@ body.docked #msg{visibility:hidden}
 .gsetl{color:var(--accent);font-weight:600}
 .gsub2 .gchip{font-size:10.5px;padding:2px 8px}
 .glist .gneed{margin:6px 0 0 40px;font-size:12px}
+
+.add2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.add2 .more{margin:0}
+.stag{font-size:11.5px;font-weight:600;color:var(--accent)}
 </style>
 
 <style>
@@ -884,9 +888,8 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
     <div class="sec">
       <div class="shead"><h2>Savings &amp; assets</h2><span id="gCount"></span></div>
       <div class="glist card" id="gList"></div>
-      <button type="button" class="gadd" id="gNew">+ Add a goal</button>
     </div>
-    <p class="foot">Balances update automatically from what you record. Tap a goal to set its target.</p>
+    <p class="foot">Balances update automatically from what you record. Tap a goal to set its target. Add savings or stocks in Profile → Settings.</p>
   </section>
 
   <!-- EDIT GOAL -->
@@ -1090,7 +1093,9 @@ const LocalDB=(()=>{
   return {collection:()=>q,doc:()=>({onSnapshot(){return()=>{}},set:async()=>{}}),all:load,replace:save};
 })();
 const GAJI = CFG.gaji||0;
-const START = CFG.start||{};   // saldo awal kategori tabungan (disimpan di HP)
+const START = CFG.start||{};
+// saldo lot awal per saham; START.lot lama hanya untuk saham pertama
+const lotStart = c => START[c.id+"_lot"]!=null ? START[c.id+"_lot"] : (((CFG.cats||[]).find(x=>x.lots)||{}).id===c.id ? (START.lot||0) : 0);   // saldo awal kategori tabungan (disimpan di HP)
 // Sisa uang dari periode sebelumnya yang ikut dipakai di periode ini (ditetapkan manual)
 const CARRY = CFG.carry||{};
 const pctW = (v,t) => Math.max(0,Math.min(100, v/t*100))+"%";
@@ -1929,7 +1934,7 @@ function drawSettings(){
       const showStart = g==="Tabungan";
       r.innerHTML='<button type="button" class="av seticon" aria-label="Change icon"></button>'+
         '<button type="button" class="setcolor" aria-label="Change colour"></button>'+
-        '<div class="setfields"><input class="setnm" placeholder="Category name">'+
+        '<div class="setfields"><input class="setnm" placeholder="'+(c.lots?"Stock name, e.g. Saham BBCA":"Category name")+'">'+(c.lots?'<span class="stag">Stock · counted in lots</span>':'')+
         (showBudget?'<label class="sl"><span>Budget</span><input class="setbg num" inputmode="numeric" placeholder="0"></label>':'')+
         (showStart?'<label class="sl"><span>'+(c.lots?"Starting lots":"Starting balance")+'</span><input class="setst num" inputmode="numeric" placeholder="0"></label>':'')+
         '</div><button type="button" class="setdel" aria-label="Delete category">✕</button>';
@@ -1942,7 +1947,7 @@ function drawSettings(){
       const st=r.querySelector(".setst");
       if(st){
         const key=c.lots?c.id+"_lot":c.id;
-        const cur0 = c.lots ? (START[key]!=null?START[key]:(START.lot||0)) : (START[key]||0);
+        const cur0 = c.lots ? lotStart(c) : (START[key]||0);
         if(c._start==null) c._start=cur0;
         st.value = c.lots ? (c._start||"") : fmtNum(c._start);
         if(c.lots) st.oninput=()=>{ st.value=st.value.replace(/\D/g,""); c._start=Number(st.value)||0; };
@@ -1961,16 +1966,20 @@ function drawSettings(){
     });
     enableReorder(box,g);
     sec.appendChild(box);
-    const add=document.createElement("button"); add.type="button"; add.className="more"; add.textContent="+ Add category";
-    add.onclick=()=>{
-      const used=draft.map(x=>x.color);
-      const color=PALETTE.find(p=>!used.includes(p))||PALETTE[draft.length%PALETTE.length];
-      const c={id:"c"+Date.now().toString(36),name:"",budget:0,grp:g,icon:g==="Pemasukan"?"income":g==="Tabungan"?"shield":"dots",color};
-      if(g==="Tabungan") c.save=true; if(g==="Pemasukan") c.income=true;
-      draft.push(c); drawSettings();
-      const rows=$("setCats").querySelectorAll(".setrow .setnm"); const last=[...rows].find(i=>i.closest(".setrow") && i.value==="" ); if(last) last.focus();
+    const mkAdd=(label,stock)=>{
+      const add=document.createElement("button"); add.type="button"; add.className="more"; add.textContent=label;
+      add.onclick=()=>{
+        const used=draft.map(x=>x.color);
+        const color=PALETTE.find(p=>!used.includes(p))||PALETTE[draft.length%PALETTE.length];
+        const c={id:"c"+Date.now().toString(36),name:"",budget:0,grp:g,icon:stock?"trend":g==="Pemasukan"?"income":g==="Tabungan"?"piggy":"dots",color};
+        if(g==="Tabungan") c.save=true; if(stock) c.lots=true; if(g==="Pemasukan") c.income=true;
+        draft.push(c); drawSettings();
+        const rows=$("setCats").querySelectorAll(".setrow .setnm"); const last=[...rows].find(i=>i.closest(".setrow") && i.value==="" ); if(last) last.focus();
+      };
+      return add;
     };
-    sec.appendChild(add);
+    if(g==="Tabungan"){ const two=document.createElement("div"); two.className="add2"; two.append(mkAdd("+ Savings (Rp)",false), mkAdd("+ Stock (lot)",true)); sec.appendChild(two); }
+    else sec.appendChild(mkAdd("+ Add category",false));
     W.appendChild(sec);
   });
 }
@@ -2068,7 +2077,7 @@ const mLabel=k=>BLN3[+k.slice(5)-1]+" "+k.slice(0,4);
 const dur=n=>{ const y=Math.floor(n/12), m=n%12; return ((y?y+(y>1?" yrs":" yr"):"")+(y&&m?" ":"")+(m?m+" mo":""))||"this month"; };
 const lotNum=v=>{ const n=parseFloat(String(v||"").replace(",",".")); return isFinite(n)&&n>0?Math.round(n*10)/10:0; };
 function catBal(c){
-  if(c.lots){ let t=START[c.id+"_lot"]!=null?START[c.id+"_lot"]:(START.lot||0); all.forEach(x=>{ if(x.cat===c.id) t+=x.lot||0; }); return t; }
+  if(c.lots){ let t=lotStart(c); all.forEach(x=>{ if(x.cat===c.id) t+=x.lot||0; }); return t; }
   let t=START[c.id]||0; all.forEach(x=>{ if(x.cat===c.id) t+=x.amount; }); return t;
 }
 function lotPrice(c){ let a=0,l=0; all.forEach(x=>{ if(x.cat===c.id&&x.lot>0){ a+=x.amount; l+=x.lot; } }); return l?a/l:0; }
@@ -2177,7 +2186,6 @@ $("gDel").onclick=async()=>{
   if(!ok) return; delete GOALS[gCat.id]; saveGoals(); closeGoal(); renderGoals(); showToast("Target removed");
 };
 $("gHist").onclick=()=>{ if(gCat) openCatList(gCat.id, all.filter(t=>t.cat===gCat.id)); };
-$("gNew").onclick=()=>openGoal(null);
 window._gReady=true; renderGoals();
 </script>
 
