@@ -466,6 +466,13 @@ body.docked #msg{visibility:hidden}
 .add2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .add2 .more{margin:0}
 .stag{font-size:11.5px;font-weight:600;color:var(--accent)}
+
+.glist .gcard{cursor:default}
+.gsub3{margin:3px 0 0 40px;font-size:12px;color:var(--muted)}
+.gsl b{color:var(--ink);font-weight:700}
+.setfields .sdue{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.setfields select{font:inherit;font-size:14px;height:38px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:0 6px;width:100%;min-width:0}
+.setfields select:disabled{opacity:.45}
 </style>
 
 <style>
@@ -889,27 +896,6 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
       <div class="shead"><h2>Savings &amp; assets</h2><span id="gCount"></span></div>
       <div class="glist card" id="gList"></div>
     </div>
-  </section>
-
-  <!-- EDIT GOAL -->
-  <section class="panel" id="p-goals" hidden>
-    <div class="addbar"><button type="button" class="cancel" id="gCancel">Cancel</button><b id="gTitle">Goal</b><button type="button" class="cancel savebtn" id="gSave">Save</button></div>
-    <div class="gehead" id="gHead"></div>
-    <div class="sec" id="gNewWrap">
-      <div class="card setform">
-        <div class="gnrow"><button type="button" class="ipbtn" id="gIcon" aria-label="Change icon"></button><label>Name<input id="gName" placeholder="e.g. Liburan" maxlength="30"></label></div>
-      </div>
-    </div>
-    <div class="sec">
-      <h2>Target</h2>
-      <div class="card setform">
-        <label><span id="gTLabel">Target amount (Rp)</span><input id="gTarget" class="num" inputmode="numeric" placeholder="0"></label>
-        <label><span id="gMLabel">Saving per month (Rp)</span><input id="gMonthly" class="num" inputmode="numeric" placeholder="0"></label>
-        <label>Target date (optional)<span class="gdue"><select id="gDueM"></select><select id="gDueY"></select></span></label>
-      </div>
-    </div>
-    <button type="button" class="kv act gtx" id="gHist"><span>See transactions</span><b>›</b></button>
-    <button type="button" class="gdel" id="gDel">Remove target</button>
   </section>
 
   <!-- 3. TAMBAH -->
@@ -1935,6 +1921,8 @@ function drawSettings(){
         '<div class="setfields"><input class="setnm" placeholder="'+(c.lots?"Stock name, e.g. Saham BBCA":"Category name")+'">'+(c.lots?'<span class="stag">Stock · counted in lots</span>':'')+
         (showBudget?'<label class="sl"><span>Budget/month</span><input class="setbg num" inputmode="numeric" placeholder="0"></label>':'')+
         (showStart?'<label class="sl"><span>'+(c.lots?"Starting lots":"Starting balance")+'</span><input class="setst num" inputmode="numeric" placeholder="0"></label>':'')+
+        (showStart?'<label class="sl"><span>'+(c.lots?"Target (lot)":"Target")+'</span><input class="settg num" inputmode="numeric" placeholder="Optional"></label>'+
+          '<label class="sl"><span>Target date</span><select class="setdm"></select></label>':'')+
         '</div><button type="button" class="setdel" aria-label="Delete category">✕</button>';
       const ib=r.querySelector(".seticon"); ib.style.setProperty("--cc",c.color); ib.innerHTML=iconSvg(c.icon);
       ib.onclick=()=>openIconPicker(c.icon,c.color,k=>{ c.icon=k; ib.innerHTML=iconSvg(k); });
@@ -1950,6 +1938,18 @@ function drawSettings(){
         st.value = c.lots ? (c._start||"") : fmtNum(c._start);
         if(c.lots) st.oninput=()=>{ st.value=st.value.replace(/\D/g,""); c._start=Number(st.value)||0; };
         else bindMoney(st,v=>{c._start=v;});
+      }
+      const tg=r.querySelector(".settg");
+      if(tg){
+        const g0=GOALS[c.id]||{};
+        if(c._target==null){ c._target=g0.target||0; c._due=g0.due||""; }
+        tg.value = c.lots ? (c._target||"") : fmtNum(c._target);
+        if(c.lots) tg.oninput=()=>{ tg.value=tg.value.replace(/\D/g,""); c._target=Number(tg.value)||0; };
+        else bindMoney(tg,v=>{c._target=v;});
+        const dm=r.querySelector(".setdm"); let k=nowKey(), opts='<option value="">No date</option>';
+        for(let i=1;i<=240;i++){ const m=mAdd(k,i); opts+='<option value="'+m+'">'+mLabel(m)+'</option>'; }
+        dm.innerHTML=opts; if(c._due && !dm.querySelector('option[value="'+c._due+'"]')) dm.insertAdjacentHTML("beforeend",'<option value="'+c._due+'">'+mLabel(c._due)+'</option>');
+        dm.value=c._due||""; dm.onchange=()=>{ c._due=dm.value; };
       }
       r.querySelector(".setdel").onclick=async()=>{
         const used=all.some(t=>t.cat===c.id);
@@ -1995,6 +1995,8 @@ $("setSave").onclick=()=>{
   const pd=parseInt($("setPayday").value,10);
   if(!(pd>=1&&pd<=28)){ showToast("Payday must be between 1 and 28"); return; }
   const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),payday:pd,cats,start});
+  const goals={}; draft.forEach(c=>{ if(c.save){ const t=c._target!=null?c._target:((GOALS[c.id]||{}).target||0), d=c._due!=null?c._due:((GOALS[c.id]||{}).due||""); if(t) goals[c.id]={target:t,due:d}; } });
+  localStorage.setItem(GOAL_KEY,JSON.stringify(goals));
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
   location.reload();
 };
@@ -2081,7 +2083,6 @@ function catBal(c){
 function lotPrice(c){ let a=0,l=0; all.forEach(x=>{ if(x.cat===c.id&&x.lot>0){ a+=x.amount; l+=x.lot; } }); return l?a/l:0; }
 function goalMonthly(c){
   const g=GOALS[c.id]||{};
-  if(g.monthly) return g.monthly;
   if(c.lots){ const p=lotPrice(c); return p&&c.budget ? Math.round(c.budget/p*10)/10 : 0; }
   return c.budget||0;
 }
@@ -2107,16 +2108,16 @@ function renderGoals(){
     const o=goalInfo(c);
     if(c.lots) lots.push(fmtV(c,o.bal)+" "+c.name.replace(/^saham\s+/i,"")); else { tot+=o.bal; if(o.target){ tS+=Math.min(o.bal,o.target); tT+=o.target; } }
     if(o.months>0 && (!next||o.months<next.m)) next={c,m:o.months,when:o.when};
-    const el=document.createElement("button"); el.type="button"; el.className="gcard"; el.style.setProperty("--cc",c.color||"var(--accent)");
-    const sub = !o.target ? '<span class="gsetl">Set a target</span>'
-      : o.left<=0 ? '<span class="num">Target '+fmtV(c,o.target)+'</span>'
-      : '<span class="num">'+Math.floor(o.pc)+'% of '+fmtV(c,o.target)+'</span>'+(o.when?'<span>· '+mLabel(o.when)+'</span>':'');
-    let h='<div class="gch"><span class="av mini" style="--cc:'+(c.color||"var(--accent)")+'">'+catIcon(c.id)+'</span><span class="gcn"></span><b class="gbv num">'+fmtV(c,o.bal)+'</b></div>'+
+    const el=document.createElement("div"); el.className="gcard"; el.style.setProperty("--cc",c.color||"var(--accent)");
+    const per = c.budget ? '<span><b class="num">'+rp(c.budget)+'</b>/mo'+(c.lots&&o.monthly?' <span class="num">≈ '+fmtV(c,o.monthly)+'</span>':'')+'</span>' : '<span>No monthly budget</span>';
+    const tline = !o.target ? '' : o.left<=0 ? 'Target '+fmtV(c,o.target)+' reached'
+      : Math.floor(o.pc)+'% of '+fmtV(c,o.target)+(o.when?' · reach '+mLabel(o.when):'');
+    el.innerHTML='<div class="gch"><span class="av mini" style="--cc:'+(c.color||"var(--accent)")+'">'+catIcon(c.id)+'</span><span class="gcn"></span><b class="gbv num">'+fmtV(c,o.bal)+'</b></div>'+
       (o.target?'<div class="gtrk2"><i style="width:'+o.pc+'%"></i></div>':'')+
-      '<div class="gsub2"><span class="gsl">'+sub+'</span>'+(o.chip&&o.target?'<span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span>':'')+'</div>'+
+      '<div class="gsub2"><span class="gsl">'+per+'</span>'+(o.chip&&o.target?'<span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span>':'')+'</div>'+
+      (tline?'<div class="gsub3 num">'+tline+'</div>':'')+
       (o.need?'<div class="gneed">Save <b class="num">'+fmtV(c,o.need)+'/mo</b> to reach it by '+mLabel(o.due)+'</div>':'');
-    el.innerHTML=h; el.querySelector(".gcn").textContent=c.name;
-    el.onclick=()=>openGoal(c.id);
+    el.querySelector(".gcn").textContent=c.name;
     L.appendChild(el);
   });
   $("gCount").textContent=cats.length+(cats.length===1?" goal":" goals");
@@ -2125,65 +2126,6 @@ function renderGoals(){
     (lots.length?'<div class="gchips">'+lots.map(x=>'<span class="num"></span>').join("")+'</div>':'');
   $("gSum").querySelectorAll(".gchips span").forEach((e,i)=>e.textContent=lots[i]);
 }
-// editor
-let gCat=null, gNewIcon="star";
-const NEW_COLORS=["#ef8a1f","#1f9fb0","#d39b00","#7a52c7","#2e9d5b","#d64545","#3b6fd8"];
-function openGoal(id){
-  gCat = id ? CAT[id] : null;
-  const g = id ? (GOALS[id]||{}) : {}, lots = !!(gCat&&gCat.lots);
-  $("gTitle").textContent = id ? "Goal" : "New goal";
-  $("gNewWrap").hidden = !!id; $("gHead").hidden = !id; $("gHist").hidden = !id; $("gDel").hidden = !(id&&g.target);
-  if(id){ const o=goalInfo(gCat); $("gHead").innerHTML='<span class="av" style="--cc:'+(gCat.color||"var(--accent)")+'">'+catIcon(id)+'</span><div><b></b><span class="num">Balance '+fmtV(gCat,o.bal)+'</span></div>'; $("gHead").querySelector("b").textContent=gCat.name; }
-  else { gNewIcon="star"; $("gName").value=""; drawNewIcon(); }
-  $("gTLabel").textContent = lots ? "Target (lot)" : "Target amount (Rp)";
-  $("gMLabel").textContent = lots ? "Lots per month" : "Saving per month (Rp)";
-  ["gTarget","gMonthly"].forEach(k=>{ $(k).setAttribute("inputmode", lots?"decimal":"numeric"); });
-  $("gTarget").value = lots ? (g.target||"") : fmtNum(g.target||0);
-  const m = id ? goalMonthly(gCat) : 0;
-  $("gMonthly").value = lots ? (m?String(m).replace(".",","):"") : fmtNum(m);
-  const y0=+todayStr().slice(0,4);
-  $("gDueM").innerHTML='<option value="">No date</option>'+BLN3.map((x,j)=>'<option value="'+pad(j+1)+'">'+x+'</option>').join("");
-  $("gDueY").innerHTML=Array.from({length:21},(_,k)=>'<option>'+(y0+k)+'</option>').join("");
-  $("gDueM").value = g.due ? g.due.slice(5) : ""; $("gDueY").value = g.due ? g.due.slice(0,4) : String(y0+1);
-  $("gDueY").disabled=!$("gDueM").value;
-  ["catat","history","tambah","grafik","profil"].forEach(x=>$("p-"+x).hidden=true);
-  $("p-goals").hidden=false; document.body.classList.add("adding"); $("app").scrollTop=0;
-}
-function drawNewIcon(){ $("gIcon").innerHTML='<span class="av" style="--cc:'+NEW_COLORS[0]+'">'+iconSvg(gNewIcon)+'</span>'; }
-$("gIcon").onclick=()=>openIconPicker(gNewIcon,NEW_COLORS[0],k=>{ gNewIcon=k; drawNewIcon(); });
-$("gDueM").onchange=()=>{ $("gDueY").disabled=!$("gDueM").value; };
-["gTarget","gMonthly"].forEach(id=>$(id).addEventListener("input",()=>{
-  const el=$(id);
-  if(gCat&&gCat.lots){ el.value=el.value.replace(/[^\d,\.]/g,""); return; }
-  const d=el.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"").slice(0,13); el.value=d?Number(d).toLocaleString("id-ID"):"";
-}));
-function closeGoal(){ $("p-goals").hidden=true; document.body.classList.remove("adding"); setTab("grafik"); }
-$("gCancel").onclick=closeGoal;
-$("gSave").onclick=()=>{
-  const lots=!!(gCat&&gCat.lots);
-  const target = lots ? lotNum($("gTarget").value) : numOf($("gTarget").value);
-  const monthly = lots ? lotNum($("gMonthly").value) : numOf($("gMonthly").value);
-  const due = $("gDueM").value ? $("gDueY").value+"-"+$("gDueM").value : "";
-  if(!gCat){
-    // goal baru = kategori Tabungan baru, supaya otomatis terisi saat mencatat
-    const name=$("gName").value.trim(); if(!name){ showToast("Give your goal a name"); $("gName").focus(); return; }
-    const id="s"+Date.now().toString(36);
-    const cats=(Array.isArray(CFG.cats)&&CFG.cats.length?CFG.cats:CATS).map(c=>Object.assign({},c));
-    const used=new Set(cats.map(c=>c.color)); const color=NEW_COLORS.find(c=>!used.has(c))||NEW_COLORS[0];
-    cats.push({id,name,budget:monthly,grp:"Tabungan",icon:gNewIcon,color,save:true});
-    localStorage.setItem(CFG_KEY,JSON.stringify(Object.assign({},CFG,{cats})));
-    GOALS[id]={target,due,monthly:0}; saveGoals(); location.reload(); return;
-  }
-  const def = (()=>{ const g=GOALS[gCat.id]; GOALS[gCat.id]={}; const d=goalMonthly(gCat); GOALS[gCat.id]=g; return d; })();
-  GOALS[gCat.id]={target,due,monthly: monthly===def?0:monthly};
-  saveGoals(); closeGoal(); renderGoals(); showToast("Goal saved");
-};
-$("gDel").onclick=async()=>{
-  $("mT").textContent="Remove this target?"; $("mYes").textContent="Yes, remove";
-  const ok=await askConfirm(gCat.name,"","The category and its balance stay."); $("mT").textContent="Delete this entry?"; $("mYes").textContent="Yes, delete";
-  if(!ok) return; delete GOALS[gCat.id]; saveGoals(); closeGoal(); renderGoals(); showToast("Target removed");
-};
-$("gHist").onclick=()=>{ if(gCat) openCatList(gCat.id, all.filter(t=>t.cat===gCat.id)); };
 window._gReady=true; renderGoals();
 </script>
 
