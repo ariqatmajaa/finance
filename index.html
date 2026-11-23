@@ -393,35 +393,38 @@ body.docked #msg{visibility:hidden}
 .bcard.warn .bar i{background:var(--yel)!important}
 .bcard.bad .bar i{background:var(--bad)!important}
 /* Goals */
-.gseg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
-.gseg button{font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:0;border-radius:10px;padding:9px 0;cursor:pointer}
-.gseg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
-#gHero{padding:18px}
-.gsub{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:4px 0 8px}
-.gsub i{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:6px;vertical-align:0}
-.gs0{stop-color:var(--accent);stop-opacity:.32}.gs1{stop-color:var(--accent);stop-opacity:0}
-.gsv{fill:color-mix(in srgb,#5b8cff 30%,transparent)}
-.gsvl{stroke:#5b8cff;stroke-width:1.6;fill:none}
-.gms{fill:var(--surface);stroke:var(--muted);stroke-width:2}
-.gms.on{fill:var(--accent);stroke:var(--surface);stroke-width:3}
-.gprog .bar{height:8px;margin:10px 0 6px}
-.gprog .bar i{background:var(--accent)}
-.gprog .bar i.warn{background:var(--yel)} .gprog .bar i.bad{background:var(--bad)}
-.gprog .gpt{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)}
-.gprog .gpv{font-size:20px;font-weight:600}
-.setform.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.gsteps{display:flex;flex-direction:column;gap:10px}
-.gstep{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
-.gstep .gsh{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
-.gstep .gsh select{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
-.gstep .gsh .x{margin-left:auto;width:30px;height:30px;border-radius:50%;border:0;background:var(--bad-soft);color:var(--bad);font-size:14px;cursor:pointer}
-.gstep .gsf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.gstep label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--muted)}
-.gstep input{height:44px;width:100%;min-width:0;box-sizing:border-box}
-.gstep label{min-width:0}
+#gSum{padding:18px}
+.gsk{font-size:13px;color:var(--muted)}
+.gsv2{font-size:26px;font-weight:500;letter-spacing:-.01em;margin-top:2px}
+.gsv2 em{font-style:normal;font-size:15px;color:var(--muted)}
+#gSum .bar,.gcard .bar{height:8px;margin:12px 0 8px}
+#gSum .bar i,.gcard .bar i{background:var(--accent)}
+.gnext{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)}
+.gnext b{color:var(--ink);font-weight:600;text-align:right}
+.glist{display:flex;flex-direction:column;gap:10px}
+.gcard{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;cursor:pointer}
+.gch{display:flex;align-items:center;gap:12px}
+.gch .av{width:40px;height:40px;border-radius:13px;flex:none}
+.gch .av svg{width:20px;height:20px}
+.gcn{flex:1;min-width:0}
+.gcn b{display:block;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcn span{font-size:13px;color:var(--muted)}
+.gpc{font-size:15px;font-weight:700}
+.gest{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
+.gest b{font-weight:600;color:var(--ink)}
+.gchip{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--surface2);color:var(--muted)}
+.gchip.ok{background:var(--accent-soft);color:var(--accent)}
+.gchip.warn{background:color-mix(in srgb,var(--yel) 16%,transparent);color:var(--yel)}
+.gchip.bad{background:var(--bad-soft);color:var(--bad)}
 .gadd{font:inherit;font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent);border-radius:14px;padding:13px;cursor:pointer}
-.kv .gv{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-weight:700;color:var(--ink)}
-.kv .gv small{font-size:11.5px;font-weight:500;color:var(--muted)}
+.gnrow{display:flex;align-items:flex-end;gap:10px}
+.gnrow label{flex:1;min-width:0}
+.gnrow .ipbtn{padding:0}
+.setform select{font:inherit;font-size:15px;height:46px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:0 10px;width:100%}
+.gdue{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.gauto{font-size:13px;color:var(--muted)}
+.gauto b{color:var(--ink)}
+.gdel{font:inherit;font-size:15px;font-weight:700;color:var(--bad);background:var(--bad-soft);border:0;border-radius:14px;padding:14px;cursor:pointer}
 </style>
 
 <style>
@@ -838,47 +841,42 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
     </div>
   </section>
 
-  <!-- 4. GOALS (proyeksi tabungan & aset) -->
+  <!-- 4. GOALS (target tabungan) -->
   <section class="panel" id="p-grafik" role="tabpanel" aria-labelledby="t-grafik" hidden>
-    <div class="gseg" role="group" aria-label="Time horizon" id="gSeg">
-      <button type="button" data-y="2" aria-pressed="true">2 yrs</button>
-      <button type="button" data-y="5" aria-pressed="false">5 yrs</button>
-      <button type="button" data-y="7" aria-pressed="false">7 yrs</button>
-      <button type="button" data-y="10" aria-pressed="false">10 yrs</button>
-    </div>
-    <div class="card" id="gHero"></div>
-    <div class="sec"><h2>Breakdown</h2><div class="rows" id="gBreak"></div></div>
-    <div class="sec"><h2>Progress</h2><div class="card" id="gProg"></div></div>
+    <div class="card" id="gSum"></div>
     <div class="sec">
-      <h2>Your plan</h2>
-      <div class="rows" id="gPlan"></div>
+      <div class="shead"><h2>Your goals</h2><span id="gCount"></span></div>
+      <div class="glist" id="gList"></div>
+      <button type="button" class="gadd" id="gNew">+ Add a goal</button>
     </div>
-    <p class="foot">A projection if you keep saving as planned. Stored on this phone only.</p>
+    <p class="foot">Tap a goal to set its target, monthly saving and date. Stored on this phone only.</p>
   </section>
 
-  <!-- RENCANA GOALS -->
+  <!-- EDIT GOAL -->
   <section class="panel" id="p-goals" hidden>
-    <div class="addbar"><button type="button" class="cancel" id="gCancel">Cancel</button><b>Plan</b><button type="button" class="cancel savebtn" id="gSave">Save</button></div>
+    <div class="addbar"><button type="button" class="cancel" id="gCancel">Cancel</button><b id="gTitle">Goal</b><button type="button" class="cancel savebtn" id="gSave">Save</button></div>
     <div class="sec">
-      <h2>Balance on 1 Jan 2027</h2>
       <div class="card setform">
-        <label>Savings (Rp)<input id="gSav0" class="num" inputmode="numeric" placeholder="0"></label>
-        <label>Assets (Rp)<input id="gInv0" class="num" inputmode="numeric" placeholder="0"></label>
+        <div class="gnrow"><button type="button" class="ipbtn" id="gIcon" aria-label="Change icon"></button><label>Name<input id="gName" placeholder="Goal name" maxlength="30"></label></div>
+        <label>Target amount (Rp)<input id="gTarget" class="num" inputmode="numeric" placeholder="0"></label>
       </div>
     </div>
     <div class="sec">
-      <h2>Expected growth per year</h2>
-      <div class="card setform g2">
-        <label>Savings (%)<input id="gSavR" class="num" inputmode="decimal" placeholder="0"></label>
-        <label>Assets (%)<input id="gInvR" class="num" inputmode="decimal" placeholder="0"></label>
+      <h2>Saved so far</h2>
+      <div class="card setform">
+        <label>Count from<select id="gLink"></select></label>
+        <label id="gSavedWrap">Amount saved (Rp)<input id="gSaved" class="num" inputmode="numeric" placeholder="0"></label>
+        <div class="gauto" id="gAuto"></div>
       </div>
     </div>
     <div class="sec">
-      <h2>Saving every month</h2>
-      <div id="gSteps" class="gsteps"></div>
-      <button type="button" class="gadd" id="gAdd">+ Add a change (e.g. after a raise)</button>
+      <h2>Plan</h2>
+      <div class="card setform">
+        <label>Saving per month (Rp)<input id="gMonthly" class="num" inputmode="numeric" placeholder="0"></label>
+        <label>Target date (optional)<span class="gdue"><select id="gDueM"></select><select id="gDueY"></select></span></label>
+      </div>
     </div>
-    <p class="foot">Each change applies from that month onward.</p>
+    <button type="button" class="gdel" id="gDel">Delete goal</button>
   </section>
 
   <!-- 3. TAMBAH -->
@@ -1803,7 +1801,7 @@ function initLock(){
 $("pfGaji").textContent = rp(GAJI);
 function backupData(){
   const data={app:"finance-ariq",version:1,exportedAt:new Date().toISOString(),cfg:CFG,tx:LocalDB.all()};
-  try{ const g=localStorage.getItem("fa_goals_v1"); if(g) data.goals=JSON.parse(g); }catch(e){}
+  try{ const g=localStorage.getItem("fa_goals_v2"); if(g) data.goals=JSON.parse(g); }catch(e){}
   const d=new Date(); const name="finance-backup-"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+".json";
   const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});
   const file=new File([blob],name,{type:"application/json"});
@@ -1823,7 +1821,7 @@ $("rsFile").addEventListener("change",async e=>{
     $("mT").textContent="Delete this entry?"; $("mYes").textContent="Yes, delete";
     if(!ok2) return;
     localStorage.setItem(CFG_KEY,JSON.stringify(Object.assign({},CFG,data.cfg)));
-    if(data.goals) localStorage.setItem("fa_goals_v1",JSON.stringify(data.goals));
+    if(data.goals) localStorage.setItem("fa_goals_v2",JSON.stringify(data.goals));
     location.reload(); return;
   }
   $("mT").textContent="Restore data?"; $("mYes").textContent="Yes, restore";
@@ -1832,7 +1830,7 @@ $("rsFile").addEventListener("change",async e=>{
   if(!ok) return;
   localStorage.setItem(CFG_KEY,JSON.stringify(data.cfg||{}));
   localStorage.setItem(TX_KEY,JSON.stringify(data.tx));
-  if(data.goals) localStorage.setItem("fa_goals_v1",JSON.stringify(data.goals));
+  if(data.goals) localStorage.setItem("fa_goals_v2",JSON.stringify(data.goals));
   location.reload();
 });
 $("goRestore").onclick=()=>setTab("profil");
@@ -2043,159 +2041,108 @@ $("catList").addEventListener("click",e=>{ if(e.target.id==="catList") $("catLis
 // ===== Mode offline =====
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
 
-// ===== Goals: proyeksi tabungan & aset (mulai 1 Jan 2027) =====
-const GOAL_KEY="fa_goals_v1", G_START="2027-01";
-const mAdd=(k,n)=>{ let [y,m]=k.split("-").map(Number); m+=n; y+=Math.floor((m-1)/12); m=((m-1)%12+12)%12+1; return y+"-"+pad(m); };
-const mLabel=k=>BLN3[+k.slice(5)-1]+" "+k.slice(0,4);
+// ===== Goals: target tabungan =====
+const GOAL_KEY="fa_goals_v2";
+const GOAL_PRESETS=[["Dana Darurat","shield","#3f63d6",/darurat/i],["Tabungan Menikah","heart","#d4588f",/nikah/i],["Beli Rumah","home","#1f9a7a",null],["Liburan","plane","#ef8a1f",null],["Sertifikasi","star","#d39b00",null],["Pendidikan","grad","#7a52c7",null]];
+const linkable=()=>CATS.filter(c=>c.save&&!c.lots);
 function loadGoals(){
   let g=null; try{ g=JSON.parse(localStorage.getItem(GOAL_KEY)); }catch(e){}
-  if(!g||!Array.isArray(g.steps)||!g.steps.length){
-    // isi awal dari budget kategori Tabungan di HP ini
-    const sv=CATS.filter(c=>c.save);
-    g={sav0:0,inv0:0,savR:0,invR:0,steps:[{from:G_START,
-      sav:sv.filter(c=>!c.lots).reduce((a,c)=>a+(c.budget||0),0),
-      inv:sv.filter(c=>c.lots).reduce((a,c)=>a+(c.budget||0),0)}]};
-  }
-  return g;
-}
-let GOALS=loadGoals(), gYears=2;
-function stepAt(k){ let s=GOALS.steps[0]; GOALS.steps.forEach(x=>{ if(x.from<=k) s=x; }); return s; }
-function project(){
-  // titik 0 = saldo 1 Jan 2027; titik i = akhir bulan ke-i
-  const rs=Math.pow(1+GOALS.savR/100,1/12)-1, ri=Math.pow(1+GOALS.invR/100,1/12)-1;
-  let s=GOALS.sav0, v=GOALS.inv0, dep=GOALS.sav0+GOALS.inv0;
-  const out=[{s,v,dep,k:G_START}];
-  for(let i=0;i<120;i++){
-    const k=mAdd(G_START,i), st=stepAt(k);
-    s=s*(1+rs)+st.sav; v=v*(1+ri)+st.inv; dep+=st.sav+st.inv;
-    out.push({s,v,dep,k:mAdd(G_START,i+1)});
-  }
-  return out;
-}
-const kfmtG=v=> v>=1e9 ? (Math.round(v/1e8)/10).toLocaleString("id-ID")+" M" : v>=1e6 ? Math.round(v/1e6).toLocaleString("id-ID")+" jt" : Math.round(v/1e3).toLocaleString("id-ID")+" rb";
-function renderGoals(){
-  const P=project(), N=gYears*12, sel=P[N];
-  document.querySelectorAll("#gSeg button").forEach(b=>b.setAttribute("aria-pressed", +b.dataset.y===gYears));
-  const endLbl=k=>{ const p=mAdd(k,-1); return BULAN[+p.slice(5)-1].slice(0,3)+" "+p.slice(0,4); };
-  // grafik 10 tahun
-  const W=340,H=190,L=40,R=12,T=18,B=24, iw=W-L-R, ih=H-T-B;
-  const max=Math.max(1,...P.map(p=>p.s+p.v));
-  const mag=Math.pow(10,Math.floor(Math.log10(max/4))); const stp=[1,2,2.5,5,10].map(x=>x*mag).find(x=>x*4>=max)||mag*10; const top=stp*4;
-  const X=i=>L+i*iw/120, Y=v=>T+(1-v/top)*ih;
-  const tot="M"+P.map((p,i)=>X(i).toFixed(1)+","+Y(p.s+p.v).toFixed(1)).join(" L");
-  const sv="M"+P.map((p,i)=>X(i).toFixed(1)+","+Y(p.s).toFixed(1)).join(" L");
-  let grid=""; for(let k=0;k<=4;k++){ const v=top*k/4,y=Y(v); grid+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" class="gln"></line><text x="${L-6}" y="${y+3.5}" text-anchor="end" class="gtx">${k?kfmtG(v):"0"}</text>`; }
-  let xl=""; [0,24,60,84,120].forEach(i=>{ xl+=`<text x="${X(i)}" y="${H-6}" text-anchor="${i===0?"start":i===120?"end":"middle"}" class="gtx">${i?"’"+String(2027+i/12-1).slice(2):"2027"}</text>`; });
-  let ms=""; [24,60,84,120].forEach(i=>{ ms+=`<circle cx="${X(i)}" cy="${Y(P[i].s+P[i].v)}" r="${i===N?6:4}" class="gms${i===N?" on":""}"></circle>`; });
-  const H0=$("gHero");
-  H0.innerHTML=`<div class="ovhead"><div><div class="ovk" id="gK"></div><div class="ovv num" id="gV"></div></div><span class="ovpill" id="gPill"></span></div>
-  <div class="gsub"><span><i style="background:#5b8cff"></i>Savings <b class="num" id="gS"></b></span><span><i style="background:var(--accent)"></i>Assets <b class="num" id="gA"></b></span></div>
-  <svg class="area" viewBox="0 0 ${W} ${H}" role="img" aria-label="Projected savings and assets over 10 years">
-    <defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="gs0"></stop><stop offset="1" class="gs1"></stop></linearGradient></defs>
-    ${grid}${xl}
-    <path d="${tot} L${X(120)},${T+ih} L${X(0)},${T+ih} Z" fill="url(#gg)"></path>
-    <path d="${sv} L${X(120)},${T+ih} L${X(0)},${T+ih} Z" class="gsv"></path>
-    <path d="${sv}" class="gsvl"></path>
-    <path d="${tot}" class="aln" fill="none"></path>
-    <line class="avl" id="gVl" y1="${T}" y2="${T+ih}"></line>${ms}<circle r="5" class="adot" id="gDot"></circle>
-  </svg>`;
-  const show=(x,scrub)=>{
-    const f=Math.max(0,Math.min(120,(x-L)/iw*120)), i=Math.floor(f), t=f-i, a=P[i], b=P[Math.min(120,i+1)];
-    const idx=Math.round(f), s=P[idx].s, v=P[idx].v, ly=Y(a.s+a.v+(b.s+b.v-a.s-a.v)*t);
-    $("gK").textContent = scrub ? "By "+endLbl(P[idx].k) : "In "+gYears+" years · by "+endLbl(sel.k);
-    $("gV").textContent=rp(s+v); $("gS").textContent=rp(s); $("gA").textContent=rp(v);
-    $("gPill").textContent = scrub ? "Year "+(Math.ceil(idx/12)||1) : "Total";
-    const vl=$("gVl"), d=$("gDot"), xx=X(f);
-    vl.setAttribute("x1",xx); vl.setAttribute("x2",xx); vl.style.opacity=scrub?1:0;
-    d.setAttribute("cx",xx); d.setAttribute("cy",ly); d.style.opacity=scrub?1:0;
-  };
-  show(X(N),false);
-  const svg=H0.querySelector("svg"); let raf=0, lx=0, on=false;
-  const toX=e=>{ const r=svg.getBoundingClientRect(); return (e.clientX-r.left)/r.width*W; };
-  svg.addEventListener("pointerdown",e=>{ on=true; try{svg.setPointerCapture(e.pointerId);}catch(_){} show(toX(e),true); });
-  svg.addEventListener("pointermove",e=>{ if(!on && e.pointerType!=="mouse") return; lx=toX(e); if(!raf) raf=requestAnimationFrame(()=>{ raf=0; show(lx,true); }); });
-  const off=()=>{ on=false; cancelAnimationFrame(raf); raf=0; show(X(N),false); };
-  svg.addEventListener("pointerup",off); svg.addEventListener("pointercancel",off); svg.addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse") off(); });
-
-  // rincian
-  const st=stepAt(mAdd(sel.k,-1));
-  $("gBreak").innerHTML=
-    `<div class="kv"><span>Savings</span><b class="num">${rp(sel.s)}</b></div>`+
-    `<div class="kv"><span>Assets</span><b class="num">${rp(sel.v)}</b></div>`+
-    `<div class="kv"><span>Total you put in</span><b class="num">${rp(sel.dep)}</b></div>`+
-    `<div class="kv"><span>Growth</span><b class="num">${rp(sel.s+sel.v-sel.dep)}</b></div>`+
-    `<div class="kv"><span>Saving per month by then</span><b class="num">${rp(st.sav+st.inv)}</b></div>`;
-
-  // progres nyata vs rencana
-  const today=todayStr(), G=$("gProg"); G.className="card gprog";
-  if(today<G_START+"-01"){
-    const d=Math.round((new Date(2027,0,1)-new Date(today+"T00:00"))/864e5);
-    G.innerHTML=`<div class="gpt"><span>Plan starts 1 Jan 2027</span><b>${d} days to go</b></div>`;
-  }else{
-    const now=today.slice(0,7); let plan=0;
-    for(let k=G_START;k<=now;k=mAdd(k,1)){ const x=stepAt(k); plan+=x.sav+x.inv; }
-    const act=all.filter(t=>isSave(t)&&t.date>=G_START+"-01").reduce((a,t)=>a+t.amount,0);
-    const pc=plan?act/plan*100:0, cls=pc>=100?"":pc>=90?"warn":"bad";
-    G.innerHTML=`<div class="gpt"><span>Saved since 1 Jan 2027</span><span>${pc>=100?"On track":"Behind plan"}</span></div><div class="gpv num">${rp(act)}</div><div class="bar"><i class="${cls}" style="width:${Math.min(100,pc)}%"></i></div><div class="gpt"><span>Plan so far</span><span class="num">${rp(plan)}</span></div>`;
-  }
-
-  // ringkasan rencana
-  const rows=[`<div class="kv"><span>Start balance</span><span class="gv num">${rp(GOALS.sav0+GOALS.inv0)}<small>Savings ${plain(GOALS.sav0)} · Assets ${plain(GOALS.inv0)}</small></span></div>`,
-    `<div class="kv"><span>Growth per year</span><span class="gv">Savings ${String(GOALS.savR).replace(".",",")}% · Assets ${String(GOALS.invR).replace(".",",")}%</span></div>`];
-  GOALS.steps.forEach(x=>rows.push(`<div class="kv"><span>From ${mLabel(x.from)}</span><span class="gv num">${rp(x.sav+x.inv)}/mo<small>Savings ${plain(x.sav)} · Assets ${plain(x.inv)}</small></span></div>`));
-  rows.push(`<button type="button" class="kv act" id="gEdit"><span>Edit plan</span><b>›</b></button>`);
-  $("gPlan").innerHTML=rows.join("");
-  $("gEdit").onclick=openGoals;
-}
-document.querySelectorAll("#gSeg button").forEach(b=>b.onclick=()=>{ gYears=+b.dataset.y; renderGoals(); });
-window._gReady=true; renderGoals();
-
-// editor rencana
-let gDraft=null;
-const pctOf=v=>{ const n=parseFloat(String(v||"").replace(",",".")); return isFinite(n)?Math.max(-50,Math.min(100,n)):0; };
-function drawSteps(){
-  const box=$("gSteps"); box.innerHTML="";
-  const years=[]; for(let y=2027;y<=2036;y++) years.push(y);
-  gDraft.steps.forEach((x,i)=>{
-    const el=document.createElement("div"); el.className="gstep";
-    const head = i===0 ? `<div class="gsh">From Jan 2027</div>` :
-      `<div class="gsh">From <select class="gm">${BLN3.map((m,j)=>`<option value="${pad(j+1)}"${+x.from.slice(5)===j+1?" selected":""}>${m}</option>`).join("")}</select><select class="gy">${years.map(y=>`<option${+x.from.slice(0,4)===y?" selected":""}>${y}</option>`).join("")}</select><button type="button" class="x" aria-label="Remove">✕</button></div>`;
-    el.innerHTML=head+`<div class="gsf"><label>Savings / month<input class="num gs" inputmode="numeric" placeholder="0"></label><label>Assets / month<input class="num gin" inputmode="numeric" placeholder="0"></label></div>`;
-    const a=el.querySelector(".gs"), b=el.querySelector(".gin");
-    a.value=fmtNum(x.sav); b.value=fmtNum(x.inv);
-    bindMoney(a,v=>x.sav=v); bindMoney(b,v=>x.inv=v);
-    if(i>0){
-      const upd=()=>{ const k=el.querySelector(".gy").value+"-"+el.querySelector(".gm").value; x.from = k<=G_START ? mAdd(G_START,1) : k; };
-      el.querySelector(".gm").onchange=upd; el.querySelector(".gy").onchange=upd;
-      el.querySelector(".x").onclick=()=>{ gDraft.steps.splice(i,1); drawSteps(); };
-    }
-    box.appendChild(el);
+  if(Array.isArray(g)) return g;
+  return GOAL_PRESETS.map(([name,icon,color,re],i)=>{
+    const c=re?linkable().find(x=>re.test(x.name)):null;
+    return {id:"g"+i,name,icon,color,target:0,saved:0,link:c?c.id:"",monthly:c?(c.budget||0):0,due:""};
   });
 }
-function openGoals(){
-  gDraft=JSON.parse(JSON.stringify(GOALS));
-  $("gSav0").value=fmtNum(gDraft.sav0); $("gInv0").value=fmtNum(gDraft.inv0);
-  $("gSavR").value=gDraft.savR?String(gDraft.savR).replace(".",","):""; $("gInvR").value=gDraft.invR?String(gDraft.invR).replace(".",","):"";
-  drawSteps();
+let GOALS=loadGoals();
+const saveGoals=()=>localStorage.setItem(GOAL_KEY,JSON.stringify(GOALS));
+const catBal=id=>{ let t=START[id]||0; all.forEach(x=>{ if(x.cat===id) t+=x.amount; }); return t; };
+const goalSaved=g=> g.link&&CAT[g.link] ? catBal(g.link) : (g.saved||0);
+const nowKey=()=>todayStr().slice(0,7);
+const mAdd=(k,n)=>{ let [y,m]=k.split("-").map(Number); m+=n; y+=Math.floor((m-1)/12); m=((m-1)%12+12)%12+1; return y+"-"+pad(m); };
+const mDiff=(a,b)=>{ const [y1,m1]=a.split("-").map(Number),[y2,m2]=b.split("-").map(Number); return (y2-y1)*12+(m2-m1); };
+const mLabel=k=>BLN3[+k.slice(5)-1]+" "+k.slice(0,4);
+const dur=n=>{ const y=Math.floor(n/12), m=n%12; return (y?y+(y>1?" yrs":" yr"):"")+(y&&m?" ":"")+(m?m+" mo":"")||"this month"; };
+function goalInfo(g){
+  const saved=goalSaved(g), left=Math.max(0,g.target-saved), pc=g.target?Math.min(100,saved/g.target*100):0;
+  const o={saved,left,pc};
+  if(!g.target){ o.text="Set a target"; o.chip=["","No target"]; return o; }
+  if(left<=0){ o.text="Target reached"; o.chip=["ok","Reached"]; o.months=0; return o; }
+  const now=nowKey(), dueIn = g.due ? Math.max(1,mDiff(now,g.due)) : null;
+  if(g.monthly>0){
+    o.months=Math.ceil(left/g.monthly); o.when=mAdd(now,o.months);
+    o.text="≈ <b>"+dur(o.months)+"</b> · by "+mLabel(o.when);
+  } else o.text="Set a monthly saving to see the estimate";
+  if(g.due){
+    const need=Math.ceil(left/dueIn/1000)*1000;
+    if(o.months!=null && o.months<=dueIn) o.chip=["ok","On track"];
+    else { o.chip=[o.months!=null && o.months<=dueIn*1.25?"warn":"bad","Behind"]; o.text+=(g.monthly>0?"<br>":"")+"Save <b>"+rp(need)+"/mo</b> to reach it by "+mLabel(g.due); }
+  } else o.chip = g.monthly>0 ? ["ok","Estimate"] : ["","No plan"];
+  return o;
+}
+function renderGoals(){
+  const L=$("gList"); L.innerHTML="";
+  let tS=0,tT=0, next=null;
+  GOALS.forEach((g,i)=>{
+    const o=goalInfo(g); tT+=g.target||0; tS+=Math.min(o.saved,g.target||o.saved);
+    if(o.months>0 && (!next||o.months<next.m)) next={g,m:o.months,when:o.when};
+    const el=document.createElement("button"); el.type="button"; el.className="gcard";
+    el.innerHTML='<div class="gch"><span class="av" style="--cc:'+g.color+'">'+iconSvg(g.icon)+'</span><span class="gcn"><b></b><span class="num">'+plain(o.saved)+(g.target?' / '+plain(g.target):'')+'</span></span><span class="gpc num">'+(g.target?Math.floor(o.pc)+'%':'')+'</span></div>'+
+      '<div class="bar"><i style="width:'+o.pc+'%"></i></div>'+
+      '<div class="gest"><span>'+o.text+'</span><span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span></div>';
+    el.querySelector(".gcn b").textContent=g.name;
+    el.onclick=()=>openGoal(i);
+    L.appendChild(el);
+  });
+  $("gCount").textContent=GOALS.length+(GOALS.length===1?" goal":" goals");
+  const pc=tT?tS/tT*100:0;
+  $("gSum").innerHTML='<div class="gsk">Saved toward your goals</div><div class="gsv2 num">'+rp(tS)+(tT?' <em>of '+rp(tT)+'</em>':'')+'</div>'+
+    '<div class="bar"><i style="width:'+Math.min(100,pc)+'%"></i></div>'+
+    '<div class="gnext"><span>'+(tT?Math.floor(pc)+'% of all targets':'Set targets to track progress')+'</span>'+(next?'<b></b>':'')+'</div>';
+  if(next) $("gSum").querySelector(".gnext b").textContent="Next: "+next.g.name+" · "+mLabel(next.when);
+}
+// editor
+let gEdit=null, gIdx=-1;
+function openGoal(i){
+  gIdx=i; gEdit = i>=0 ? Object.assign({},GOALS[i]) : {id:"g"+Date.now(),name:"",icon:"star",color:"#1f9fb0",target:0,saved:0,link:"",monthly:0,due:""};
+  $("gTitle").textContent = i>=0 ? "Edit goal" : "New goal";
+  $("gIcon").innerHTML='<span class="av" style="--cc:'+gEdit.color+'">'+iconSvg(gEdit.icon)+'</span>';
+  $("gName").value=gEdit.name; $("gTarget").value=fmtNum(gEdit.target); $("gSaved").value=fmtNum(gEdit.saved); $("gMonthly").value=fmtNum(gEdit.monthly);
+  $("gLink").innerHTML='<option value="">Enter manually</option>'+linkable().map(c=>'<option value="'+c.id+'">Category: '+c.name.replace(/</g,"&lt;")+'</option>').join("");
+  $("gLink").value = gEdit.link&&CAT[gEdit.link] ? gEdit.link : "";
+  const y0=+todayStr().slice(0,4);
+  $("gDueM").innerHTML='<option value="">No date</option>'+BLN3.map((m,j)=>'<option value="'+pad(j+1)+'">'+m+'</option>').join("");
+  $("gDueY").innerHTML=Array.from({length:21},(_,k)=>'<option>'+(y0+k)+'</option>').join("");
+  $("gDueM").value = gEdit.due ? gEdit.due.slice(5) : ""; $("gDueY").value = gEdit.due ? gEdit.due.slice(0,4) : String(y0+1);
+  syncLink();
+  $("gDel").hidden = i<0;
   ["catat","history","tambah","grafik","profil"].forEach(x=>$("p-"+x).hidden=true);
   $("p-goals").hidden=false; document.body.classList.add("adding"); $("app").scrollTop=0;
 }
-function closeGoals(){ $("p-goals").hidden=true; document.body.classList.remove("adding"); setTab("grafik"); }
-bindMoney($("gSav0"),v=>gDraft.sav0=v); bindMoney($("gInv0"),v=>gDraft.inv0=v);
-$("gAdd").onclick=()=>{
-  const last=gDraft.steps[gDraft.steps.length-1];
-  let k=mAdd(last.from,6); if(k>"2036-12") k="2036-12";
-  gDraft.steps.push({from:k,sav:last.sav,inv:last.inv}); drawSteps();
-  requestAnimationFrame(()=>{ const s=$("gSteps").lastElementChild; s&&s.scrollIntoView({behavior:"smooth",block:"center"}); });
-};
-$("gCancel").onclick=closeGoals;
+function syncLink(){
+  const id=$("gLink").value; $("gSavedWrap").hidden=!!id; $("gAuto").hidden=!id;
+  if(id) $("gAuto").innerHTML='Balance of this category: <b class="num">'+rp(catBal(id))+'</b>. Updates automatically when you record savings.';
+  $("gDueY").disabled=!$("gDueM").value;
+}
+$("gLink").onchange=()=>{ syncLink(); const c=CAT[$("gLink").value]; if(c && !numOf($("gMonthly").value)) $("gMonthly").value=fmtNum(c.budget||0); };
+$("gDueM").onchange=syncLink;
+["gTarget","gSaved","gMonthly"].forEach(id=>bindMoney($(id),()=>{}));
+$("gIcon").onclick=()=>openIconPicker(gEdit.icon,gEdit.color,k=>{ gEdit.icon=k; $("gIcon").innerHTML='<span class="av" style="--cc:'+gEdit.color+'">'+iconSvg(k)+'</span>'; });
+function closeGoal(){ $("p-goals").hidden=true; document.body.classList.remove("adding"); setTab("grafik"); }
+$("gCancel").onclick=closeGoal;
 $("gSave").onclick=()=>{
-  gDraft.savR=pctOf($("gSavR").value); gDraft.invR=pctOf($("gInvR").value);
-  const m={}; gDraft.steps.forEach((x,i)=>{ m[i===0?G_START:x.from]=Object.assign({},x,{from:i===0?G_START:x.from}); });
-  gDraft.steps=Object.keys(m).sort().map(k=>m[k]);
-  GOALS=gDraft; localStorage.setItem(GOAL_KEY,JSON.stringify(GOALS));
-  closeGoals(); renderGoals(); showToast("Plan saved");
+  const name=$("gName").value.trim(); if(!name){ showToast("Give your goal a name"); $("gName").focus(); return; }
+  Object.assign(gEdit,{name,target:numOf($("gTarget").value),saved:numOf($("gSaved").value),link:$("gLink").value,monthly:numOf($("gMonthly").value),
+    due:$("gDueM").value?$("gDueY").value+"-"+$("gDueM").value:""});
+  if(gIdx>=0) GOALS[gIdx]=gEdit; else GOALS.push(gEdit);
+  saveGoals(); closeGoal(); renderGoals(); showToast("Goal saved");
 };
+$("gDel").onclick=async()=>{
+  $("mT").textContent="Delete this goal?"; $("mYes").textContent="Yes, delete";
+  const ok=await askConfirm(gEdit.name||"Goal","",""); $("mT").textContent="Delete this entry?";
+  if(!ok) return; GOALS.splice(gIdx,1); saveGoals(); closeGoal(); renderGoals(); showToast("Deleted");
+};
+$("gNew").onclick=()=>openGoal(-1);
+window._gReady=true; renderGoals();
 </script>
 
 </body>
