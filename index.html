@@ -469,7 +469,7 @@ body.docked #msg{visibility:hidden}
 
 .glist .gcard{cursor:default}
 .gsub3{margin:3px 0 0 40px;font-size:12px;color:var(--muted)}
-.gsl b{color:var(--ink);font-weight:700}
+.gsl b{font-weight:inherit;color:inherit}
 .setfields .sdue{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
 .setfields select{font:inherit;font-size:14px;height:38px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:0 6px;width:100%;min-width:0}
 .setfields select:disabled{opacity:.45}
@@ -1921,6 +1921,7 @@ function drawSettings(){
         '<div class="setfields"><input class="setnm" placeholder="'+(c.lots?"Stock name, e.g. Saham BBCA":"Category name")+'">'+(c.lots?'<span class="stag">Stock · counted in lots</span>':'')+
         (showBudget?'<label class="sl"><span>Budget/month</span><input class="setbg num" inputmode="numeric" placeholder="0"></label>':'')+
         (showStart?'<label class="sl"><span>'+(c.lots?"Starting lots":"Starting balance")+'</span><input class="setst num" inputmode="numeric" placeholder="0"></label>':'')+
+        (c.lots?'<label class="sl"><span>Lots/month</span><input class="setlpm num" inputmode="numeric" placeholder="0"></label>':'')+
         (showStart?'<label class="sl"><span>'+(c.lots?"Target (lot)":"Target")+'</span><input class="settg num" inputmode="numeric" placeholder="Optional"></label>'+
           '<label class="sl"><span>Target date</span><select class="setdm"></select></label>':'')+
         '</div><button type="button" class="setdel" aria-label="Delete category">✕</button>';
@@ -1942,7 +1943,8 @@ function drawSettings(){
       const tg=r.querySelector(".settg");
       if(tg){
         const g0=GOALS[c.id]||{};
-        if(c._target==null){ c._target=g0.target||0; c._due=g0.due||""; }
+        if(c._target==null){ c._target=g0.target||0; c._due=g0.due||""; c._lpm=g0.lpm||0; }
+        const lp=r.querySelector(".setlpm"); if(lp){ lp.value=c._lpm||""; lp.oninput=()=>{ lp.value=lp.value.replace(/\D/g,"").slice(0,4); c._lpm=Number(lp.value)||0; }; }
         tg.value = c.lots ? (c._target||"") : fmtNum(c._target);
         if(c.lots) tg.oninput=()=>{ tg.value=tg.value.replace(/\D/g,""); c._target=Number(tg.value)||0; };
         else bindMoney(tg,v=>{c._target=v;});
@@ -1995,7 +1997,7 @@ $("setSave").onclick=()=>{
   const pd=parseInt($("setPayday").value,10);
   if(!(pd>=1&&pd<=28)){ showToast("Payday must be between 1 and 28"); return; }
   const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),payday:pd,cats,start});
-  const goals={}; draft.forEach(c=>{ if(c.save){ const t=c._target!=null?c._target:((GOALS[c.id]||{}).target||0), d=c._due!=null?c._due:((GOALS[c.id]||{}).due||""); if(t) goals[c.id]={target:t,due:d}; } });
+  const goals={}; draft.forEach(c=>{ if(c.save){ const t=c._target!=null?c._target:((GOALS[c.id]||{}).target||0), d=c._due!=null?c._due:((GOALS[c.id]||{}).due||""); const l=c._lpm!=null?c._lpm:((GOALS[c.id]||{}).lpm||0); if(t||l) goals[c.id]={target:t,due:d,lpm:l}; } });
   localStorage.setItem(GOAL_KEY,JSON.stringify(goals));
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
   location.reload();
@@ -2083,7 +2085,7 @@ function catBal(c){
 function lotPrice(c){ let a=0,l=0; all.forEach(x=>{ if(x.cat===c.id&&x.lot>0){ a+=x.amount; l+=x.lot; } }); return l?a/l:0; }
 function goalMonthly(c){
   const g=GOALS[c.id]||{};
-  if(c.lots){ const p=lotPrice(c); return p&&c.budget ? Math.round(c.budget/p*10)/10 : 0; }
+  if(c.lots){ if((GOALS[c.id]||{}).lpm) return GOALS[c.id].lpm; const p=lotPrice(c); return p&&c.budget ? Math.round(c.budget/p*10)/10 : 0; }
   return c.budget||0;
 }
 const fmtV=(c,v)=> c.lots ? (Math.round(v*10)/10).toLocaleString("id-ID")+" lot" : rp(v);
@@ -2109,14 +2111,16 @@ function renderGoals(){
     if(c.lots) lots.push(fmtV(c,o.bal)+" "+c.name.replace(/^saham\s+/i,"")); else { tot+=o.bal; if(o.target){ tS+=Math.min(o.bal,o.target); tT+=o.target; } }
     if(o.months>0 && (!next||o.months<next.m)) next={c,m:o.months,when:o.when};
     const el=document.createElement("div"); el.className="gcard"; el.style.setProperty("--cc",c.color||"var(--accent)");
-    const per = c.budget ? '<span><b class="num">'+rp(c.budget)+'</b>/mo'+(c.lots&&o.monthly?' <span class="num">≈ '+fmtV(c,o.monthly)+'</span>':'')+'</span>' : '<span>No monthly budget</span>';
+    const lotTxt=v=>(Math.round(v*10)/10).toLocaleString("id-ID")+(v===1?" Lot":" Lots");
+    const per = c.lots ? (o.monthly?'<span class="num">'+lotTxt(o.monthly)+' / month</span>':'')
+      : (c.budget?'<span class="num">'+rp(c.budget)+' / month</span>':'');
     const tline = !o.target ? '' : o.left<=0 ? 'Target '+fmtV(c,o.target)+' reached'
       : Math.floor(o.pc)+'% of '+fmtV(c,o.target)+(o.when?' · reach '+mLabel(o.when):'');
     el.innerHTML='<div class="gch"><span class="av mini" style="--cc:'+(c.color||"var(--accent)")+'">'+catIcon(c.id)+'</span><span class="gcn"></span><b class="gbv num">'+fmtV(c,o.bal)+'</b></div>'+
       (o.target?'<div class="gtrk2"><i style="width:'+o.pc+'%"></i></div>':'')+
       '<div class="gsub2"><span class="gsl">'+per+'</span>'+(o.chip&&o.target?'<span class="gchip '+o.chip[0]+'">'+o.chip[1]+'</span>':'')+'</div>'+
       (tline?'<div class="gsub3 num">'+tline+'</div>':'')+
-      (o.need?'<div class="gneed">Save <b class="num">'+fmtV(c,o.need)+'/mo</b> to reach it by '+mLabel(o.due)+'</div>':'');
+      (o.need?'<div class="gneed">Save <span class="num">'+(c.lots?lotTxt(o.need):rp(o.need))+' / month</span> to reach it by '+mLabel(o.due)+'</div>':'');
     el.querySelector(".gcn").textContent=c.name;
     L.appendChild(el);
   });
