@@ -889,7 +889,6 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
       <div class="shead"><h2>Savings &amp; assets</h2><span id="gCount"></span></div>
       <div class="glist card" id="gList"></div>
     </div>
-    <p class="foot">Balances update automatically from what you record. Tap a goal to set its target. Add savings or stocks in Profile → Settings.</p>
   </section>
 
   <!-- EDIT GOAL -->
@@ -962,7 +961,6 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
         <button type="button" class="kv act" id="rsBtn"><span>Restore from backup</span><b>›</b></button>
       </div>
       <input type="file" id="rsFile" accept="application/json,.json" hidden>
-      <p class="foot">Your data is stored on this phone only. Back up regularly, e.g. to iCloud Drive or Google Drive.</p>
     </div>
   </section>
 
@@ -1935,7 +1933,7 @@ function drawSettings(){
       r.innerHTML='<button type="button" class="av seticon" aria-label="Change icon"></button>'+
         '<button type="button" class="setcolor" aria-label="Change colour"></button>'+
         '<div class="setfields"><input class="setnm" placeholder="'+(c.lots?"Stock name, e.g. Saham BBCA":"Category name")+'">'+(c.lots?'<span class="stag">Stock · counted in lots</span>':'')+
-        (showBudget?'<label class="sl"><span>Budget</span><input class="setbg num" inputmode="numeric" placeholder="0"></label>':'')+
+        (showBudget?'<label class="sl"><span>Budget/month</span><input class="setbg num" inputmode="numeric" placeholder="0"></label>':'')+
         (showStart?'<label class="sl"><span>'+(c.lots?"Starting lots":"Starting balance")+'</span><input class="setst num" inputmode="numeric" placeholder="0"></label>':'')+
         '</div><button type="button" class="setdel" aria-label="Delete category">✕</button>';
       const ib=r.querySelector(".seticon"); ib.style.setProperty("--cc",c.color); ib.innerHTML=iconSvg(c.icon);
