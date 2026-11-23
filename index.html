@@ -16,7 +16,7 @@
 <style>html,body,*{touch-action:manipulation}html{-webkit-text-size-adjust:100%}body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Finance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
 /* Layout: satu kolom; header + navigasi periode, lalu 4 tab: Catat / Data / Riwayat / Grafik */
 :root{
@@ -549,6 +549,149 @@ html,body{height:100%;overflow:hidden}
 .navi > button{flex:1}
 .hapt{position:absolute;inset:0;z-index:2;opacity:.011;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .hapt input{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;pointer-events:none}
+
+/* =====================================================================
+   TAMPILAN "ANALYTICS": gelap dengan cahaya hijau, kartu kaca, tombol bulat
+   ===================================================================== */
+:root{
+  --bg:#eef1ef; --surface:#ffffff; --surface2:#f2f5f3; --ink:#111513; --muted:#6b7570; --line:rgba(17,21,19,.07);
+  --accent:#16a34a; --accent-soft:rgba(22,163,74,.12); --accent-ink:#ffffff; --warn:#d97706; --warn-soft:rgba(217,119,6,.12); --bad:#e5484d; --bad-soft:rgba(229,72,77,.12);
+  --track:rgba(17,21,19,.07); --glow:rgba(34,197,94,.16); --shadow:0 1px 2px rgba(0,0,0,.04),0 12px 28px -20px rgba(0,0,0,.25);
+  --f-display:"Outfit","Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hero-ink:var(--ink); --hero-dim:var(--muted); --hero-glass:var(--surface2); --hero-bad:var(--bad);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0a0c0b; --surface:#161917; --surface2:#202422; --ink:#f3f6f4; --muted:#8d9691; --line:rgba(255,255,255,.07);
+  --accent:#5be37d; --accent-soft:rgba(91,227,125,.13); --accent-ink:#0a0c0b; --warn:#f5a54a; --warn-soft:rgba(245,165,74,.14); --bad:#ff6b61; --bad-soft:rgba(255,107,97,.14);
+  --track:rgba(255,255,255,.08); --glow:rgba(56,190,90,.38); --shadow:none; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a0c0b; --surface:#161917; --surface2:#202422; --ink:#f3f6f4; --muted:#8d9691; --line:rgba(255,255,255,.07);
+  --accent:#5be37d; --accent-soft:rgba(91,227,125,.13); --accent-ink:#0a0c0b; --warn:#f5a54a; --warn-soft:rgba(245,165,74,.14); --bad:#ff6b61; --bad-soft:rgba(255,107,97,.14);
+  --track:rgba(255,255,255,.08); --glow:rgba(56,190,90,.38); --shadow:none; color-scheme:dark}
+
+body{font-family:var(--f-display);background:radial-gradient(130% 55% at 50% -12%,var(--glow),transparent 62%),var(--bg)!important;background-color:var(--bg)!important;letter-spacing:.005em}
+#app{background:transparent}
+h2{font-size:17px;font-weight:600;letter-spacing:0}
+.hello{font-size:13px;font-weight:500;color:var(--muted)}
+.num{font-family:var(--f-display)}
+
+/* Kartu umum */
+.rows,.card,.goal,.hcheck,.hscore,.monthnav,.welcome,.hsum div,.catcard,form:not(.sbox form){background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:24px!important;box-shadow:var(--shadow)!important}
+.days .rows{border-radius:24px!important}
+
+/* Tombol bulat ala referensi */
+.themebtn,.monthnav button,.eye,.sx,#clClose,#balClose{width:42px!important;height:42px!important;border-radius:50%!important;background:var(--surface2)!important;border:1px solid var(--line)!important;color:var(--ink)!important;box-shadow:none!important}
+.monthnav{padding:6px!important}
+.monthnav span{font-weight:600;font-size:15px}
+
+/* Kartu saldo: gelap, berpendar hijau */
+.hero{background:radial-gradient(120% 95% at 100% 0%,color-mix(in srgb,var(--accent) 26%,transparent),transparent 55%),radial-gradient(90% 80% at 0% 110%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 60%),var(--surface)!important;
+  border:1px solid var(--line)!important;border-radius:28px!important;box-shadow:var(--shadow)!important;color:var(--ink)}
+.hero::before,.hero::after{display:none}
+.hlabel{font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink)}
+.hchip{background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);font-weight:600}
+.hero .big{font-weight:500!important;font-size:clamp(34px,10vw,44px)!important;letter-spacing:-.02em!important}
+.hdaily{color:var(--muted)}
+.hdaily b{color:var(--ink)}
+.ptrack{height:6px;background:var(--track)}
+.ptrack i{background:var(--accent);opacity:1;box-shadow:0 0 12px color-mix(in srgb,var(--accent) 60%,transparent)}
+.hero .split > div{background:var(--surface2)!important;border:1px solid var(--line);border-radius:16px!important}
+.hero .split .label{color:var(--muted)!important}
+.hero .split .v{color:var(--ink)!important;font-size:15px!important;font-weight:600}
+
+/* Riwayat */
+.days .dhead{background:transparent!important;color:var(--muted)!important;font-weight:600;border-bottom:1px solid var(--line)!important}
+.days .dhead span:first-child{color:var(--ink)}
+.tx{padding:13px 16px}
+.tx .c{font-weight:600;font-size:15px}
+.tx .num{font-weight:600}
+.tx .del{width:30px;height:30px;border-radius:50%;background:var(--surface2);font-size:14px;color:var(--muted)}
+
+/* Ikon kategori: bulat, berpendar */
+.av{border-radius:50%!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--cc) 30%,transparent),0 6px 16px -8px var(--cc)!important}
+.ctile .av{border-radius:50%!important}
+.av.mini{border-radius:50%!important}
+
+/* Grafik */
+.donut circle[stroke="var(--track)"]{stroke:var(--track)}
+#chartCard .dp{color:var(--muted)}
+.lg .h .pc{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.bar{background:var(--track)}
+.sdots button{background:var(--track)}
+.sdots button.on{background:var(--accent);box-shadow:0 0 10px color-mix(in srgb,var(--accent) 60%,transparent)}
+#dailyCard{padding:18px}
+.ovhead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.ovk{font-size:13px;color:var(--muted)}
+.ovv{font-size:26px;font-weight:500;letter-spacing:-.01em;margin-top:2px}
+.ovpill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;color:var(--accent);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+svg.area{width:100%;height:auto;display:block;touch-action:pan-y;overflow:visible}
+.gln{stroke:var(--line);stroke-dasharray:3 4}
+.gtx{fill:var(--muted);font-size:10px;font-family:var(--f-display)}
+.aln{stroke:var(--accent);stroke-width:2.4;stroke-linecap:round;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--accent) 70%,transparent))}
+.ag0{stop-color:var(--accent);stop-opacity:.35}
+.ag1{stop-color:var(--accent);stop-opacity:0}
+.avl{stroke:var(--ink);stroke-opacity:.35;stroke-dasharray:3 3}
+.adot{fill:var(--accent);stroke:var(--surface);stroke-width:3}
+.atip rect{fill:var(--surface2);stroke:var(--line)}
+.att{fill:var(--ink);font-size:11px;font-weight:600;font-family:var(--f-display)}
+.adate{text-align:center;font-size:12px;color:var(--muted);margin-top:4px}
+
+/* Profile & Health */
+.pcard{background:radial-gradient(120% 120% at 100% 0%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 60%),var(--surface)!important;color:var(--ink)!important;border:1px solid var(--line);border-radius:28px!important;box-shadow:var(--shadow)!important}
+.pav{background:var(--accent)!important;color:var(--accent-ink)!important}
+.psub{color:var(--muted)!important}
+.goal .gi,.hcheck .gi{border-radius:50%}
+.spill,.pill{border:1px solid currentColor;border-color:color-mix(in srgb,currentColor 35%,transparent)}
+.sval b{font-weight:500}
+.sarc.good{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--accent) 60%,transparent))}
+.kv + .kv,.row,.tip + .tip{border-color:var(--line)!important}
+
+/* Tambah & panel isian */
+.addbar .cancel{color:var(--accent)}
+.kind{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.kind button{border:0!important;border-radius:999px!important;background:transparent!important;color:var(--muted)!important;height:42px}
+#k-out[aria-pressed="true"],#k-in[aria-pressed="true"]{background:var(--surface)!important;color:var(--ink)!important;box-shadow:0 1px 2px rgba(0,0,0,.15),0 0 0 1px var(--line)}
+.ctile{background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:22px!important;box-shadow:none!important}
+.ctile.sel{border:1.5px solid var(--accent)!important;background:var(--accent-soft)!important}
+.sheet .sbox,.clbox,.mbox{background:var(--surface)!important;border:1px solid var(--line)!important}
+input,select,.datebox{background:var(--surface2)!important;border-color:var(--line)!important;color:var(--ink)}
+.btn{background:var(--accent)!important;color:var(--accent-ink)!important;font-weight:600;box-shadow:0 8px 22px -10px color-mix(in srgb,var(--accent) 80%,transparent)}
+.toast{background:var(--surface2);border-color:var(--line)}
+.toast .tic{background:var(--accent);color:var(--accent-ink)}
+
+/* Menu bawah mengambang */
+.bnav{left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;padding:0 6px!important;border-radius:28px;border:1px solid var(--line)!important;
+  background:color-mix(in srgb,var(--surface) 82%,transparent)!important;-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 14px 40px -18px rgba(0,0,0,.55)}
+.bin{height:66px}
+.bnav button{height:66px;font-weight:500}
+.bnav button[aria-current="page"]{color:var(--accent)}
+.bnav .plus i{background:var(--accent)!important;color:var(--accent-ink)!important;border:4px solid var(--bg)!important;border-radius:50%!important;box-shadow:0 0 22px color-mix(in srgb,var(--accent) 55%,transparent)!important;margin-top:-26px}
+.wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+
+/* ===== Kartu anggaran (Profile) ===== */
+#budget .bsub{font-size:14px;color:var(--muted);font-weight:600}
+.bgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.bcard{--tone:var(--accent);font:inherit;text-align:left;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:12px 12px 12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;min-width:0;position:relative;overflow:hidden}
+.bcard.warn{--tone:var(--warn)} .bcard.bad{--tone:var(--bad)}
+.bcard::before{content:"";position:absolute;inset:auto -20% -40% -20%;height:70%;background:radial-gradient(60% 60% at 50% 100%,color-mix(in srgb,var(--tone) 22%,transparent),transparent 70%);pointer-events:none}
+.bcard:active{transform:scale(.98)}
+.bc-h{display:flex;align-items:center;gap:8px;min-width:0;position:relative}
+.bc-n{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-g{width:100%;height:56px;display:block;position:relative;overflow:visible}
+.bc-s0{stop-color:var(--tone);stop-opacity:.35} .bc-s1{stop-color:var(--tone);stop-opacity:0}
+.bc-l{stroke:var(--tone);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 4px color-mix(in srgb,var(--tone) 60%,transparent))}
+.bc-cap{stroke:var(--muted);stroke-opacity:.5;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
+.bc-d{fill:var(--tone);stroke:var(--surface);stroke-width:2;vector-effect:non-scaling-stroke}
+.bc-f{display:flex;justify-content:space-between;align-items:baseline;gap:6px;position:relative;min-width:0}
+.bc-f b{font-size:22px;font-weight:500;color:var(--tone)}
+.bc-f span{font-size:11.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-f em{font-style:normal;color:var(--muted)}
+
+.bc-f{flex-direction:column;align-items:flex-start;gap:1px}
+.bc-f span{max-width:100%}
+.hero .big{font-size:clamp(30px,8.6vw,40px)!important}
+.hbtns .eye{width:38px!important;height:38px!important}
+.hbtns{gap:6px}
 </style>
 </head>
 <body>
@@ -1150,38 +1293,48 @@ function renderData(mk, txs, by, spend, save, extra, pre){
     G.appendChild(el);
   });
 
-  // Anggaran per pos
+  // Anggaran per pos: kartu dengan grafik kecil, bisa diketuk untuk melihat transaksinya
   const b = $("budget"); b.innerHTML="";
-  let g=null, box=null;
-  const GRP_TITLE={"Tetap":"Fixed","Fleksibel":"Flexible","Tabungan":"Savings & stocks"};
   const bh=document.createElement("h2");bh.textContent="Budget";bh.className="bh";b.appendChild(bh);
-  CATS.forEach(c=>{
-    const used = by[c.id]||0;
-    if(c.income || c.save) return;
-    if(c.budget===0 && used===0) return;
-    if(c.grp!==g){
-      g=c.grp;
-      const sec=document.createElement("div");sec.className="sec";
-      const h=document.createElement("h2");h.textContent=GRP_TITLE[c.grp]||c.grp;
-      box=document.createElement("div");box.className="rows";
-      sec.appendChild(h);sec.appendChild(box);
-      if(c.grp==="Tetap"||c.grp==="Fleksibel"){
-        let pair=b.querySelector(".bpair"); if(!pair){pair=document.createElement("div");pair.className="bpair";b.appendChild(pair);}
-        sec.classList.add("half"); pair.appendChild(sec);
-      } else b.appendChild(sec);
-    }
-    const r=document.createElement("div");r.className="row";
-    const pct = c.budget? used/c.budget*100 : (used?100:0);
-    let cls="", pill="";
-    if(c.save){ if(c.budget && used>=c.budget) pill='<span class="pill ok">reached</span>'; }
-    else if(c.budget && used>c.budget){cls="over";pill='<span class="pill over">over '+plain(used-c.budget)+'</span>';}
-    else if(c.budget && pct>=85 && c.grp==="Fleksibel") cls="near";
-    const sw = `<i class="sw" style="background:${catColor(c.id)}"></i>`;
-    r.innerHTML = c.budget
-      ? `<div class="h"><span class="n">${sw}<span class="nm"></span>${pill}</span><span class="a num">${plain(used)} <em>/ ${plain(c.budget)}</em></span></div><div class="bar"><i class="${cls}" style="width:${Math.min(100,pct)}%;${cls?"":"background:"+catColor(c.id)}"></i></div>`
-      : `<div class="h"><span class="n">${sw}<span class="nm"></span></span><span class="a num">${plain(used)} <em>no limit</em></span></div>`;
-    r.querySelector(".nm").textContent=c.name;
-    box.appendChild(r);
+  const pdays = periodDays(cur.y,cur.m), tIdx = pdays.indexOf(todayStr());
+  const lastI = tIdx>=0 ? tIdx : (pdays[0]>todayStr() ? -1 : pdays.length-1);
+  const GRPS=[["Fleksibel","Flexible"],["Tetap","Fixed"]];
+  GRPS.forEach(([g,title])=>{
+    const cats = CATS.filter(c=>c.grp===g && !c.save && !c.income && (c.budget>0 || (by[c.id]||0)>0));
+    if(!cats.length) return;
+    const sec=document.createElement("div"); sec.className="sec";
+    const h=document.createElement("h2"); h.className="bsub"; h.textContent=title; sec.appendChild(h);
+    const grid=document.createElement("div"); grid.className="bgrid"; sec.appendChild(grid);
+    cats.forEach(c=>{
+      const used=by[c.id]||0;
+      const pct = c.budget ? used/c.budget*100 : 0;
+      const tone = !c.budget ? "ok" : pct>100 ? "bad" : (pct>=85 && g==="Fleksibel") ? "warn" : "ok";
+      // kumulatif per hari untuk garis kecil
+      const per={}; txs.forEach(t=>{ if(t.cat===c.id) per[t.date]=(per[t.date]||0)+t.amount; });
+      let acc=0; const cum=pdays.map((d,i)=>{ acc+=per[d]||0; return i<=lastI?acc:null; }).filter(v=>v!==null);
+      const W=160,H=56, top=Math.max(c.budget||0, acc, 1);
+      const pts=cum.map((v,i)=>[ (i/Math.max(1,pdays.length-1))*W, H-4-(v/top)*(H-10) ]);
+      let line="", area="";
+      if(pts.length>1){
+        line="M"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" L");
+        area=line+" L"+pts[pts.length-1][0].toFixed(1)+","+H+" L0,"+H+" Z";
+      }
+      const capY = c.budget ? (H-4-(c.budget/top)*(H-10)).toFixed(1) : null;
+      const end = pts.length ? pts[pts.length-1] : null;
+      const el=document.createElement("button"); el.type="button"; el.className="bcard "+tone; el.style.setProperty("--cc",catColor(c.id));
+      el.innerHTML='<div class="bc-h"><span class="av mini" style="--cc:'+catColor(c.id)+'">'+catIcon(c.id)+'</span><span class="bc-n"></span></div>'+
+        '<svg class="bc-g" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true">'+
+          '<defs><linearGradient id="bg_'+c.id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="bc-s0"></stop><stop offset="1" class="bc-s1"></stop></linearGradient></defs>'+
+          (capY?'<line x1="0" x2="'+W+'" y1="'+capY+'" y2="'+capY+'" class="bc-cap"></line>':'')+
+          (area?'<path d="'+area+'" fill="url(#bg_'+c.id+')" stroke="none"></path><path d="'+line+'" class="bc-l" fill="none"></path>':'')+
+          (end?'<circle cx="'+end[0].toFixed(1)+'" cy="'+end[1].toFixed(1)+'" r="3.5" class="bc-d"></circle>':'')+
+        '</svg>'+
+        '<div class="bc-f"><b class="num">'+(c.budget?Math.round(pct)+"%":"—")+'</b><span class="num">'+plain(used)+(c.budget?'<em> / '+plain(c.budget)+'</em>':'<em> no limit</em>')+'</span></div>';
+      el.querySelector(".bc-n").textContent=c.name;
+      el.onclick=()=>openCatList(c.id, txs);
+      grid.appendChild(el);
+    });
+    b.appendChild(sec);
   });
 }
 
@@ -1364,28 +1517,65 @@ function renderCharts(txs, by, spend){
     });
   }
 
-  // Batang harian bertumpuk per kategori
+  // Grafik garis area: pengeluaran per hari (gaya "Spending Overview")
   const D=$("dailyCard");
   const days=periodDays(cur.y,cur.m);
   const exp=txs.filter(t=>!isIncome(t)&&!isSave(t));
   if(!exp.length){ D.innerHTML='<div class="empty">No spending in this period.</div>'; return; }
-  const per={}; exp.forEach(t=>{ (per[t.date]=per[t.date]||{}); per[t.date][t.cat]=(per[t.date][t.cat]||0)+t.amount; });
-  const tot=d=>Object.values(per[d]||{}).reduce((a,b)=>a+b,0);
-  const maxDay=Math.max(...days.map(tot));
-  const step = maxDay>2000000?1000000: maxDay>500000?250000: maxDay>200000?100000:50000;
-  const top = Math.ceil(maxDay/step)*step || step;
-  const today=todayStr();
-  let cols="";
-  days.forEach(d=>{
-    const segsH = CATS.filter(c=>per[d]&&per[d][c.id]).map(c=>`<i style="height:${per[d][c.id]/top*150}px;background:${catColor(c.id)}"></i>`).join("");
-    cols+=`<div class="col${d===today?" today":""}" title="${dayLabel(d)}: ${plain(tot(d))}">${segsH}</div>`;
-  });
+  const perDay={}; exp.forEach(t=>{ perDay[t.date]=(perDay[t.date]||0)+t.amount; });
+  const today=todayStr(); const ti=days.indexOf(today);
+  const last = ti>=0 ? ti : (days[0]>today ? -1 : days.length-1);
+  const vals=days.map(d=>perDay[d]||0);
+  const kfmt=v=> v>=1e6 ? (Math.round(v/1e5)/10).toLocaleString("id-ID")+" jt" : Math.round(v/1e3).toLocaleString("id-ID")+" rb";
+  const maxV=Math.max(1,...vals.slice(0,last+1));
+  const step = maxV>2000000?1000000: maxV>800000?500000: maxV>400000?200000: maxV>200000?100000:50000;
+  const top=Math.ceil(maxV/step)*step;
+  const W=340,H=200,L=40,R=10,T=26,B=24, iw=W-L-R, ih=H-T-B;
+  const X=i=>L+i*iw/Math.max(1,days.length-1), Y=v=>T+(1-v/top)*ih;
+  const pts=vals.slice(0,last+1).map((v,i)=>[X(i),Y(v)]);
+  // kurva monoton (tidak melewati batas bawah/atas)
+  function smooth(p){
+    if(p.length<2) return p.length?`M${p[0][0]},${p[0][1]}`:"";
+    const n=p.length, dx=[],dy=[],m=[],t=[];
+    for(let i=0;i<n-1;i++){dx[i]=p[i+1][0]-p[i][0];dy[i]=p[i+1][1]-p[i][1];m[i]=dy[i]/dx[i];}
+    t[0]=m[0]; t[n-1]=m[n-2];
+    for(let i=1;i<n-1;i++){ t[i]=(m[i-1]*m[i]<=0)?0:(m[i-1]+m[i])/2; }
+    for(let i=0;i<n-1;i++){ if(m[i]===0){t[i]=0;t[i+1]=0;continue;} const a=t[i]/m[i],b=t[i+1]/m[i],h=a*a+b*b; if(h>9){const k=3/Math.sqrt(h);t[i]=k*a*m[i];t[i+1]=k*b*m[i];} }
+    let d=`M${p[0][0]},${p[0][1]}`;
+    for(let i=0;i<n-1;i++){ const h=dx[i]/3; d+=` C${p[i][0]+h},${p[i][1]+t[i]*h} ${p[i+1][0]-h},${p[i+1][1]-t[i+1]*h} ${p[i+1][0]},${p[i+1][1]}`; }
+    return d;
+  }
+  const line=smooth(pts);
+  const area= pts.length ? line+` L${pts[pts.length-1][0]},${T+ih} L${pts[0][0]},${T+ih} Z` : "";
   let grid="";
-  for(let v=step; v<=top; v+=step){ if(top/step>4 && (v/step)%2) continue; grid+=`<div class="gl" style="bottom:${v/top*150}px"><span class="num">${v>=1e6?(v/1e6).toLocaleString("id-ID")+" jt":(v/1e3)+" rb"}</span></div>`; }
-  const xl = days.map((d,i)=>{const dd=+d.slice(8);return `<span>${(i%7===0||i===days.length-1)?dd+(i===0||dd===1?" "+BLN3[+d.slice(5,7)-1]:""):""}</span>`;}).join("");
-  const used = CATS.filter(c=>exp.some(t=>t.cat===c.id));
-  D.innerHTML=`<div class="daily"><div class="cols">${grid}${cols}</div><div class="xl">${xl}</div>
-    <div class="legend" style="margin-top:8px">${used.map(c=>`<span><b style="background:${catColor(c.id)}"></b>${c.name}</span>`).join("")}</div></div>`;
+  for(let k=0;k<=4;k++){ const v=top*k/4, y=Y(v); grid+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" class="gln"></line><text x="${L-6}" y="${y+3.5}" text-anchor="end" class="gtx">${k?kfmt(v):"0"}</text>`; }
+  let xl=""; days.forEach((d,i)=>{ const dd=+d.slice(8); if(i%7===0||i===days.length-1) xl+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" class="gtx">${dd}${i===0?" "+BLN3[+d.slice(5,7)-1]:""}</text>`; });
+  const peak = vals.slice(0,last+1).reduce((bi,v,i,arr)=>v>arr[bi]?i:bi,0);
+  D.innerHTML=`<div class="ovhead"><div><div class="ovk">Spent this period</div><div class="ovv num">${rp(vals.reduce((a,b)=>a+b,0))}</div></div><span class="ovpill">Daily</span></div>
+  <svg class="area" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily spending">
+    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="ag0"></stop><stop offset="1" class="ag1"></stop></linearGradient></defs>
+    ${grid}${xl}
+    <path d="${area}" fill="url(#ag)" stroke="none"></path>
+    <path d="${line}" class="aln" fill="none"></path>
+    <g id="amk"><line class="avl" y1="${T}" y2="${T+ih}"></line><circle r="5" class="adot"></circle>
+      <g class="atip"><rect rx="9" height="22"></rect><text text-anchor="middle" class="att"></text></g></g>
+    <rect x="${L}" y="${T-10}" width="${iw}" height="${ih+10}" fill="transparent" stroke="none" id="ahit"></rect>
+  </svg><div class="adate" id="adate"></div>`;
+  const mk=$("amk"), dt=$("adate");
+  const place=i=>{ if(i<0||i>last) return; const x=X(i), y=Y(vals[i]);
+    mk.querySelector(".avl").setAttribute("x1",x); mk.querySelector(".avl").setAttribute("x2",x);
+    const c=mk.querySelector(".adot"); c.setAttribute("cx",x); c.setAttribute("cy",y);
+    const tx=mk.querySelector(".att"), rc=mk.querySelector("rect");
+    tx.textContent=kfmt(vals[i]); const w=Math.max(44,tx.textContent.length*7.2+16);
+    const bx=Math.min(W-R-w,Math.max(L,x-w/2)), by=Math.max(2,y-34);
+    rc.setAttribute("x",bx); rc.setAttribute("y",by); rc.setAttribute("width",w);
+    tx.setAttribute("x",bx+w/2); tx.setAttribute("y",by+15);
+    dt.textContent=dayLabel(days[i]);
+  };
+  place(peak);
+  const hit=$("ahit"), svgA=D.querySelector("svg.area");
+  const pick=e=>{ const r=svgA.getBoundingClientRect(); const px=(e.clientX-r.left)/r.width*W; place(Math.max(0,Math.min(last,Math.round((px-L)/iw*(days.length-1))))); };
+  hit.addEventListener("pointerdown",pick); hit.addEventListener("pointermove",e=>{ if(e.buttons||e.pointerType==="mouse") pick(e); });
 }
 
 $("f").addEventListener("submit",async e=>{
@@ -1560,7 +1750,7 @@ $("goRestore").onclick=()=>setTab("profil");
 
 // ===== Geser grafik: donat <-> batang harian =====
 (function(){
-  const S=$("slides"), dots=[...$("sdots").children], titles=["Spending by category","Daily spending"];
+  const S=$("slides"), dots=[...$("sdots").children], titles=["Spending by category","Spending overview"];
   let cur=0;
   const upd=()=>{ const i=Math.round(S.scrollLeft/Math.max(1,S.clientWidth)); if(i===cur) return; cur=i;
     dots.forEach((d,k)=>d.classList.toggle("on",k===i)); $("slideTitle").textContent=titles[i]||titles[0]; };
@@ -1688,8 +1878,8 @@ $("setSave").onclick=()=>{
 })();
 
 // ===== Daftar transaksi per kategori (dari Grafik)
-function openCatList(id){
-  const c=CAT[id]; const list=chartTx.filter(t=>t.cat===id).sort((a,b)=>(b.date+(b.createdAt||"")).localeCompare(a.date+(a.createdAt||"")));
+function openCatList(id, src){
+  const c=CAT[id]; const list=(src||chartTx).filter(t=>t.cat===id).sort((a,b)=>(b.date+(b.createdAt||"")).localeCompare(a.date+(a.createdAt||"")));
   const tot=list.reduce((a,t)=>a+t.amount,0);
   $("clIcon").style.setProperty("--cc",catColor(id)); $("clIcon").innerHTML=catIcon(id);
   $("clName").textContent=c.name;
