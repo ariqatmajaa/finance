@@ -709,7 +709,7 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
 .bcard.bad .bar i{background:var(--bad)}
 .bcard.warn .bar i{background:var(--warn)}
 /* urutkan daftar */
-.clsort{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px;border-radius:14px;background:var(--track);margin:0 0 10px}
+.clsort{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:4px;border-radius:14px;background:var(--track);margin:0 0 10px}
 .clsort button{font:inherit;font-size:13px;font-weight:600;height:34px;border:0;border-radius:10px;background:none;color:var(--muted);cursor:pointer}
 .clsort button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.25)}
 /* pemilih ikon */
@@ -718,6 +718,18 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
 .ipbtn .av{width:46px;height:46px;border-radius:15px}
 .ipbtn .av svg{width:22px;height:22px}
 .ipbtn.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+
+/* ===== Revisi 23 Nov (2) ===== */
+#list .del{display:none}
+#modal{z-index:60}
+.cldel{font:inherit;width:30px;height:30px;border:0;border-radius:50%;background:var(--track);color:var(--muted);cursor:pointer;flex:none;margin-left:4px}
+.clrow{gap:10px}
+.clrow .l{flex:1}
+svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-select:none}
+.setrow{transition:box-shadow .15s ease,background .15s ease}
+.setrow.dragging{position:relative;z-index:5;background:var(--surface);box-shadow:0 14px 30px -10px rgba(0,0,0,.55);border-radius:14px;transition:none}
+.reordering .setrow:not(.dragging){transition:transform .15s ease}
+.bcard .bc-f span{font-size:14px;font-weight:600}
 </style>
 </head>
 <body>
@@ -754,7 +766,7 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
         <div class="hdaily" id="heroDaily"></div>
         <div class="label" id="carryNote" hidden></div>
       </div>
-      <div class="ptrack" aria-hidden="true"><i id="heroProg"></i></div>
+      <div class="ptrack" aria-hidden="true" hidden><i id="heroProg"></i></div>
       <div class="stack" id="stack" hidden></div>
       <div class="split">
         <div hidden><div class="label" id="gajiL">Gaji</div><div class="v num" id="gaji">0</div></div>
@@ -778,11 +790,9 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
     <button id="next" aria-label="Next period">›</button>
     </div>
     <div class="sec">
-      <div class="shead"><h2 id="slideTitle">Spending by category</h2><span class="sdots" id="sdots"><button type="button" class="on" aria-label="Category chart"></button><button type="button" aria-label="Daily chart"></button></span></div>
-      <div class="slides" id="slides">
-        <div class="slide"><div class="card" id="chartCard"></div></div>
-        <div class="slide"><div class="card" id="dailyCard"></div></div>
-      </div>
+      <h2>Spending overview</h2>
+      <div class="card" id="dailyCard"></div>
+      <div id="chartCard" hidden></div>
     </div>
     <div class="sec">
       <div class="shead"><h2>Categories</h2><span id="hTotal"></span></div>
@@ -933,7 +943,6 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
     <div class="clsort" role="group" aria-label="Sort">
       <button type="button" data-sort="date" aria-pressed="true">Newest</button>
       <button type="button" data-sort="high" aria-pressed="false">Highest</button>
-      <button type="button" data-sort="low" aria-pressed="false">Lowest</button>
     </div>
     <div class="cllist" id="clList"></div>
   </div>
@@ -1398,7 +1407,7 @@ function renderData(mk, txs, by, spend, save, extra, pre){
       const end = pts.length ? pts[pts.length-1] : null;
       const el=document.createElement("button"); el.type="button"; el.className="bcard "+tone; el.style.setProperty("--cc",catColor(c.id));
       el.innerHTML='<div class="bc-h"><span class="av mini" style="--cc:'+catColor(c.id)+'">'+catIcon(c.id)+'</span><span class="bc-n"></span></div>'+
-        '<div class="bc-f"><b class="num">'+(c.budget?Math.round(pct)+"%":"—")+'</b><span class="num">'+plain(used)+(c.budget?'<em> / '+plain(c.budget)+'</em>':'<em> no limit</em>')+'</span></div>'+
+        '<div class="bc-f"><span class="num">'+plain(used)+(c.budget?'<em> / '+plain(c.budget)+'</em>':'<em> no limit</em>')+'</span></div>'+
         '<div class="bar"><i style="width:'+Math.min(100,pct)+'%"></i></div>';
       el.querySelector(".bc-n").textContent=c.name;
       el.onclick=()=>openCatList(c.id, txs);
@@ -1578,7 +1587,7 @@ function renderCharts(txs, by, spend){
     };
     segEls.forEach(s=>bindHold(s,+s.dataset.i));
     // Daftar kategori: cukup ketuk untuk melihat transaksinya (tanpa efek tahan)
-    setTimeout(()=>[...lg.children].forEach((el,k)=>el.addEventListener("click",()=>openCatList(items[k].c.id))),0);
+    setTimeout(()=>[...lg.children].forEach((el,k)=>el.addEventListener("click",()=>openCatList(items[k].c.id,null,false,true))),0);
     items.forEach(({c,v})=>{
       const it=document.createElement("div");it.className="it";
       it.innerHTML=`<div class="h"><span class="n"><span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="nm"></span></span><span class="a num">${plain(v)}</span><span class="pc num">${Math.round(v/spend*100)}%</span></div><div class="bar"><i style="width:${v/max*100}%;background:${catColor(c.id)}"></i></div>`;
@@ -1632,20 +1641,31 @@ function renderCharts(txs, by, spend){
     <rect x="${L}" y="${T-10}" width="${iw}" height="${ih+10}" fill="transparent" stroke="none" id="ahit"></rect>
   </svg><div class="adate" id="adate"></div>`;
   const mk=$("amk"), dt=$("adate");
-  const place=i=>{ if(i<0||i>last) return; const x=X(i), y=Y(vals[i]);
-    mk.querySelector(".avl").setAttribute("x1",x); mk.querySelector(".avl").setAttribute("x2",x);
-    const c=mk.querySelector(".adot"); c.setAttribute("cx",x); c.setAttribute("cy",y);
-    const tx=mk.querySelector(".att"), rc=mk.querySelector("rect");
-    tx.textContent=kfmt(vals[i]); const w=Math.max(44,tx.textContent.length*7.2+16);
+  const pathEl=D.querySelector(".aln"); const plen = pts.length>1 ? pathEl.getTotalLength() : 0;
+  const yAtX=x=>{ if(!plen) return pts.length?pts[0][1]:T+ih; let lo=0,hi=plen;
+    for(let k=0;k<18;k++){ const mid=(lo+hi)/2; if(pathEl.getPointAtLength(mid).x<x) lo=mid; else hi=mid; }
+    return pathEl.getPointAtLength((lo+hi)/2).y; };
+  const vline=mk.querySelector(".avl"), dot=mk.querySelector(".adot"), tx=mk.querySelector(".att"), rc=mk.querySelector("rect");
+  let lastI=-1;
+  const placeX=x=>{
+    if(last<0) return;
+    x=Math.max(X(0),Math.min(X(last),x));
+    const y=yAtX(x);
+    vline.setAttribute("x1",x); vline.setAttribute("x2",x);
+    dot.setAttribute("cx",x); dot.setAttribute("cy",y);
+    const i=Math.max(0,Math.min(last,Math.round((x-L)/iw*(days.length-1))));
+    if(i!==lastI){ lastI=i; tx.textContent=kfmt(vals[i]); dt.textContent=dayLabel(days[i]); }
+    const w=Math.max(44,tx.textContent.length*7.2+16);
     const bx=Math.min(W-R-w,Math.max(L,x-w/2)), by=Math.max(2,y-34);
     rc.setAttribute("x",bx); rc.setAttribute("y",by); rc.setAttribute("width",w);
     tx.setAttribute("x",bx+w/2); tx.setAttribute("y",by+15);
-    dt.textContent=dayLabel(days[i]);
   };
-  place(peak);
-  const hit=$("ahit"), svgA=D.querySelector("svg.area");
-  const pick=e=>{ const r=svgA.getBoundingClientRect(); const px=(e.clientX-r.left)/r.width*W; place(Math.max(0,Math.min(last,Math.round((px-L)/iw*(days.length-1))))); };
-  hit.addEventListener("pointerdown",pick); hit.addEventListener("pointermove",e=>{ if(e.buttons||e.pointerType==="mouse") pick(e); });
+  placeX(X(peak));
+  const svgA=D.querySelector("svg.area"); let raf=0, pendX=null;
+  const toX=e=>{ const r=svgA.getBoundingClientRect(); return (e.clientX-r.left)/r.width*W; };
+  const sched=x=>{ pendX=x; if(!raf) raf=requestAnimationFrame(()=>{ raf=0; placeX(pendX); }); };
+  svgA.addEventListener("pointerdown",e=>{ try{svgA.setPointerCapture(e.pointerId);}catch(_){} sched(toX(e)); });
+  svgA.addEventListener("pointermove",e=>{ if(e.pointerType==="mouse"||svgA.hasPointerCapture(e.pointerId)) sched(toX(e)); });
 }
 
 $("f").addEventListener("submit",async e=>{
@@ -1818,20 +1838,6 @@ $("rsFile").addEventListener("change",async e=>{
 });
 $("goRestore").onclick=()=>setTab("profil");
 
-// ===== Geser grafik: donat <-> batang harian =====
-(function(){
-  const S=$("slides"), dots=[...$("sdots").children], titles=["Spending by category","Spending overview"];
-  let cur=0;
-  const upd=()=>{ const i=Math.round(S.scrollLeft/Math.max(1,S.clientWidth)); if(i===cur) return; cur=i;
-    dots.forEach((d,k)=>d.classList.toggle("on",k===i)); $("slideTitle").textContent=titles[i]||titles[0]; };
-  S.addEventListener("scroll",()=>requestAnimationFrame(upd),{passive:true});
-  dots.forEach((d,k)=>d.onclick=()=>S.scrollTo({left:k*S.clientWidth,behavior:"smooth"}));
-  // tinggi area grafik mengikuti grafik yang sedang tampil
-  const fit=()=>{ const sl=S.children[cur]; if(sl&&sl.offsetHeight) S.style.height=sl.firstElementChild.offsetHeight+"px"; };
-  S.addEventListener("scroll",()=>requestAnimationFrame(fit),{passive:true});
-  window.fitSlides=fit; new ResizeObserver(fit).observe(S);
-})();
-
 // ===== Mode terang / gelap =====
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none"></path></svg>';
 const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none"></path></svg>';
@@ -1872,6 +1878,33 @@ function openSettings(){
 }
 function closeSettings(){ $("p-settings").hidden=true; document.body.classList.remove("adding"); setTab("profil"); }
 const SET_GROUPS=[["Fleksibel","Flexible expenses"],["Tetap","Fixed expenses"],["Tabungan","Savings & assets"],["Pemasukan","Income"]];
+// Tahan baris kategori ~0,35 detik lalu geser untuk mengubah urutan
+function enableReorder(box,g){
+  let drag=null, timer=null, sy=0;
+  const rows=()=>[...box.querySelectorAll(".setrow")];
+  const start=(row,y)=>{ drag={row,y0:y}; row.classList.add("dragging"); box.classList.add("reordering"); try{haptic();}catch(e){} };
+  const move=y=>{
+    const row=drag.row; let dy=y-drag.y0;
+    const next=row.nextElementSibling, prev=row.previousElementSibling;
+    if(next && next.classList.contains("setrow") && dy>next.offsetHeight/2){ box.insertBefore(next,row); drag.y0+=next.offsetHeight; dy=y-drag.y0; }
+    else if(prev && prev.classList.contains("setrow") && dy<-prev.offsetHeight/2){ box.insertBefore(row,prev); drag.y0-=prev.offsetHeight; dy=y-drag.y0; }
+    row.style.transform="translateY("+dy+"px)";
+  };
+  const end=()=>{
+    clearTimeout(timer); timer=null; if(!drag) return;
+    drag.row.classList.remove("dragging"); drag.row.style.transform=""; box.classList.remove("reordering"); drag=null;
+    const order=rows().map(r=>r._cat);
+    draft=[...draft.filter(x=>x.grp!==g), ...order];
+  };
+  const blocked=t=>t.closest("input,button");
+  box.addEventListener("touchstart",e=>{ const row=e.target.closest(".setrow"); if(!row||blocked(e.target)) return; sy=e.touches[0].clientY; timer=setTimeout(()=>start(row,sy),350); },{passive:true});
+  box.addEventListener("touchmove",e=>{ const y=e.touches[0].clientY; if(!drag){ if(timer&&Math.abs(y-sy)>8){clearTimeout(timer);timer=null;} return; } e.preventDefault(); move(y); },{passive:false});
+  box.addEventListener("touchend",end); box.addEventListener("touchcancel",end);
+  box.addEventListener("mousedown",e=>{ const row=e.target.closest(".setrow"); if(!row||blocked(e.target)) return; sy=e.clientY; timer=setTimeout(()=>start(row,sy),350);
+    const mm=ev=>{ if(drag) move(ev.clientY); else if(Math.abs(ev.clientY-sy)>8){clearTimeout(timer);timer=null;} };
+    const mu=()=>{ end(); document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); };
+    document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu); });
+}
 function drawSettings(){
   const W=$("setCats"); W.innerHTML="";
   SET_GROUPS.forEach(([g,title])=>{
@@ -1911,8 +1944,10 @@ function drawSettings(){
         if(!ok) return;
         draft=draft.filter(x=>x!==c); drawSettings();
       };
+      r._cat=c;
       box.appendChild(r);
     });
+    enableReorder(box,g);
     sec.appendChild(box);
     const add=document.createElement("button"); add.type="button"; add.className="more"; add.textContent="+ Add category";
     add.onclick=()=>{
@@ -1928,6 +1963,7 @@ function drawSettings(){
   });
 }
 $("setOpen").onclick=openSettings;
+bindMoney($("setGaji"),()=>{});
 $("setCancel").onclick=closeSettings;
 $("setPayday").addEventListener("input",()=>{ $("setPayday").value=$("setPayday").value.replace(/\D/g,"").slice(0,2); });
 $("setSave").onclick=()=>{
@@ -1969,9 +2005,9 @@ $("ipClose").onclick=()=>{$("iconPick").hidden=true;};
 $("iconPick").addEventListener("click",e=>{ if(e.target.id==="iconPick") $("iconPick").hidden=true; });
 
 let clSort="date", _clLast=null;
-function openCatList(id, src, keepSort){
+function openCatList(id, src, keepSort, canDelete){
   if(!keepSort) clSort="date";
-  _clLast={id,src};
+  _clLast={id,src,del:!!canDelete};
   document.querySelectorAll(".clsort button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sort===clSort));
   const c=CAT[id]; const list=(src||chartTx).filter(t=>t.cat===id).sort((a,b)=>
     clSort==="high" ? b.amount-a.amount : clSort==="low" ? a.amount-b.amount : (b.date+(b.createdAt||"")).localeCompare(a.date+(a.createdAt||"")));
@@ -1982,17 +2018,23 @@ function openCatList(id, src, keepSort){
   const box=$("clList"); box.innerHTML="";
   list.forEach(t=>{
     const r=document.createElement("div"); r.className="clrow";
-    r.innerHTML='<div class="l"><b></b><span></span></div><span class="num"></span>';
+    r.innerHTML='<div class="l"><b></b><span></span></div><span class="num"></span>'+(canDelete?'<button type="button" class="cldel" aria-label="Delete">✕</button>':'');
     r.querySelector("b").textContent=t.note||c.name;
     r.querySelector(".l span").textContent=dayLabel(t.date);
     r.querySelector(".num").textContent=plain(t.amount);
+    if(canDelete) r.querySelector(".cldel").onclick=async()=>{
+      const ok=await askConfirm(c.name, rp(t.amount), dayLabel(t.date)+(t.note?" \u00b7 "+t.note:""));
+      if(!ok) return;
+      try{ await db.collection("tx").doc(t.id).delete(); all=all.filter(x=>x.id!==t.id); render(); resync();
+        openCatList(id, null, true, true); showToast("Deleted"); }catch(e){ showToast("Couldn't delete. Try again."); }
+    };
     box.appendChild(r);
   });
   if(!list.length) box.innerHTML='<div class="empty">No transactions.</div>';
   $("catList").hidden=false;
 }
 $("clClose").onclick=()=>{$("catList").hidden=true;};
-document.querySelectorAll(".clsort button").forEach(b=>b.onclick=()=>{ clSort=b.dataset.sort; if(_clLast){ const keepScroll=0; openCatList(_clLast.id,_clLast.src,true); $("clList").scrollTop=keepScroll; } });
+document.querySelectorAll(".clsort button").forEach(b=>b.onclick=()=>{ clSort=b.dataset.sort; if(_clLast){ const keepScroll=0; openCatList(_clLast.id,_clLast.src,true,_clLast.del); $("clList").scrollTop=keepScroll; } });
 $("catList").addEventListener("click",e=>{ if(e.target.id==="catList") $("catList").hidden=true; });
 
 // ===== Matikan zoom (cubit & ketuk dua kali) =====
