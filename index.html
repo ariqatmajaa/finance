@@ -903,6 +903,11 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
 .pie.act .pbadge:not(.on){opacity:.35}
 .pie.act .seg.on{stroke-width:30px}
 .pie{width:220px!important}
+
+/* Tab Add: saat panel isian terbuka, menu bawah disembunyikan */
+body.addtab.docked .bnav{display:none!important}
+body.addtab.docked:not(.kbopen) .sheet{bottom:0!important;padding-bottom:env(safe-area-inset-bottom,0px)!important}
+body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 24px + env(safe-area-inset-bottom,0px))!important}
 </style>
 </head>
 <body>
