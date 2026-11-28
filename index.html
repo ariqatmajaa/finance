@@ -809,7 +809,6 @@ input,select,.datebox{background:var(--surface2)!important;border-color:var(--li
 .ipbtn.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
 
 /* ===== Revisi 23 Nov (2) ===== */
-#list .del{display:none}
 #modal{z-index:60}
 .cldel{font:inherit;width:30px;height:30px;border:0;border-radius:50%;background:var(--track);color:var(--muted);cursor:pointer;flex:none;margin-left:4px}
 .clrow{gap:10px}
@@ -951,6 +950,9 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
 .bsr span{font-size:12px;color:var(--muted)}
 .bsr b{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .bsr b.bad{color:var(--bad)} .bsr b.warn{color:var(--yel)}
+
+#list .tx.edit{cursor:pointer}
+#list .tx.edit:active{background:var(--surface2)}
 </style>
 </head>
 <body>
@@ -1223,7 +1225,7 @@ const LocalDB=(()=>{
     onSnapshot(cb){subs.push(cb);setTimeout(()=>cb(snap()),0);return()=>{}},
     get:async()=>snap(),
     add:async d=>{const id=Date.now().toString(36)+Math.random().toString(36).slice(2,8);const a=load();a.push(Object.assign({id},d));save(a);return {id};},
-    doc:id=>({delete:async()=>{save(load().filter(o=>o.id!==id));}})};
+    doc:id=>({delete:async()=>{save(load().filter(o=>o.id!==id));},update:async d=>{save(load().map(o=>o.id===id?Object.assign({},o,d,{id}):o));}})};
   return {collection:()=>q,doc:()=>({onSnapshot(){return()=>{}},set:async()=>{}}),all:load,replace:save};
 })();
 const GAJI = CFG.gaji||0;
@@ -1458,11 +1460,12 @@ function openSheet(id){
   const wasOpen = !$("sheet").hidden && $("sDone").hidden;
   sel.value=id;
   $("sIcon").style.setProperty("--cc",catColor(id)); $("sIcon").innerHTML=catIcon(id);
-  $("sKind").textContent = c.income ? "Income" : c.save ? "Savings & stocks" : "Expense";
+  $("sKind").textContent = (editId?"Edit · ":"")+(c.income ? "Income" : c.save ? "Savings & stocks" : "Expense");
   $("sT").textContent=c.name;
   $("lotWrap").hidden = !c.lots;
   $("sMsg").textContent="";
   if(!wasOpen){
+    editId=null; $("save").textContent="Save";
     $("amt").value=""; $("note").value="";
     $("date").value=todayStr(); syncDate(); $("lot").value="1"; $("lot").dataset.fresh="1";
     $("sForm").hidden=false; $("sDone").hidden=true;
@@ -1718,6 +1721,7 @@ function renderHistory(txs, ids){
       try{await db.collection("tx").doc(t.id).delete(); all=all.filter(x=>x.id!==t.id); render(); resync();}catch(e){del.textContent="Failed";}
     };
     if(!db) del.hidden=true;
+    el.classList.add("edit"); el.addEventListener("click",e=>{ if(e.target.closest(".del")) return; openEdit(t); });
     box.appendChild(el);
   });
   M.hidden = true;
@@ -1736,7 +1740,7 @@ function renderCharts(txs, by, spend){
       const it=document.createElement("div");it.className="it";
       it.innerHTML=`<div class="h"><span class="n"><span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="nm"></span></span><span class="a num">${plain(v)}</span><span class="pc num">${Math.round(v/spend*100)}%</span></div><div class="bar"><i style="width:${v/max*100}%;background:${catColor(c.id)}"></i></div>`;
       it.querySelector(".nm").textContent=c.name;
-      it.addEventListener("click",()=>openCatList(c.id,null,false,true));
+      it.addEventListener("click",()=>openCatList(c.id,null,false,false));
       lg.appendChild(it);
     });
   }
@@ -1824,6 +1828,18 @@ $("f").addEventListener("submit",async e=>{
   const doc={cat:sel.value,amount,date,month:periodKey(date),note:$("note").value.trim(),createdAt:new Date().toISOString()};
   if(CAT[sel.value]&&CAT[sel.value].lots) doc.lot=Math.max(0,parseInt($("lot").value||"0",10));
   $("save").disabled=true;
+  if(editId){
+    try{
+      const id=editId, prev=all.find(x=>x.id===id)||{}; delete doc.createdAt; if(!(CAT[doc.cat]&&CAT[doc.cat].lots)) doc.lot=null;
+      await db.collection("tx").doc(id).update(doc);
+      all=all.map(x=>x.id===id?Object.assign({},x,doc,{createdAt:prev.createdAt}):x);
+      editId=null; $("save").textContent="Save"; $("amt").value=""; $("note").value="";
+      render(); resync(); fillCats(); npSet(null);
+      showToast("Updated · "+CAT[doc.cat].name+" "+rp(amount));
+      setTab("catat");
+    }catch(err){ $("sMsg").textContent="Couldn't update. Please try again."; }
+    $("save").disabled=false; return;
+  }
   try{
     const ref = await db.collection("tx").add(doc);
     // tampilkan langsung tanpa menunggu sinkronisasi
@@ -2354,7 +2370,7 @@ function renderPie(items, spend){
       const back=document.createElement("button"); back.type="button"; back.className="pback"; back.innerHTML='<span>‹ All parent categories</span>'; back.onclick=()=>{ pieSel=null; draw(); }; list.appendChild(back);
       g.cats.sort((a,b)=>b.v-a.v).forEach(({c,v})=>{ const r=document.createElement("button"); r.type="button"; r.className="prow";
         r.innerHTML=`<span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="pn"></span><span class="pa num">${plain(v)}</span><span class="pp num">${Math.round(v/g.v*100)}%</span>`;
-        r.querySelector(".pn").textContent=c.name; r.onclick=()=>openCatList(c.id,null,false,true); list.appendChild(r); });
+        r.querySelector(".pn").textContent=c.name; r.onclick=()=>openCatList(c.id,null,false,false); list.appendChild(r); });
     } else groups.forEach(g=>{ const r=document.createElement("button"); r.type="button"; r.className="prow";
         r.innerHTML=`<span class="av mini" style="--cc:${g.color}">${iconSvg(g.icon)}</span><span class="pn"></span><span class="pa num">${plain(g.v)}</span><span class="pp num">${Math.round(g.v/spend*100)}%</span>`;
         r.querySelector(".pn").textContent=g.name; r.onclick=()=>{ pieSel=g.id; draw(); }; list.appendChild(r); });
@@ -2433,6 +2449,22 @@ function openPeriods(selKey, onPick){
 $("perBtn").onclick=()=>openPeriods();
 $("ppClose").onclick=()=>$("perPick").hidden=true;
 $("perPick").addEventListener("click",e=>{ if(e.target.id==="perPick") $("perPick").hidden=true; });
+
+// ===== Edit transaksi dari Home
+var editId=null;
+function openEdit(t){
+  const c=CAT[t.cat]; if(!c) return;
+  setTab("tambah");
+  setKind(c.income?"in":"out");
+  closeSheet();
+  openSheet(t.cat);
+  editId=t.id; $("save").textContent="Update";
+  $("sKind").textContent="Edit · "+(c.income ? "Income" : c.save ? "Savings & stocks" : "Expense");
+  $("amt").value=plain(t.amount); $("note").value=t.note||"";
+  $("date").value=t.date; syncDate();
+  if(c.lots){ $("lot").value=String(t.lot||0); $("lot").dataset.fresh="1"; }
+  const tile=document.querySelector('.ctile[data-cat="'+t.cat+'"]'); if(tile) tile.scrollIntoView({block:"center"});
+}
 </script>
 
 </body>
