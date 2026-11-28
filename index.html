@@ -958,8 +958,6 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
 body.editing .bnav{display:none!important}
 body.editing:not(.kbopen) .sheet{bottom:0!important;padding-bottom:env(safe-area-inset-bottom,0px)!important}
 body.editing.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 24px + env(safe-area-inset-bottom,0px))!important}
-body.editing .sheet .datelbl{display:none}
-body.editing .sheet .notelbl{grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -1838,7 +1836,7 @@ $("f").addEventListener("submit",async e=>{
   $("save").disabled=true;
   if(editId){
     try{
-      const id=editId, prev=all.find(x=>x.id===id)||{}; delete doc.createdAt; doc.cat=prev.cat; doc.date=prev.date; doc.month=prev.month||periodKey(prev.date); if(!(CAT[doc.cat]&&CAT[doc.cat].lots)) doc.lot=null;
+      const id=editId, prev=all.find(x=>x.id===id)||{}; delete doc.createdAt; doc.cat=prev.cat; if(!(CAT[doc.cat]&&CAT[doc.cat].lots)) doc.lot=null;
       await db.collection("tx").doc(id).update(doc);
       all=all.map(x=>x.id===id?Object.assign({},x,doc,{createdAt:prev.createdAt}):x);
       $("amt").value=""; $("note").value="";
@@ -2464,7 +2462,7 @@ function openEdit(t){
   if(!$("sheet").hidden) closeSheet();
   sel.value=t.cat; editId=t.id;
   $("sIcon").style.setProperty("--cc",catColor(t.cat)); $("sIcon").innerHTML=catIcon(t.cat);
-  $("sKind").textContent="Edit · "+dayLabel(t.date); $("sT").textContent=c.name;
+  $("sKind").textContent="Edit · "+(c.income ? "Income" : c.save ? "Savings & stocks" : "Expense"); $("sT").textContent=c.name;
   $("lotWrap").hidden=!c.lots; if(c.lots){ $("lot").value=String(t.lot||0); $("lot").dataset.fresh="1"; }
   $("amt").value=plain(t.amount); $("note").value=t.note||"";
   $("date").value=t.date; syncDate();
