@@ -940,6 +940,17 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
 .ppv{font-size:14px;color:var(--muted)}
 .ppc{width:18px;color:var(--accent);font-weight:800;text-align:right}
 .pprow.on b{color:var(--accent)}
+
+/* Profile: periode budget */
+.bhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bper{display:flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.bper i{font-style:normal;font-size:11px;color:var(--muted)}
+.bsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 4px}
+.bsr{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:0 6px}
+.bsr + .bsr{border-left:1px solid var(--line)}
+.bsr span{font-size:12px;color:var(--muted)}
+.bsr b{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bsr b.bad{color:var(--bad)} .bsr b.warn{color:var(--yel)}
 </style>
 </head>
 <body>
@@ -1608,8 +1619,22 @@ function renderData(mk, txs, by, spend, save, extra, pre){
 
   // Anggaran per pos: kartu dengan grafik kecil, bisa diketuk untuk melihat transaksinya
   const b = $("budget"); b.innerHTML="";
-  const bh=document.createElement("h2");bh.textContent="Budget";bh.className="bh";b.appendChild(bh);
-  const pdays = periodDays(cur.y,cur.m), tIdx = pdays.indexOf(todayStr());
+  // periode budget bisa dipilih sendiri (default: periode berjalan)
+  const curKey=monthKey(), bKey=budKey||curKey;
+  if(bKey!==curKey){ txs=all.filter(t=>periodKey(t.date)===bKey); by={}; txs.forEach(t=>{by[t.cat]=(by[t.cat]||0)+t.amount;}); }
+  const [bY,bM]=bKey.split("-").map(Number);
+  const bh=document.createElement("div"); bh.className="bhead";
+  bh.innerHTML='<h2 class="bh">Budget</h2><button type="button" class="bper"><span></span><i aria-hidden="true">▾</i></button>';
+  bh.querySelector(".bper span").textContent=periodLabel(bY,bM-1);
+  bh.querySelector(".bper").onclick=()=>openPeriods(bKey,k=>{ budKey = k===periodKey(todayStr()) ? null : k; render(); });
+  b.appendChild(bh);
+  const bCats=CATS.filter(c=>(c.grp==="Fleksibel"||c.grp==="Tetap")&&!c.save&&!c.income);
+  const bTot=bCats.reduce((a,c)=>a+(c.budget||0),0), bUsed=bCats.reduce((a,c)=>a+(by[c.id]||0),0);
+  const bs=document.createElement("div"); bs.className="bsum";
+  const bpc=bTot?bUsed/bTot*100:0, btone=bpc>=100?"bad":bpc>=90?"warn":"ok";
+  bs.innerHTML='<div class="bsr"><span>Spent</span><b class="num">'+rp(bUsed)+'</b></div><div class="bsr"><span>Budget</span><b class="num">'+rp(bTot)+'</b></div><div class="bsr"><span>'+(bUsed<=bTot?"Left":"Over")+'</span><b class="num '+btone+'">'+rp(Math.abs(bTot-bUsed))+'</b></div>';
+  b.appendChild(bs);
+  const pdays = periodDays(bY,bM-1), tIdx = pdays.indexOf(todayStr());
   const lastI = tIdx>=0 ? tIdx : (pdays[0]>todayStr() ? -1 : pdays.length-1);
   const GRPS=[["Fleksibel","Flexible"],["Tetap","Fixed"]];
   GRPS.forEach(([g,title])=>{
@@ -2386,10 +2411,11 @@ var _hSlide=0;
 })();
 
 // ===== Pilih periode (History)
-function openPeriods(){
+var budKey=null;
+function openPeriods(selKey, onPick){
   const now=periodKey(todayStr()); let first=START_KEY;
   all.forEach(t=>{ const k=periodKey(t.date); if(k<first) first=k; });
-  const sel=monthKey(), L=$("ppList"); L.innerHTML="";
+  const sel=selKey||monthKey(), L=$("ppList"); L.innerHTML="";
   let k=now, n=0;
   while(k>=first && n<60){
     const [y,m]=k.split("-").map(Number);
@@ -2398,13 +2424,13 @@ function openPeriods(){
     b.innerHTML='<span class="ppl"><b></b><small></small></span><span class="num ppv">'+rp(out)+'</span><span class="ppc" aria-hidden="true">'+(k===sel?"✓":"")+'</span>';
     b.querySelector("b").textContent=periodLabel(y,m-1);
     b.querySelector("small").textContent = k===now ? "Current period" : "";
-    const kk=k; b.onclick=()=>{ const [yy,mm]=kk.split("-").map(Number); cur={y:yy,m:mm-1}; showAll=false; $("perPick").hidden=true; render(); };
+    const kk=k; b.onclick=()=>{ $("perPick").hidden=true; if(onPick) return onPick(kk); const [yy,mm]=kk.split("-").map(Number); cur={y:yy,m:mm-1}; showAll=false; render(); };
     L.appendChild(b); k=prevKey(k); n++;
   }
   $("perPick").hidden=false;
   const on=L.querySelector(".on"); if(on) on.scrollIntoView({block:"nearest"});
 }
-$("perBtn").onclick=openPeriods;
+$("perBtn").onclick=()=>openPeriods();
 $("ppClose").onclick=()=>$("perPick").hidden=true;
 $("perPick").addEventListener("click",e=>{ if(e.target.id==="perPick") $("perPick").hidden=true; });
 </script>
