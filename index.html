@@ -852,6 +852,12 @@ body.kbopen.docked .wrap{padding-bottom:calc(var(--dockh,300px) + 16px)!importan
 .sheet #amt.npact,.sheet #lot.npact{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-soft);caret-color:transparent}
 .sheet #amt,.sheet #lot{cursor:pointer}
 .sheet #amt,.sheet #lot{text-align:right}
+
+/* Tab Add: menu bawah tetap tampil */
+body.addtab .bnav{display:block!important}
+body.addtab:not(.kbopen) .sheet{bottom:calc(106px + env(safe-area-inset-bottom,0px))!important;padding-bottom:0!important}
+body.addtab .wrap{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))!important}
+body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 124px + env(safe-area-inset-bottom,0px))!important}
 </style>
 </head>
 <body>
@@ -933,7 +939,7 @@ body.kbopen.docked .wrap{padding-bottom:calc(var(--dockh,300px) + 16px)!importan
 
   <!-- 3. TAMBAH -->
   <section class="panel" id="p-tambah" role="tabpanel" aria-labelledby="t-tambah" hidden>
-    <div class="addbar"><button type="button" class="cancel" id="addCancel">Cancel</button><b>Add</b><span></span></div>
+    <div class="addbar"><span></span><b>Add</b><span></span></div>
     <div class="sec">
       <div class="kind" role="group" aria-label="Type">
         <button type="button" id="k-out" aria-pressed="true">Expense</button>
@@ -1251,6 +1257,7 @@ function setTab(t){
   tab=t;
   if(t!=="tambah") ls.set("kas_tab",t);
   document.body.classList.toggle("adding", t==="tambah");
+  document.body.classList.toggle("addtab", t==="tambah");
   if(t==="history" && window.fitSlides) requestAnimationFrame(window.fitSlides);
   TABS.forEach(x=>{ $("p-"+x).hidden = x!==t; if(x===t) $("t-"+x).setAttribute("aria-current","page"); else $("t-"+x).removeAttribute("aria-current"); });
   if(changed) $("app").scrollTop=0;
@@ -1292,6 +1299,8 @@ document.querySelectorAll(".bnav button[data-tab]").forEach(b=>{
 });
 document.querySelectorAll(".bnav button[data-tab]").forEach(b=>b.onclick=()=>{
   // Ketuk menu yang sedang dibuka -> gulir ke atas
+  // tombol + saat di halaman Add (ikon ×) -> kembali ke halaman sebelumnya
+  if(b.dataset.tab==="tambah" && tab==="tambah"){ setTab(prevTab||"catat"); return; }
   if(b.dataset.tab===tab){ if(!(b._top && Date.now()-b._top<600)) scrollToTop(); return; }
   setTab(b.dataset.tab);
 });
@@ -1308,7 +1317,6 @@ document.querySelectorAll(".bnav button[data-tab]").forEach(b=>{
   lab.addEventListener("click",e=>{ if(e.target!==inp) e.stopPropagation(); });
 });
 setTab(tab);
-$("addCancel").onclick=()=>setTab(prevTab||"catat");
 
 // ---- Form
 let kind="out";
