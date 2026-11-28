@@ -945,7 +945,7 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
 .bhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .bper{display:flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer;white-space:nowrap}
 .bper i{font-style:normal;font-size:11px;color:var(--muted)}
-.bsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 4px}
+.bsum{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 4px}
 .bsr{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:0 6px}
 .bsr + .bsr{border-left:1px solid var(--line)}
 .bsr span{font-size:12px;color:var(--muted)}
@@ -1621,7 +1621,7 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   const b = $("budget"); b.innerHTML="";
   // periode budget bisa dipilih sendiri (default: periode berjalan)
   const curKey=monthKey(), bKey=budKey||curKey;
-  if(bKey!==curKey){ txs=all.filter(t=>periodKey(t.date)===bKey); by={}; txs.forEach(t=>{by[t.cat]=(by[t.cat]||0)+t.amount;}); }
+  txs=all.filter(t=>periodKey(t.date)===bKey); by={}; txs.forEach(t=>{by[t.cat]=(by[t.cat]||0)+t.amount;});
   const [bY,bM]=bKey.split("-").map(Number);
   const bh=document.createElement("div"); bh.className="bhead";
   bh.innerHTML='<h2 class="bh">Budget</h2><button type="button" class="bper"><span></span><i aria-hidden="true">▾</i></button>';
@@ -1632,7 +1632,7 @@ function renderData(mk, txs, by, spend, save, extra, pre){
   const bTot=bCats.reduce((a,c)=>a+(c.budget||0),0), bUsed=bCats.reduce((a,c)=>a+(by[c.id]||0),0);
   const bs=document.createElement("div"); bs.className="bsum";
   const bpc=bTot?bUsed/bTot*100:0, btone=bpc>=100?"bad":bpc>=90?"warn":"ok";
-  bs.innerHTML='<div class="bsr"><span>Spent</span><b class="num">'+rp(bUsed)+'</b></div><div class="bsr"><span>Budget</span><b class="num">'+rp(bTot)+'</b></div><div class="bsr"><span>'+(bUsed<=bTot?"Left":"Over")+'</span><b class="num '+btone+'">'+rp(Math.abs(bTot-bUsed))+'</b></div>';
+  bs.innerHTML='<div class="bsr"><span>Spent</span><b class="num '+btone+'">'+rp(bUsed)+'</b></div><div class="bsr"><span>Budget</span><b class="num">'+rp(bTot)+'</b></div>';
   b.appendChild(bs);
   const pdays = periodDays(bY,bM-1), tIdx = pdays.indexOf(todayStr());
   const lastI = tIdx>=0 ? tIdx : (pdays[0]>todayStr() ? -1 : pdays.length-1);
