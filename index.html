@@ -915,6 +915,11 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
 .hslide > .card{flex:1;display:flex;flex-direction:column}
 #pieCard .pwrap{flex:1;align-items:center;margin:0}
 #dailyCard svg.area{margin-top:auto}
+
+.hnav{display:flex;align-items:center;gap:10px}
+.harr{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:20px;line-height:1;padding:0 0 2px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.harr:disabled{opacity:.3;cursor:default}
+.harr:not(:disabled):active{background:var(--surface2)}
 </style>
 </head>
 <body>
@@ -975,7 +980,7 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
     <button id="next" aria-label="Next period">›</button>
     </div>
     <div class="sec">
-      <div class="shead"><h2>Spending overview</h2><div class="sdots" id="hDots"><button type="button" class="on" aria-label="Daily chart"></button><button type="button" aria-label="By parent category"></button></div></div>
+      <div class="shead"><h2>Spending overview</h2><div class="hnav"><button type="button" class="harr" id="hPrev" aria-label="Previous chart">‹</button><div class="sdots" id="hDots"><button type="button" class="on" aria-label="Daily chart"></button><button type="button" aria-label="By parent category"></button></div><button type="button" class="harr" id="hNext" aria-label="Next chart">›</button></div></div>
       <div class="hslides" id="hSlides"><div class="htrack" id="hTrack">
         <div class="hslide"><div class="card" id="dailyCard"></div></div>
         <div class="hslide"><div class="card" id="pieCard"></div></div>
@@ -2324,8 +2329,9 @@ var _hSlide=0;
   const pos=(dx,anim)=>{ T.style.transition=anim?"transform .38s cubic-bezier(.22,.8,.24,1)":"none"; T.style.transform="translate3d("+(-_hSlide*(w()+GAP)+dx)+"px,0,0)"; };
   const fit=()=>{ S.style.height=""; };
   window.fitSlides=fit;
-  const go=i=>{ i=Math.max(0,Math.min(slides.length-1,i)); _hSlide=i; pos(0,true); dots.forEach((d,k)=>d.classList.toggle("on",k===i)); const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden=i!==0; const pd=$("pieDetail"); if(pd.innerHTML) pd.hidden=i!==1; fit(); };
+  const go=i=>{ i=Math.max(0,Math.min(slides.length-1,i)); _hSlide=i; pos(0,true); dots.forEach((d,k)=>d.classList.toggle("on",k===i)); $("hPrev").disabled=i===0; $("hNext").disabled=i===slides.length-1; const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden=i!==0; const pd=$("pieDetail"); if(pd.innerHTML) pd.hidden=i!==1; fit(); };
   dots.forEach((d,k)=>d.onclick=()=>go(k));
+  $("hPrev").onclick=()=>go(_hSlide-1); $("hNext").onclick=()=>go(_hSlide+1);
   slides.forEach(sl=>new ResizeObserver(fit).observe(sl));
   addEventListener("resize",()=>pos(0,false));
   let st=null;
@@ -2349,7 +2355,7 @@ var _hSlide=0;
   S.addEventListener("pointerup",end); S.addEventListener("pointercancel",end);
   // klik yang terjadi tepat setelah menggeser jangan dianggap ketukan
   S.addEventListener("click",e=>{ if(S._swiped&&Date.now()-S._swiped<300){ e.stopPropagation(); e.preventDefault(); } },true);
-  pos(0,false);
+  pos(0,false); $("hPrev").disabled=true;
 })();
 </script>
 
