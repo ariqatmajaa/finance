@@ -877,7 +877,7 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
 .pn{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pa{font-size:14px;font-weight:600}
 .pp{font-size:12px;color:var(--muted);width:38px;text-align:right}
-.pback{justify-content:space-between;color:var(--accent);font-size:13px;font-weight:700}
+.pback{justify-content:flex-start;color:var(--accent);font-size:13px;font-weight:700}
 .pback b{color:var(--ink);font-size:14px}
 .dayd{padding:14px 16px}
 .ddh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}
@@ -969,6 +969,7 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
         <div class="hslide"><div class="card" id="pieCard"></div></div>
       </div></div>
       <div class="card dayd" id="dayDetail" hidden></div>
+      <div class="card dayd" id="pieDetail" hidden></div>
       <div id="chartCard" hidden></div>
     </div>
     <div class="sec" hidden>
@@ -2248,7 +2249,7 @@ var PARENTS = Array.isArray(CFG.parents) ? CFG.parents : [];
 var pieSel=null;
 function renderPie(items, spend){
   const P=$("pieCard");
-  if(!items.length){ P.innerHTML='<div class="empty">No spending in this period.</div>'; return; }
+  if(!items.length){ P.innerHTML='<div class="empty">No spending in this period.</div>'; $("pieDetail").innerHTML=""; $("pieDetail").hidden=true; return; }
   let groups;
   if(PARENTS.length){
     const m={}; PARENTS.forEach(p=>m[p.id]={id:p.id,name:p.name,color:p.color,icon:p.icon||"dots",v:0,cats:[]});
@@ -2267,8 +2268,9 @@ function renderPie(items, spend){
    <div class="pwrap"><svg class="donut pie" viewBox="-6 -6 232 232" role="img" aria-label="Spending by parent category">
     <circle cx="110" cy="110" r="${R}" fill="none" stroke="var(--track)" stroke-width="22"></circle>${segs}${badges}
     <text x="110" y="104" text-anchor="middle" class="pcl"></text><text x="110" y="126" text-anchor="middle" class="pcv num"></text><text x="110" y="144" text-anchor="middle" class="pcl pcp"></text>
-   </svg></div><div class="plist"></div>`;
-  const svg=P.querySelector("svg"), segEls=[...svg.querySelectorAll(".seg")], [tl,tv,tp]=svg.querySelectorAll("text"), list=P.querySelector(".plist");
+   </svg></div>`;
+  const PD=$("pieDetail"); PD.innerHTML='<div class="ddh"><b></b><span class="num"></span></div><div class="plist"></div>'; PD.hidden=(_hSlide||0)!==1;
+  const svg=P.querySelector("svg"), segEls=[...svg.querySelectorAll(".seg")], [tl,tv,tp]=svg.querySelectorAll("text"), list=PD.querySelector(".plist"), ph=PD.querySelector(".ddh");
   const draw=()=>{
     const i=groups.findIndex(g=>g.id===pieSel);
     segEls.forEach((el,k)=>el.classList.toggle("on",k===i)); svg.classList.toggle("act",i>=0);
@@ -2276,9 +2278,11 @@ function renderPie(items, spend){
     if(i>=0){ const g=groups[i]; tl.textContent=g.name; tl.style.fill=g.color; tv.textContent=plain(g.v); tp.textContent=Math.round(g.v/spend*100)+"%"; }
     else { tl.textContent="Total spent"; tl.style.fill=""; tv.textContent=plain(spend); tp.textContent=""; }
     list.innerHTML="";
+    ph.querySelector("b").textContent = i>=0 ? groups[i].name : (PARENTS.length?"Parent categories":"Categories");
+    ph.querySelector("span").textContent = rp(i>=0 ? groups[i].v : spend);
     if(i>=0){
       const g=groups[i];
-      const back=document.createElement("button"); back.type="button"; back.className="pback"; back.innerHTML='<span>‹ All</span><b></b>'; back.querySelector("b").textContent=g.name; back.onclick=()=>{ pieSel=null; draw(); }; list.appendChild(back);
+      const back=document.createElement("button"); back.type="button"; back.className="pback"; back.innerHTML='<span>‹ All parent categories</span>'; back.onclick=()=>{ pieSel=null; draw(); }; list.appendChild(back);
       g.cats.sort((a,b)=>b.v-a.v).forEach(({c,v})=>{ const r=document.createElement("button"); r.type="button"; r.className="prow";
         r.innerHTML=`<span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="pn"></span><span class="pa num">${plain(v)}</span><span class="pp num">${Math.round(v/g.v*100)}%</span>`;
         r.querySelector(".pn").textContent=c.name; r.onclick=()=>openCatList(c.id,null,false,true); list.appendChild(r); });
@@ -2308,7 +2312,7 @@ var _hSlide=0;
   const pos=(dx,anim)=>{ T.style.transition=anim?"transform .38s cubic-bezier(.22,.8,.24,1)":"none"; T.style.transform="translate3d("+(-_hSlide*(w()+GAP)+dx)+"px,0,0)"; };
   const fit=()=>{ const sl=slides[_hSlide||0]; if(sl) S.style.height=sl.offsetHeight+"px"; };
   window.fitSlides=fit;
-  const go=i=>{ i=Math.max(0,Math.min(slides.length-1,i)); _hSlide=i; pos(0,true); dots.forEach((d,k)=>d.classList.toggle("on",k===i)); const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden=i!==0; fit(); };
+  const go=i=>{ i=Math.max(0,Math.min(slides.length-1,i)); _hSlide=i; pos(0,true); dots.forEach((d,k)=>d.classList.toggle("on",k===i)); const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden=i!==0; const pd=$("pieDetail"); if(pd.innerHTML) pd.hidden=i!==1; fit(); };
   dots.forEach((d,k)=>d.onclick=()=>go(k));
   slides.forEach(sl=>new ResizeObserver(fit).observe(sl));
   addEventListener("resize",()=>pos(0,false));
