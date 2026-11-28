@@ -824,6 +824,15 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
 body.adding.kbopen .sheet{padding-bottom:0!important}
 body.adding.kbopen .sheet .sbox{margin-bottom:4px}
 body.adding.docked .wrap{padding-bottom:calc(var(--dockh,300px) + var(--kb,0px) + 24px + env(safe-area-inset-bottom,0px))!important}
+
+/* Keyboard terbuka: layar & panel isian mengikuti area yang terlihat, panel menempel ke keyboard */
+body.kbopen #app{top:var(--vvt,0px)!important;bottom:auto!important;height:var(--vvh,100%)!important}
+body.kbopen .sheet{top:calc(var(--vvt,0px) + var(--vvh,100vh))!important;bottom:auto!important;transform:translateY(-100%);padding-bottom:0!important}
+body.kbopen .sheet .sbox{margin-bottom:6px!important}
+body.kbopen.docked .wrap{padding-bottom:calc(var(--dockh,300px) + 16px)!important}
+.sheet form > label{gap:0}
+.sheet #sMsg:empty{display:none}
+.sheet .shead2{margin-bottom:8px!important}
 </style>
 </head>
 <body>
@@ -978,16 +987,16 @@ body.adding.docked .wrap{padding-bottom:calc(var(--dockh,300px) + var(--kb,0px) 
         <button type="button" class="sx" id="sClose" aria-label="Close">✕</button>
       </div>
       <form id="f" autocomplete="off">
-        <label class="full">Amount (Rp)
-          <input id="amt" class="num amtbig" inputmode="numeric" placeholder="0" required>
+        <label class="full">
+          <input id="amt" class="num amtbig" inputmode="numeric" placeholder="Amount (Rp)" aria-label="Amount (Rp)" required>
         </label>
         <label id="lotWrap" class="full" hidden>Lots
           <input id="lot" type="number" inputmode="numeric" min="0" step="1" value="1">
         </label>
-        <label>Note
-          <input id="note" placeholder="Add a note">
+        <label>
+          <input id="note" placeholder="Add a note" aria-label="Note">
         </label>
-        <label>Date
+        <label>
           <span class="datebox"><span id="dateText">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none"></rect><path d="M3 10h18M8 3v4M16 3v4" fill="none"></path></svg><input id="date" type="date" required aria-label="Tanggal"></span>
         </label>
         <button class="btn full" id="save" type="submit" disabled>Save</button>
@@ -1302,6 +1311,7 @@ function fillCats(){
     b.innerHTML=`<span class="av" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="cn"></span>`;
     b.querySelector(".cn").textContent=c.name;
     b.onclick=()=>openSheet(c.id);
+    b.addEventListener("mousedown",e=>{ if(!$("sheet").hidden && $("sDone").hidden) e.preventDefault(); });
     grid.appendChild(b);
   });
 }
@@ -2015,7 +2025,11 @@ $("setSave").onclick=()=>{
 // ===== Panel isian ikut naik di atas keyboard
 (function(){
   const vv=window.visualViewport; if(!vv) return;
-  const upd=()=>{ const kb=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); document.body.style.setProperty("--kb", kb+"px"); document.body.classList.toggle("kbopen", kb>80); };
+  const upd=()=>{
+    const kb=Math.max(0, window.innerHeight - vv.height - vv.offsetTop), b=document.body.style;
+    b.setProperty("--kb", kb+"px"); b.setProperty("--vvh", vv.height+"px"); b.setProperty("--vvt", Math.max(0,vv.offsetTop)+"px");
+    document.body.classList.toggle("kbopen", kb>80);
+  };
   vv.addEventListener("resize",upd); vv.addEventListener("scroll",upd); upd();
 })();
 
