@@ -920,6 +920,26 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
 .harr{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:20px;line-height:1;padding:0 0 2px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .harr:disabled{opacity:.3;cursor:default}
 .harr:not(:disabled):active{background:var(--surface2)}
+
+/* Tombol pilih periode */
+.monthnav{justify-content:center}
+.monthnav .perbtn{width:auto!important;height:auto!important;border-radius:12px!important;background:none!important;border:0!important;box-shadow:none!important}
+.perbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;padding:0 14px}
+.monthnav .perbtn > span{flex:none!important;width:auto;min-width:0}
+.monthnav .perbtn #monthLabel{font-size:17px!important;font-weight:700;white-space:nowrap;text-align:center}
+.monthnav .perbtn .pcal{width:34px!important;padding:0!important}
+.perbtn .pcal{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent)}
+.perbtn .pcal svg{width:18px;height:18px}
+.perbtn .pchev{font-size:13px;color:var(--muted)}
+.pprow{display:flex;align-items:center;gap:12px;width:100%;padding:14px 4px;border:0;border-top:1px solid var(--line);background:none;font:inherit;color:var(--ink);text-align:left;cursor:pointer}
+.pprow:first-child{border-top:0}
+.ppl{flex:1;min-width:0;display:flex;flex-direction:column}
+.ppl b{font-size:15px;font-weight:600}
+.ppl small{font-size:12px;color:var(--accent);font-weight:600}
+.ppl small:empty{display:none}
+.ppv{font-size:14px;color:var(--muted)}
+.ppc{width:18px;color:var(--accent);font-weight:800;text-align:right}
+.pprow.on b{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -975,9 +995,9 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
   <!-- 2. HISTORY -->
   <section class="panel" id="p-history" role="tabpanel" aria-labelledby="t-history" hidden>
     <div class="monthnav" id="monthnav">
-    <button id="prev" aria-label="Previous period">‹</button>
-    <span id="monthLabel">—</span>
-    <button id="next" aria-label="Next period">›</button>
+    <button id="prev" aria-label="Previous period" hidden>‹</button>
+    <button type="button" class="perbtn" id="perBtn" aria-haspopup="dialog"><span class="pcal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none"></rect><path d="M3 10h18M8 3v4M16 3v4" fill="none"></path></svg></span><span id="monthLabel">—</span><span class="pchev" aria-hidden="true">▾</span></button>
+    <button id="next" aria-label="Next period" hidden>›</button>
     </div>
     <div class="sec">
       <div class="shead"><h2>Spending overview</h2><div class="hnav"><button type="button" class="harr" id="hPrev" aria-label="Previous chart">‹</button><div class="sdots" id="hDots"><button type="button" class="on" aria-label="Daily chart"></button><button type="button" aria-label="By parent category"></button></div><button type="button" class="harr" id="hNext" aria-label="Next chart">›</button></div></div>
@@ -1121,6 +1141,13 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 2
   <div class="clbox">
     <div class="clhead"><div class="stx"><div class="st" id="ipT">Choose an icon</div></div><button type="button" class="sx" id="ipClose" aria-label="Close">✕</button></div>
     <div class="cllist"><div class="ipgrid" id="ipGrid"></div></div>
+  </div>
+</div>
+
+<div class="clmodal" id="perPick" hidden role="dialog" aria-modal="true" aria-labelledby="ppT">
+  <div class="clbox">
+    <div class="clhead"><div class="stx"><div class="st" id="ppT">Choose a period</div></div><button type="button" class="sx" id="ppClose" aria-label="Close">✕</button></div>
+    <div class="cllist" id="ppList"></div>
   </div>
 </div>
 
@@ -2357,6 +2384,29 @@ var _hSlide=0;
   S.addEventListener("click",e=>{ if(S._swiped&&Date.now()-S._swiped<300){ e.stopPropagation(); e.preventDefault(); } },true);
   pos(0,false); $("hPrev").disabled=true;
 })();
+
+// ===== Pilih periode (History)
+function openPeriods(){
+  const now=periodKey(todayStr()); let first=START_KEY;
+  all.forEach(t=>{ const k=periodKey(t.date); if(k<first) first=k; });
+  const sel=monthKey(), L=$("ppList"); L.innerHTML="";
+  let k=now, n=0;
+  while(k>=first && n<60){
+    const [y,m]=k.split("-").map(Number);
+    const out=all.filter(t=>periodKey(t.date)===k && !isIncome(t) && !isSave(t)).reduce((a,t)=>a+t.amount,0);
+    const b=document.createElement("button"); b.type="button"; b.className="pprow"+(k===sel?" on":"");
+    b.innerHTML='<span class="ppl"><b></b><small></small></span><span class="num ppv">'+rp(out)+'</span><span class="ppc" aria-hidden="true">'+(k===sel?"✓":"")+'</span>';
+    b.querySelector("b").textContent=periodLabel(y,m-1);
+    b.querySelector("small").textContent = k===now ? "Current period" : "";
+    const kk=k; b.onclick=()=>{ const [yy,mm]=kk.split("-").map(Number); cur={y:yy,m:mm-1}; showAll=false; $("perPick").hidden=true; render(); };
+    L.appendChild(b); k=prevKey(k); n++;
+  }
+  $("perPick").hidden=false;
+  const on=L.querySelector(".on"); if(on) on.scrollIntoView({block:"nearest"});
+}
+$("perBtn").onclick=openPeriods;
+$("ppClose").onclick=()=>$("perPick").hidden=true;
+$("perPick").addEventListener("click",e=>{ if(e.target.id==="perPick") $("perPick").hidden=true; });
 </script>
 
 </body>
