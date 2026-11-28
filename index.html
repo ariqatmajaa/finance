@@ -860,9 +860,10 @@ body.addtab .wrap{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))!im
 body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 124px + env(safe-area-inset-bottom,0px))!important}
 
 /* History: geser grafik + donat induk + rincian hari */
-.hslides{display:flex;overflow-x:auto;overflow-y:hidden;transition:height .2s ease;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:12px;margin:0 -16px;padding:0 16px;scroll-padding:0 16px;align-items:flex-start}
+.hslides{overflow:hidden;touch-action:pan-y;transition:height .3s ease;margin:0 -16px;padding:0 16px}
+.htrack{display:flex;gap:12px;align-items:flex-start;will-change:transform}
 .hslides::-webkit-scrollbar{display:none}
-.hslide{flex:0 0 100%;scroll-snap-align:start;min-width:0}
+.hslide{flex:0 0 100%;min-width:0}
 #pieCard{padding:18px}
 .pwrap{display:flex;justify-content:center;margin:4px 0 6px}
 .pie{width:200px!important;max-width:100%}
@@ -895,6 +896,13 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
 .setparrow + .setparrow{border-top:1px solid var(--line)}
 .setparrow input{flex:1;min-width:0;height:38px;padding:0 10px;font-size:15px}
 .setparrow .setcolor{flex:none}
+
+.pbadge{pointer-events:none}
+.pbadge circle{fill:var(--surface);stroke:var(--line);stroke-width:1.5;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+.pbadge svg .f{fill:currentColor;fill-opacity:.32;stroke:none}
+.pie.act .pbadge:not(.on){opacity:.35}
+.pie.act .seg.on{stroke-width:30px}
+.pie{width:220px!important}
 </style>
 </head>
 <body>
@@ -956,14 +964,14 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
     </div>
     <div class="sec">
       <div class="shead"><h2>Spending overview</h2><div class="sdots" id="hDots"><button type="button" class="on" aria-label="Daily chart"></button><button type="button" aria-label="By parent category"></button></div></div>
-      <div class="hslides" id="hSlides">
+      <div class="hslides" id="hSlides"><div class="htrack" id="hTrack">
         <div class="hslide"><div class="card" id="dailyCard"></div></div>
         <div class="hslide"><div class="card" id="pieCard"></div></div>
-      </div>
+      </div></div>
       <div class="card dayd" id="dayDetail" hidden></div>
       <div id="chartCard" hidden></div>
     </div>
-    <div class="sec">
+    <div class="sec" hidden>
       <div class="shead"><h2>Categories</h2><span id="hTotal"></span></div>
       <div class="card catcard"><div class="lg" id="hLg"></div></div>
     </div>
@@ -1696,7 +1704,7 @@ function renderCharts(txs, by, spend){
   const area= pts.length ? line+` L${pts[pts.length-1][0]},${T+ih} L${pts[0][0]},${T+ih} Z` : "";
   let grid="";
   for(let k=0;k<=4;k++){ const v=top*k/4, y=Y(v); grid+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" class="gln"></line><text x="${L-6}" y="${y+3.5}" text-anchor="end" class="gtx">${k?kfmt(v):"0"}</text>`; }
-  let xl=""; days.forEach((d,i)=>{ const dd=+d.slice(8); if(i%7===0||i===days.length-1) xl+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" class="gtx">${dd}${i===0?" "+BLN3[+d.slice(5,7)-1]:""}</text>`; });
+  let xl=""; days.forEach((d,i)=>{ const dd=+d.slice(8); if(i%7===0||(i===days.length-1&&i%7>=3)) xl+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" class="gtx">${dd}${i===0?" "+BLN3[+d.slice(5,7)-1]:""}</text>`; });
   const peak = vals.slice(0,last+1).reduce((bi,v,i,arr)=>v>arr[bi]?i:bi,0);
   D.innerHTML=`<div class="ovhead"><div><div class="ovk">Spent this period</div><div class="ovv num">${rp(vals.reduce((a,b)=>a+b,0))}</div></div><span class="ovpill">Daily</span></div>
   <svg class="area" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily spending">
@@ -1983,9 +1991,12 @@ function drawParents(){
   if(!draftPar.length) box.innerHTML='<div class="empty">No parent categories yet, e.g. Rumah for Kosan, Listrik and Laundry.</div>';
   draftPar.forEach(p=>{
     const r=document.createElement("div"); r.className="setparrow";
-    r.innerHTML='<button type="button" class="setcolor" aria-label="Change colour"></button><input placeholder="Parent name, e.g. Rumah" maxlength="24"><button type="button" class="setdel" aria-label="Delete parent">✕</button>';
+    if(!p.icon) p.icon="dots";
+    r.innerHTML='<button type="button" class="av seticon pico" aria-label="Change icon"></button><button type="button" class="setcolor" aria-label="Change colour"></button><input placeholder="Parent name, e.g. Rumah" maxlength="24"><button type="button" class="setdel" aria-label="Delete parent">✕</button>';
+    const ib=r.querySelector(".pico"); ib.style.setProperty("--cc",p.color); ib.innerHTML=iconSvg(p.icon);
+    ib.onclick=()=>openIconPicker(p.icon,p.color,k=>{ p.icon=k; ib.innerHTML=iconSvg(k); });
     const cb=r.querySelector(".setcolor"); cb.style.background=p.color;
-    cb.onclick=()=>{ p.color=PALETTE[(PALETTE.indexOf(p.color)+1)%PALETTE.length]; cb.style.background=p.color; };
+    cb.onclick=()=>{ p.color=PALETTE[(PALETTE.indexOf(p.color)+1)%PALETTE.length]; cb.style.background=p.color; ib.style.setProperty("--cc",p.color); };
     const inp=r.querySelector("input"); inp.value=p.name||"";
     inp.oninput=()=>{ p.name=inp.value; document.querySelectorAll('.setpar option[value="'+p.id+'"]').forEach(o=>o.textContent=inp.value||"Untitled"); };
     r.querySelector(".setdel").onclick=()=>{ draftPar=draftPar.filter(x=>x!==p); draft.forEach(c=>{ if(c.parent===p.id) delete c.parent; }); drawParents(); drawSettings(); };
@@ -1994,7 +2005,7 @@ function drawParents(){
 }
 $("setParAdd").onclick=()=>{
   const used=draftPar.map(x=>x.color); const color=PALETTE.find(c=>!used.includes(c))||PALETTE[0];
-  draftPar.push({id:"p"+Date.now().toString(36),name:"",color}); drawParents(); drawSettings();
+  draftPar.push({id:"p"+Date.now().toString(36),name:"",color,icon:"dots"}); drawParents(); drawSettings();
   const ins=$("setPar").querySelectorAll("input"); if(ins.length) ins[ins.length-1].focus();
 };
 function drawSettings(){
@@ -2088,7 +2099,7 @@ $("setSave").onclick=()=>{
   const start=Object.assign({},START);
   draft.forEach(c=>{ if(c.save && c._start!=null){ start[c.lots?c.id+"_lot":c.id]=c._start; } });
   const cats=draft.map(c=>{ const o={id:c.id,name:c.name.trim(),budget:c.grp==="Pemasukan"?0:(c.budget||0),grp:c.grp,icon:c.icon,color:c.color}; if(c.save)o.save=true; if(c.income)o.income=true; if(c.lots)o.lots=true; if(c.parent&&!c.save&&!c.income)o.parent=c.parent; return o; });
-  const parents=draftPar.filter(p=>String(p.name||"").trim()).map(p=>({id:p.id,name:p.name.trim(),color:p.color}));
+  const parents=draftPar.filter(p=>String(p.name||"").trim()).map(p=>({id:p.id,name:p.name.trim(),color:p.color,icon:p.icon||"dots"}));
   const pids=new Set(parents.map(p=>p.id)); cats.forEach(c=>{ if(c.parent&&!pids.has(c.parent)) delete c.parent; });
   const pd=parseInt($("setPayday").value,10);
   if(!(pd>=1&&pd<=28)){ showToast("Payday must be between 1 and 28"); return; }
@@ -2240,24 +2251,28 @@ function renderPie(items, spend){
   if(!items.length){ P.innerHTML='<div class="empty">No spending in this period.</div>'; return; }
   let groups;
   if(PARENTS.length){
-    const m={}; PARENTS.forEach(p=>m[p.id]={id:p.id,name:p.name,color:p.color,v:0,cats:[]});
-    const other={id:"_other",name:"Other",color:"#7f8c8d",v:0,cats:[]};
+    const m={}; PARENTS.forEach(p=>m[p.id]={id:p.id,name:p.name,color:p.color,icon:p.icon||"dots",v:0,cats:[]});
+    const other={id:"_other",name:"Other",color:"#7f8c8d",icon:"dots",v:0,cats:[]};
     items.forEach(it=>{ const g=m[it.c.parent]||other; g.v+=it.v; g.cats.push(it); });
     groups=[...Object.values(m),other].filter(g=>g.v>0).sort((a,b)=>b.v-a.v);
-  } else groups=items.map(it=>({id:it.c.id,name:it.c.name,color:catColor(it.c.id),v:it.v,cats:[it]}));
+  } else groups=items.map(it=>({id:it.c.id,name:it.c.name,color:catColor(it.c.id),icon:it.c.icon||"dots",v:it.v,cats:[it]}));
   if(pieSel && !groups.find(g=>g.id===pieSel)) pieSel=null;
-  const R=78, CIRC=2*Math.PI*R, GAP=groups.length>1?2:0; let off=0, segs="";
+  const R=80, CIRC=2*Math.PI*R, GAP=groups.length>1?2:0; let off=0, segs="", badges="";
   groups.forEach((g,i)=>{ const len=g.v/spend*CIRC, draw=Math.max(.5,len-GAP);
-    segs+=`<circle class="seg" data-i="${i}" cx="110" cy="110" r="${R}" fill="none" stroke="${g.color}" stroke-width="26" stroke-dasharray="${draw} ${CIRC-draw}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)"></circle>`; off+=len; });
+    segs+=`<circle class="seg" data-i="${i}" cx="110" cy="110" r="${R}" fill="none" stroke="${g.color}" stroke-width="22" stroke-dasharray="${draw} ${CIRC-draw}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)"></circle>`;
+    if(g.v/spend>=0.06){ const a=(off+len/2)/CIRC*2*Math.PI-Math.PI/2, x=(110+R*Math.cos(a)).toFixed(1), y=(110+R*Math.sin(a)).toFixed(1);
+      badges+=`<g class="pbadge" data-i="${i}" transform="translate(${x} ${y})"><circle r="16"></circle><svg x="-9.5" y="-9.5" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:${g.color}">${ICON[g.icon]||ICON.dots}</svg></g>`; }
+    off+=len; });
   P.innerHTML=`<div class="ovhead"><div><div class="ovk">${PARENTS.length?"By parent category":"By category"}</div><div class="ovv num">${rp(spend)}</div></div><span class="ovpill">Total</span></div>
-   <div class="pwrap"><svg class="donut pie" viewBox="0 0 220 220" role="img" aria-label="Spending by parent category">
-    <circle cx="110" cy="110" r="${R}" fill="none" stroke="var(--track)" stroke-width="26"></circle>${segs}
+   <div class="pwrap"><svg class="donut pie" viewBox="-6 -6 232 232" role="img" aria-label="Spending by parent category">
+    <circle cx="110" cy="110" r="${R}" fill="none" stroke="var(--track)" stroke-width="22"></circle>${segs}${badges}
     <text x="110" y="104" text-anchor="middle" class="pcl"></text><text x="110" y="126" text-anchor="middle" class="pcv num"></text><text x="110" y="144" text-anchor="middle" class="pcl pcp"></text>
    </svg></div><div class="plist"></div>`;
   const svg=P.querySelector("svg"), segEls=[...svg.querySelectorAll(".seg")], [tl,tv,tp]=svg.querySelectorAll("text"), list=P.querySelector(".plist");
   const draw=()=>{
     const i=groups.findIndex(g=>g.id===pieSel);
     segEls.forEach((el,k)=>el.classList.toggle("on",k===i)); svg.classList.toggle("act",i>=0);
+    svg.querySelectorAll(".pbadge").forEach(b=>b.classList.toggle("on",+b.dataset.i===i));
     if(i>=0){ const g=groups[i]; tl.textContent=g.name; tl.style.fill=g.color; tv.textContent=plain(g.v); tp.textContent=Math.round(g.v/spend*100)+"%"; }
     else { tl.textContent="Total spent"; tl.style.fill=""; tv.textContent=plain(spend); tp.textContent=""; }
     list.innerHTML="";
@@ -2268,7 +2283,7 @@ function renderPie(items, spend){
         r.innerHTML=`<span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="pn"></span><span class="pa num">${plain(v)}</span><span class="pp num">${Math.round(v/g.v*100)}%</span>`;
         r.querySelector(".pn").textContent=c.name; r.onclick=()=>openCatList(c.id,null,false,true); list.appendChild(r); });
     } else groups.forEach(g=>{ const r=document.createElement("button"); r.type="button"; r.className="prow";
-        r.innerHTML=`<i class="pdot" style="background:${g.color}"></i><span class="pn"></span><span class="pa num">${plain(g.v)}</span><span class="pp num">${Math.round(g.v/spend*100)}%</span>`;
+        r.innerHTML=`<span class="av mini" style="--cc:${g.color}">${iconSvg(g.icon)}</span><span class="pn"></span><span class="pa num">${plain(g.v)}</span><span class="pp num">${Math.round(g.v/spend*100)}%</span>`;
         r.querySelector(".pn").textContent=g.name; r.onclick=()=>{ pieSel=g.id; draw(); }; list.appendChild(r); });
   };
   segEls.forEach((el,k)=>el.addEventListener("click",()=>{ pieSel = pieSel===groups[k].id ? null : groups[k].id; draw(); }));
@@ -2285,16 +2300,40 @@ function showDay(d, txs){
     r.innerHTML=`<span class="av mini" style="--cc:${catColor(t.cat)}">${catIcon(t.cat)}</span><span class="ddc"><b></b><small></small></span><span class="num">${plain(t.amount)}</span>`;
     r.querySelector("b").textContent=catName(t.cat); r.querySelector("small").textContent=t.note||""; B.appendChild(r); });
 }
-// ===== Geser antar grafik
+// ===== Geser antar grafik (mengikuti jari, lalu meluncur ke slide)
 var _hSlide=0;
 (function(){
-  const S=$("hSlides"), dots=[...$("hDots").children];
-  const fit=()=>{ const sl=S.children[_hSlide||0]; if(sl) S.style.height=sl.offsetHeight+"px"; };
+  const S=$("hSlides"), T=$("hTrack"), slides=[...T.children], dots=[...$("hDots").children], GAP=12;
+  const w=()=>S.clientWidth-32;
+  const pos=(dx,anim)=>{ T.style.transition=anim?"transform .38s cubic-bezier(.22,.8,.24,1)":"none"; T.style.transform="translate3d("+(-_hSlide*(w()+GAP)+dx)+"px,0,0)"; };
+  const fit=()=>{ const sl=slides[_hSlide||0]; if(sl) S.style.height=sl.offsetHeight+"px"; };
   window.fitSlides=fit;
-  const set=i=>{ _hSlide=i; dots.forEach((d,k)=>d.classList.toggle("on",k===i)); const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden = i!==0; fit(); };
-  new ResizeObserver(fit).observe(S.children[0]); new ResizeObserver(fit).observe(S.children[1]);
-  S.addEventListener("scroll",()=>{ const i=Math.round(S.scrollLeft/Math.max(1,S.clientWidth)); if(i!==_hSlide) set(i); },{passive:true});
-  dots.forEach((d,k)=>d.onclick=()=>S.scrollTo({left:k*S.clientWidth,behavior:"smooth"}));
+  const go=i=>{ i=Math.max(0,Math.min(slides.length-1,i)); _hSlide=i; pos(0,true); dots.forEach((d,k)=>d.classList.toggle("on",k===i)); const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden=i!==0; fit(); };
+  dots.forEach((d,k)=>d.onclick=()=>go(k));
+  slides.forEach(sl=>new ResizeObserver(fit).observe(sl));
+  addEventListener("resize",()=>pos(0,false));
+  let st=null;
+  S.addEventListener("pointerdown",e=>{ if(e.target.closest("svg.area")||(e.pointerType==="mouse"&&e.button!==0)) return; st={x:e.clientX,y:e.clientY,t:Date.now(),id:e.pointerId,lock:null,dx:0}; });
+  S.addEventListener("pointermove",e=>{
+    if(!st||e.pointerId!==st.id) return;
+    const dx=e.clientX-st.x, dy=e.clientY-st.y;
+    if(!st.lock){ if(Math.abs(dx)<6&&Math.abs(dy)<6) return; st.lock=Math.abs(dx)>Math.abs(dy)?"x":"y"; if(st.lock==="x"){ try{S.setPointerCapture(e.pointerId);}catch(_){} } }
+    if(st.lock!=="x") return;
+    const edge=(_hSlide===0&&dx>0)||(_hSlide===slides.length-1&&dx<0);
+    st.dx = edge ? dx/3 : dx; pos(st.dx,false);
+  });
+  const end=e=>{
+    if(!st||(e&&e.pointerId!==st.id)) return;
+    const s0=st; st=null; if(s0.lock!=="x") return;
+    const v=s0.dx/Math.max(1,Date.now()-s0.t);
+    let i=_hSlide; if(s0.dx<-w()*0.2||v<-0.45) i++; else if(s0.dx>w()*0.2||v>0.45) i--;
+    go(i);
+    S._swiped=Date.now();
+  };
+  S.addEventListener("pointerup",end); S.addEventListener("pointercancel",end);
+  // klik yang terjadi tepat setelah menggeser jangan dianggap ketukan
+  S.addEventListener("click",e=>{ if(S._swiped&&Date.now()-S._swiped<300){ e.stopPropagation(); e.preventDefault(); } },true);
+  pos(0,false);
 })();
 </script>
 
