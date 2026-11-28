@@ -908,6 +908,13 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
 body.addtab.docked .bnav{display:none!important}
 body.addtab.docked:not(.kbopen) .sheet{bottom:0!important;padding-bottom:env(safe-area-inset-bottom,0px)!important}
 body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 24px + env(safe-area-inset-bottom,0px))!important}
+
+/* Kedua grafik sama tinggi */
+.htrack{align-items:stretch!important}
+.hslide{display:flex}
+.hslide > .card{flex:1;display:flex;flex-direction:column}
+#pieCard .pwrap{flex:1;align-items:center;margin:0}
+#dailyCard svg.area{margin-top:auto}
 </style>
 </head>
 <body>
@@ -2315,7 +2322,7 @@ var _hSlide=0;
   const S=$("hSlides"), T=$("hTrack"), slides=[...T.children], dots=[...$("hDots").children], GAP=12;
   const w=()=>S.clientWidth-32;
   const pos=(dx,anim)=>{ T.style.transition=anim?"transform .38s cubic-bezier(.22,.8,.24,1)":"none"; T.style.transform="translate3d("+(-_hSlide*(w()+GAP)+dx)+"px,0,0)"; };
-  const fit=()=>{ const sl=slides[_hSlide||0]; if(sl) S.style.height=sl.offsetHeight+"px"; };
+  const fit=()=>{ S.style.height=""; };
   window.fitSlides=fit;
   const go=i=>{ i=Math.max(0,Math.min(slides.length-1,i)); _hSlide=i; pos(0,true); dots.forEach((d,k)=>d.classList.toggle("on",k===i)); const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden=i!==0; const pd=$("pieDetail"); if(pd.innerHTML) pd.hidden=i!==1; fit(); };
   dots.forEach((d,k)=>d.onclick=()=>go(k));
