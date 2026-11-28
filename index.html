@@ -833,6 +833,24 @@ body.kbopen.docked .wrap{padding-bottom:calc(var(--dockh,300px) + 16px)!importan
 .sheet form > label{gap:0}
 .sheet #sMsg:empty{display:none}
 .sheet .shead2{margin-bottom:8px!important}
+
+/* Tombol angka ala iPhone, ukuran ringkas */
+:root{--kbbg:#d1d4da;--kbkey:#ffffff;--kbkp:#b4b8c0;--kbink:#111}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--kbbg:#1e1f21;--kbkey:#46474a;--kbkp:#2c2d2f;--kbink:#fff}}
+:root[data-theme="dark"]{--kbbg:#1e1f21;--kbkey:#46474a;--kbkp:#2c2d2f;--kbink:#fff}
+.sheet .sbox{max-height:none!important}
+.npad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px -8px -6px;padding:6px;border-radius:16px;background:var(--kbbg);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.npad[hidden]{display:none}
+.npad button{height:46px;border:0;border-radius:10px;background:var(--kbkey);color:var(--kbink);font-family:-apple-system,"SF Pro Display",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,.35);-webkit-tap-highlight-color:transparent;transition:background .06s}
+.npad button:active{background:var(--kbkp)}
+.npad b{font-size:23px;font-weight:400;line-height:1}
+.npad small{font-size:8.5px;font-weight:600;letter-spacing:.2em;margin-top:2px;opacity:.9}
+.npad .k000 b{font-size:19px}
+.npad .kdel{background:transparent;box-shadow:none}
+.npad .kdel:active{background:var(--kbkey)}
+.npad .kdel svg{width:26px;height:26px}
+.sheet #amt.npact,.sheet #lot.npact{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-soft);caret-color:transparent}
+.sheet #amt,.sheet #lot{cursor:pointer}
 </style>
 </head>
 <body>
@@ -988,10 +1006,10 @@ body.kbopen.docked .wrap{padding-bottom:calc(var(--dockh,300px) + 16px)!importan
       </div>
       <form id="f" autocomplete="off">
         <label class="full">
-          <input id="amt" class="num amtbig" inputmode="numeric" placeholder="Amount (Rp)" aria-label="Amount (Rp)" required>
+          <input id="amt" class="num amtbig" inputmode="none" readonly placeholder="Amount (Rp)" aria-label="Amount (Rp)">
         </label>
         <label id="lotWrap" class="full" hidden>Lots
-          <input id="lot" type="number" inputmode="numeric" min="0" step="1" value="1">
+          <input id="lot" class="num" inputmode="none" readonly value="1">
         </label>
         <label>
           <input id="note" placeholder="Add a note" aria-label="Note">
@@ -1002,6 +1020,7 @@ body.kbopen.docked .wrap{padding-bottom:calc(var(--dockh,300px) + 16px)!importan
         <button class="btn full" id="save" type="submit" disabled>Save</button>
         <div class="msg full" id="sMsg"></div>
       </form>
+      <div class="npad" id="npad" hidden><button type="button" data-k="1"><b>1</b><small>&nbsp;</small></button><button type="button" data-k="2"><b>2</b><small>ABC</small></button><button type="button" data-k="3"><b>3</b><small>DEF</small></button><button type="button" data-k="4"><b>4</b><small>GHI</small></button><button type="button" data-k="5"><b>5</b><small>JKL</small></button><button type="button" data-k="6"><b>6</b><small>MNO</small></button><button type="button" data-k="7"><b>7</b><small>PQRS</small></button><button type="button" data-k="8"><b>8</b><small>TUV</small></button><button type="button" data-k="9"><b>9</b><small>WXYZ</small></button><button type="button" data-k="000" class="k000"><b>000</b></button><button type="button" data-k="0"><b>0</b><small>&nbsp;</small></button><button type="button" data-k="del" class="kdel" aria-label="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 5H20a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8.5L2.5 12z" fill="none"></path><path d="M11.5 9.5l5 5M16.5 9.5l-5 5" fill="none"></path></svg></button></div>
     </div>
     <div class="sdone" id="sDone" hidden>
       <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none"></path></svg></div>
@@ -1326,15 +1345,15 @@ function openSheet(id){
   $("sMsg").textContent="";
   if(!wasOpen){
     $("amt").value=""; $("note").value="";
-    $("date").value=todayStr(); syncDate(); $("lot").value="1";
+    $("date").value=todayStr(); syncDate(); $("lot").value="1"; $("lot").dataset.fresh="1";
     $("sForm").hidden=false; $("sDone").hidden=true;
     $("sheet").hidden=false;
   }
   $("save").disabled = !db;
   markSel(); dockPad();
   // fokus langsung di dalam ketukan supaya keyboard tetap muncul walau pindah kategori
-  const f = wasOpen && _lastField && !_lastField.closest("[hidden]") ? _lastField : $("amt");
-  try{ f.focus({preventScroll:true}); }catch(e){ try{f.focus();}catch(_){} }
+  if(wasOpen && document.activeElement===$("note")){ npSet(null); }
+  else npSet(wasOpen && npTarget==="lot" && c.lots ? "lot" : "amt");
 }
 let _lastField=null;
 ["amt","note","lot"].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener("focus",()=>{ _lastField=el; }); });
@@ -1345,7 +1364,7 @@ async function resync(){
   if(!db) return;
   try{ const snap = await db.collection("tx").orderBy("date","desc").limit(1000).get(); all = snap.docs.map(d=>Object.assign({id:d.id},d.data())); render(); }catch(e){}
 }
-function closeSheet(){ $("sheet").hidden=true; sel.value=null; markSel(); dockPad(); }
+function closeSheet(){ $("sheet").hidden=true; sel.value=null; npSet(null); markSel(); dockPad(); }
 function setKind(k){
   kind=k;$("k-out").setAttribute("aria-pressed",k==="out");$("k-in").setAttribute("aria-pressed",k==="in");
   fillCats();
@@ -1365,18 +1384,32 @@ $("date").addEventListener("click",()=>{try{$("date").showPicker();}catch(e){}})
 syncDate();
 $("sClose").onclick=closeSheet;
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("sheet").hidden) closeSheet(); });
-// Format ribuan dengan titik saat mengetik, kursor tetap di posisi digit yang sama
-$("amt").addEventListener("input",()=>{
-  const el=$("amt");
-  const pos=el.selectionStart||el.value.length;
-  const digitsBefore=el.value.slice(0,pos).replace(/\D/g,"").length;
-  const digits=el.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"").slice(0,12);
-  const out=digits?Number(digits).toLocaleString("id-ID"):"";
-  el.value=out;
-  let p=0,seen=0;
-  while(p<out.length&&seen<digitsBefore){if(/\d/.test(out[p]))seen++;p++;}
-  try{el.setSelectionRange(p,p);}catch(e){}
+// ===== Tombol angka sendiri (pengganti keyboard iPhone untuk nominal & lot)
+let npTarget=null;
+function npSet(t){
+  npTarget=t;
+  ["amt","lot"].forEach(id=>$(id).classList.toggle("npact", t===id));
+  $("npad").hidden=!t;
+  if(t && document.activeElement && document.activeElement.blur && document.activeElement!==document.body) document.activeElement.blur();
+  dockPad();
+}
+["amt","lot"].forEach(id=>{
+  const el=$(id);
+  el.addEventListener("pointerdown",e=>{ e.preventDefault(); npSet(id); });
+  el.addEventListener("focus",()=>{ el.blur(); npSet(id); });
 });
+$("note").addEventListener("focus",()=>{ if(npTarget) npSet(null); });
+$("npad").addEventListener("pointerdown",e=>e.preventDefault());
+$("npad").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+  if(!npTarget) return;
+  const el=$(npTarget), k=b.dataset.k, max=npTarget==="amt"?12:4;
+  let d=el.value.replace(/\D/g,"");
+  if(npTarget==="lot" && el.dataset.fresh!=="0"){ d=""; el.dataset.fresh="0"; }
+  if(k==="del") d=d.slice(0,-1); else d=(d+k).replace(/^0+(?=\d)/,"").slice(0,max);
+  if(/^0+$/.test(d)) d = npTarget==="lot" ? "0" : "";
+  el.value = npTarget==="amt" ? (d?Number(d).toLocaleString("id-ID"):"") : d;
+}));
+
 
 $("prev").onclick=()=>{cur.m--; if(cur.m<0){cur.m=11;cur.y--;} showAll=false; render();};
 $("next").onclick=()=>{cur.m++; if(cur.m>11){cur.m=0;cur.y++;} showAll=false; render();};
@@ -1706,7 +1739,7 @@ $("f").addEventListener("submit",async e=>{
     // Panel tetap terbuka di kategori yang sama, siap isi berikutnya
     $("amt").value=""; $("note").value=""; $("sMsg").textContent="";
     showToast(CAT[doc.cat].name+" · "+(CAT[doc.cat].income?"+":"")+rp(amount));
-    try{$("amt").blur();}catch(e){}
+    npSet(null);
     setTab("catat");
   }catch(err){
     $("sMsg").textContent = err&&err.code==="quota_exceeded" ? "Storage full. Delete some old entries." : "Couldn't save. Please try again.";
