@@ -819,6 +819,11 @@ svg.area{touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-selec
 .setrow.dragging{position:relative;z-index:5;background:var(--surface);box-shadow:0 14px 30px -10px rgba(0,0,0,.55);border-radius:14px;transition:none}
 .reordering .setrow:not(.dragging){transition:transform .15s ease}
 .bcard .bc-f span{font-size:14px;font-weight:600}
+
+/* Isian transaksi: nempel ke keyboard, daftar kategori tetap bisa digulir */
+body.adding.kbopen .sheet{padding-bottom:0!important}
+body.adding.kbopen .sheet .sbox{margin-bottom:4px}
+body.adding.docked .wrap{padding-bottom:calc(var(--dockh,300px) + var(--kb,0px) + 24px + env(safe-area-inset-bottom,0px))!important}
 </style>
 </head>
 <body>
@@ -1317,8 +1322,12 @@ function openSheet(id){
   }
   $("save").disabled = !db;
   markSel(); dockPad();
-  if(!wasOpen){ try{$("amt").focus();}catch(e){} }
+  // fokus langsung di dalam ketukan supaya keyboard tetap muncul walau pindah kategori
+  const f = wasOpen && _lastField && !_lastField.closest("[hidden]") ? _lastField : $("amt");
+  try{ f.focus({preventScroll:true}); }catch(e){ try{f.focus();}catch(_){} }
 }
+let _lastField=null;
+["amt","note","lot"].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener("focus",()=>{ _lastField=el; }); });
 function markSel(){ const open=!$("sheet").hidden; document.querySelectorAll(".ctile").forEach(t=>t.classList.toggle("sel", open && t.dataset.cat===sel.value)); }
 function dockPad(){ const open=!$("sheet").hidden; document.body.classList.toggle("docked",open); if(open) document.body.style.setProperty("--dockh",$("sheet").querySelector(".sbox").offsetHeight+"px"); }
 // Ambil ulang data dari penyimpanan (cadangan kalau pembaruan otomatis terlambat)
@@ -2006,7 +2015,7 @@ $("setSave").onclick=()=>{
 // ===== Panel isian ikut naik di atas keyboard
 (function(){
   const vv=window.visualViewport; if(!vv) return;
-  const upd=()=>{ const kb=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); document.body.style.setProperty("--kb", kb+"px"); };
+  const upd=()=>{ const kb=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); document.body.style.setProperty("--kb", kb+"px"); document.body.classList.toggle("kbopen", kb>80); };
   vv.addEventListener("resize",upd); vv.addEventListener("scroll",upd); upd();
 })();
 
