@@ -858,6 +858,43 @@ body.addtab .bnav{display:block!important}
 body.addtab:not(.kbopen) .sheet{bottom:calc(106px + env(safe-area-inset-bottom,0px))!important;padding-bottom:0!important}
 body.addtab .wrap{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))!important}
 body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 124px + env(safe-area-inset-bottom,0px))!important}
+
+/* History: geser grafik + donat induk + rincian hari */
+.hslides{display:flex;overflow-x:auto;overflow-y:hidden;transition:height .2s ease;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:12px;margin:0 -16px;padding:0 16px;scroll-padding:0 16px;align-items:flex-start}
+.hslides::-webkit-scrollbar{display:none}
+.hslide{flex:0 0 100%;scroll-snap-align:start;min-width:0}
+#pieCard{padding:18px}
+.pwrap{display:flex;justify-content:center;margin:4px 0 6px}
+.pie{width:200px!important;max-width:100%}
+.pie .seg{cursor:pointer}
+.pcl{fill:var(--muted);font-size:12px;font-weight:600;font-family:var(--f-display)}
+.pcv{fill:var(--ink);font-size:19px;font-weight:700;font-family:var(--f-display)}
+.plist{display:flex;flex-direction:column}
+.prow,.pback{display:flex;align-items:center;gap:10px;width:100%;padding:10px 2px;border:0;border-top:1px solid var(--line);background:none;font:inherit;color:var(--ink);text-align:left;cursor:pointer}
+.plist > :first-child{border-top:0}
+.pdot{width:12px;height:12px;border-radius:4px;flex:none;margin:0 8px 0 2px}
+.pn{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pa{font-size:14px;font-weight:600}
+.pp{font-size:12px;color:var(--muted);width:38px;text-align:right}
+.pback{justify-content:space-between;color:var(--accent);font-size:13px;font-weight:700}
+.pback b{color:var(--ink);font-size:14px}
+.dayd{padding:14px 16px}
+.ddh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}
+.ddh b{font-size:15px;font-weight:700}
+.ddh span{font-size:15px;font-weight:700}
+.ddn{font-size:13px;color:var(--muted);padding:6px 0}
+.ddr{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.ddh + .ddr{border-top:0}
+.ddc{flex:1;min-width:0;display:flex;flex-direction:column}
+.ddc b{font-size:14px;font-weight:600}
+.ddc small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ddc small:empty{display:none}
+.ddr > .num{font-size:14px;font-weight:600}
+#hDots{padding:4px 0}
+.setparrow{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.setparrow + .setparrow{border-top:1px solid var(--line)}
+.setparrow input{flex:1;min-width:0;height:38px;padding:0 10px;font-size:15px}
+.setparrow .setcolor{flex:none}
 </style>
 </head>
 <body>
@@ -918,8 +955,12 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
     <button id="next" aria-label="Next period">›</button>
     </div>
     <div class="sec">
-      <h2>Spending overview</h2>
-      <div class="card" id="dailyCard"></div>
+      <div class="shead"><h2>Spending overview</h2><div class="sdots" id="hDots"><button type="button" class="on" aria-label="Daily chart"></button><button type="button" aria-label="By parent category"></button></div></div>
+      <div class="hslides" id="hSlides">
+        <div class="hslide"><div class="card" id="dailyCard"></div></div>
+        <div class="hslide"><div class="card" id="pieCard"></div></div>
+      </div>
+      <div class="card dayd" id="dayDetail" hidden></div>
       <div id="chartCard" hidden></div>
     </div>
     <div class="sec">
@@ -960,6 +1001,11 @@ body.addtab.docked:not(.kbopen) .wrap{padding-bottom:calc(var(--dockh,300px) + 1
         <label>Salary per month (Rp)<input id="setGaji" class="num" inputmode="numeric" placeholder="0"></label>
         <label>Payday (date, 1–28)<input id="setPayday" class="num" inputmode="numeric" placeholder="1" maxlength="2"></label>
       </div>
+    </div>
+    <div class="sec">
+      <h2>Parent categories</h2>
+      <div class="rows setrows" id="setPar"></div>
+      <button type="button" class="more" id="setParAdd">+ Add parent category</button>
     </div>
     <div id="setCats" class="panel" style="gap:18px"></div>
     <p class="foot">Tap an icon to change it, tap the colour dot to change the colour. Settings are stored on this phone only.</p>
@@ -1602,64 +1648,27 @@ function renderHistory(txs, ids){
 // ===== Cek kesehatan keuangan (periode berjalan) =====
 
 function renderCharts(txs, by, spend){
-  // Donat per kategori
-  const C=$("chartCard");
+  // Daftar kategori (di bawah) + donat per induk kategori (slide 2)
   const items = CATS.filter(c=>!c.save && !c.income && (by[c.id]||0)>0).map(c=>({c, v:by[c.id]})).sort((a,b)=>b.v-a.v);
   const lg=$("hLg"); lg.innerHTML=""; lg.classList.remove("act");
-  if(!items.length){ C.innerHTML='<div class="empty">No spending in this period.</div>'; lg.innerHTML='<div class="empty">No categories yet.</div>'; }
+  if(!items.length) lg.innerHTML='<div class="empty">No categories yet.</div>';
   else{
-    const R=78, CIRC=2*Math.PI*R, GAP= items.length>1 ? 2 : 0;
-    let off=0, segs="";
-    items.forEach(({c,v},i)=>{
-      const len=v/spend*CIRC;
-      const draw=Math.max(0.5,len-GAP);
-      segs+=`<circle class="seg" data-i="${i}" cx="110" cy="110" r="${R}" fill="none" stroke="${catColor(c.id)}" stroke-width="26" stroke-dasharray="${draw} ${CIRC-draw}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)"></circle>`;
-      off+=len;
-    });
     const max=items[0].v;
-    C.innerHTML = `<div class="dwrap"><div class="donutwrap"><svg class="donut" viewBox="0 0 220 220" role="img" aria-label="Spending by category, total ${rp(spend)}">
-      <circle cx="110" cy="110" r="${R}" fill="none" stroke="var(--track)" stroke-width="26"></circle>${segs}
-      <g class="ctr" id="dc">
-      <text id="dcL" x="110" y="100" text-anchor="middle" class="sub" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif">Total spent</text>
-      <text id="dcV" x="110" y="122" text-anchor="middle" font-size="18" font-weight="800" font-family="Plus Jakarta Sans, system-ui, sans-serif">${plain(spend)}</text>
-      <text id="dcP" x="110" y="140" text-anchor="middle" class="sub" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif"></text>
-      </g>
-    </svg></div><div class="dlg" aria-hidden="true">${items.map(({c,v})=>`<div class="dl"><i class="ring" style="--cc:${catColor(c.id)}"></i><span class="dn">${esc(c.name)}</span><span class="dp num">${(v/spend*100).toFixed(1)}%</span></div>`).join("")}</div></div>`;
-    const svg=C.querySelector(".donut"), segEls=[...svg.querySelectorAll(".seg")];
-    let active=-1;
-    const showCat=i=>{
-      if(i===active) return; active=i;
-      const ctr=$("dc");
-      segEls.forEach((s,k)=>s.classList.toggle("on",k===i));
-      svg.classList.toggle("act",i>=0); lg.classList.toggle("act",i>=0);
-      [...lg.children].forEach((el,k)=>el.classList.toggle("on",k===i));
-      if(i>=0){ const {c,v}=items[i]; $("dcL").textContent=c.name; $("dcL").style.fill=catColor(c.id); $("dcV").textContent=plain(v); $("dcP").textContent=Math.round(v/spend*100)+"%"; }
-      else{ $("dcL").textContent="Total spent"; $("dcL").style.fill=""; $("dcV").textContent=plain(spend); $("dcP").textContent=""; }
-      ctr.classList.remove("pop"); void ctr.getBBox(); ctr.classList.add("pop");
-    };
-    const bindHold=(el,i)=>{
-      el.addEventListener("pointerdown",e=>{showCat(i);});
-      el.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")showCat(i);});
-      ["pointerup","pointercancel","pointerleave"].forEach(ev=>el.addEventListener(ev,()=>{if(active===i)showCat(-1);}));
-      el.addEventListener("contextmenu",e=>e.preventDefault());
-      el.addEventListener("click",()=>openCatList(items[i].c.id));
-    };
-    segEls.forEach(s=>bindHold(s,+s.dataset.i));
-    // Daftar kategori: cukup ketuk untuk melihat transaksinya (tanpa efek tahan)
-    setTimeout(()=>[...lg.children].forEach((el,k)=>el.addEventListener("click",()=>openCatList(items[k].c.id,null,false,true))),0);
-    items.forEach(({c,v})=>{
+    items.forEach(({c,v},k)=>{
       const it=document.createElement("div");it.className="it";
       it.innerHTML=`<div class="h"><span class="n"><span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="nm"></span></span><span class="a num">${plain(v)}</span><span class="pc num">${Math.round(v/spend*100)}%</span></div><div class="bar"><i style="width:${v/max*100}%;background:${catColor(c.id)}"></i></div>`;
       it.querySelector(".nm").textContent=c.name;
+      it.addEventListener("click",()=>openCatList(c.id,null,false,true));
       lg.appendChild(it);
     });
   }
+  renderPie(items, spend);
 
   // Grafik garis area: pengeluaran per hari (gaya "Spending Overview")
   const D=$("dailyCard");
   const days=periodDays(cur.y,cur.m);
   const exp=txs.filter(t=>!isIncome(t)&&!isSave(t));
-  if(!exp.length){ D.innerHTML='<div class="empty">No spending in this period.</div>'; return; }
+  if(!exp.length){ D.innerHTML='<div class="empty">No spending in this period.</div>'; $("dayDetail").hidden=true; return; }
   const perDay={}; exp.forEach(t=>{ perDay[t.date]=(perDay[t.date]||0)+t.amount; });
   const today=todayStr(); const ti=days.indexOf(today);
   const last = ti>=0 ? ti : (days[0]>today ? -1 : days.length-1);
@@ -1713,7 +1722,7 @@ function renderCharts(txs, by, spend){
     vline.setAttribute("x1",x); vline.setAttribute("x2",x);
     dot.setAttribute("cx",x); dot.setAttribute("cy",y);
     const i=Math.max(0,Math.min(last,Math.round((x-L)/iw*(days.length-1))));
-    if(i!==lastI){ lastI=i; tx.textContent=kfmt(vals[i]); dt.textContent=dayLabel(days[i]); }
+    if(i!==lastI){ lastI=i; tx.textContent=kfmt(vals[i]); dt.textContent=dayLabel(days[i]); showDay(days[i], txs); }
     const w=Math.max(44,tx.textContent.length*7.2+16);
     const bx=Math.min(W-R-w,Math.max(L,x-w/2)), by=Math.max(2,y-34);
     rc.setAttribute("x",bx); rc.setAttribute("y",by); rc.setAttribute("width",w);
@@ -1930,6 +1939,7 @@ function bindMoney(inp, onval){
 }
 function openSettings(){
   draft = CATS.map(c=>Object.assign({},c));
+  draftPar = PARENTS.map(p=>Object.assign({},p)); drawParents();
   $("setName").value = CFG.name||"";
   $("setGaji").value = fmtNum(CFG.gaji||0);
   $("setPayday").value = PAYDAY;
@@ -1967,6 +1977,26 @@ function enableReorder(box,g){
     const mu=()=>{ end(); document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); };
     document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu); });
 }
+var draftPar=[];
+function drawParents(){
+  const box=$("setPar"); box.innerHTML="";
+  if(!draftPar.length) box.innerHTML='<div class="empty">No parent categories yet, e.g. Rumah for Kosan, Listrik and Laundry.</div>';
+  draftPar.forEach(p=>{
+    const r=document.createElement("div"); r.className="setparrow";
+    r.innerHTML='<button type="button" class="setcolor" aria-label="Change colour"></button><input placeholder="Parent name, e.g. Rumah" maxlength="24"><button type="button" class="setdel" aria-label="Delete parent">✕</button>';
+    const cb=r.querySelector(".setcolor"); cb.style.background=p.color;
+    cb.onclick=()=>{ p.color=PALETTE[(PALETTE.indexOf(p.color)+1)%PALETTE.length]; cb.style.background=p.color; };
+    const inp=r.querySelector("input"); inp.value=p.name||"";
+    inp.oninput=()=>{ p.name=inp.value; document.querySelectorAll('.setpar option[value="'+p.id+'"]').forEach(o=>o.textContent=inp.value||"Untitled"); };
+    r.querySelector(".setdel").onclick=()=>{ draftPar=draftPar.filter(x=>x!==p); draft.forEach(c=>{ if(c.parent===p.id) delete c.parent; }); drawParents(); drawSettings(); };
+    box.appendChild(r);
+  });
+}
+$("setParAdd").onclick=()=>{
+  const used=draftPar.map(x=>x.color); const color=PALETTE.find(c=>!used.includes(c))||PALETTE[0];
+  draftPar.push({id:"p"+Date.now().toString(36),name:"",color}); drawParents(); drawSettings();
+  const ins=$("setPar").querySelectorAll("input"); if(ins.length) ins[ins.length-1].focus();
+};
 function drawSettings(){
   const W=$("setCats"); W.innerHTML="";
   SET_GROUPS.forEach(([g,title])=>{
@@ -1980,6 +2010,7 @@ function drawSettings(){
       r.innerHTML='<button type="button" class="av seticon" aria-label="Change icon"></button>'+
         '<button type="button" class="setcolor" aria-label="Change colour"></button>'+
         '<div class="setfields"><input class="setnm" placeholder="'+(c.lots?"Stock name, e.g. Saham BBCA":"Category name")+'">'+(c.lots?'<span class="stag">Stock · counted in lots</span>':'')+
+        ((g==="Fleksibel"||g==="Tetap")?'<label class="sl"><span>Parent</span><select class="setpar"></select></label>':'')+
         (showBudget?'<label class="sl"><span>Budget/month</span><input class="setbg num" inputmode="numeric" placeholder="0"></label>':'')+
         (showStart?'<label class="sl"><span>'+(c.lots?"Starting lots":"Starting balance")+'</span><input class="setst num" inputmode="numeric" placeholder="0"></label>':'')+
         (c.lots?'<label class="sl"><span>Lots/month</span><input class="setlpm num" inputmode="numeric" placeholder="0"></label>':'')+
@@ -2001,6 +2032,8 @@ function drawSettings(){
         if(c.lots) st.oninput=()=>{ st.value=st.value.replace(/\D/g,""); c._start=Number(st.value)||0; };
         else bindMoney(st,v=>{c._start=v;});
       }
+      const ps=r.querySelector(".setpar");
+      if(ps){ ps.innerHTML='<option value="">None</option>'+draftPar.map(p=>'<option value="'+p.id+'">'+esc(p.name||"Untitled")+'</option>').join(""); ps.value=draftPar.some(p=>p.id===c.parent)?c.parent:""; ps.onchange=()=>{ c.parent=ps.value||undefined; }; }
       const tg=r.querySelector(".settg");
       if(tg){
         const g0=GOALS[c.id]||{};
@@ -2054,10 +2087,12 @@ $("setSave").onclick=()=>{
   if(!draft.some(c=>!c.save&&!c.income)){ showToast("Keep at least one expense category"); return; }
   const start=Object.assign({},START);
   draft.forEach(c=>{ if(c.save && c._start!=null){ start[c.lots?c.id+"_lot":c.id]=c._start; } });
-  const cats=draft.map(c=>{ const o={id:c.id,name:c.name.trim(),budget:c.grp==="Pemasukan"?0:(c.budget||0),grp:c.grp,icon:c.icon,color:c.color}; if(c.save)o.save=true; if(c.income)o.income=true; if(c.lots)o.lots=true; return o; });
+  const cats=draft.map(c=>{ const o={id:c.id,name:c.name.trim(),budget:c.grp==="Pemasukan"?0:(c.budget||0),grp:c.grp,icon:c.icon,color:c.color}; if(c.save)o.save=true; if(c.income)o.income=true; if(c.lots)o.lots=true; if(c.parent&&!c.save&&!c.income)o.parent=c.parent; return o; });
+  const parents=draftPar.filter(p=>String(p.name||"").trim()).map(p=>({id:p.id,name:p.name.trim(),color:p.color}));
+  const pids=new Set(parents.map(p=>p.id)); cats.forEach(c=>{ if(c.parent&&!pids.has(c.parent)) delete c.parent; });
   const pd=parseInt($("setPayday").value,10);
   if(!(pd>=1&&pd<=28)){ showToast("Payday must be between 1 and 28"); return; }
-  const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),payday:pd,cats,start});
+  const cfg=Object.assign({},CFG,{name:$("setName").value.trim(),gaji:numOf($("setGaji").value),payday:pd,cats,start,parents});
   const goals={}; draft.forEach(c=>{ if(c.save){ const t=c._target!=null?c._target:((GOALS[c.id]||{}).target||0), d=c._due!=null?c._due:((GOALS[c.id]||{}).due||""); const l=c._lpm!=null?c._lpm:((GOALS[c.id]||{}).lpm||0); if(t||l) goals[c.id]={target:t,due:d,lpm:l}; } });
   localStorage.setItem(GOAL_KEY,JSON.stringify(goals));
   localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
@@ -2196,6 +2231,71 @@ function renderGoals(){
   $("gSum").querySelectorAll(".gchips span").forEach((e,i)=>e.textContent=lots[i]);
 }
 window._gReady=true; renderGoals();
+
+// ===== Donat per induk kategori (slide 2 History)
+var PARENTS = Array.isArray(CFG.parents) ? CFG.parents : [];
+var pieSel=null;
+function renderPie(items, spend){
+  const P=$("pieCard");
+  if(!items.length){ P.innerHTML='<div class="empty">No spending in this period.</div>'; return; }
+  let groups;
+  if(PARENTS.length){
+    const m={}; PARENTS.forEach(p=>m[p.id]={id:p.id,name:p.name,color:p.color,v:0,cats:[]});
+    const other={id:"_other",name:"Other",color:"#7f8c8d",v:0,cats:[]};
+    items.forEach(it=>{ const g=m[it.c.parent]||other; g.v+=it.v; g.cats.push(it); });
+    groups=[...Object.values(m),other].filter(g=>g.v>0).sort((a,b)=>b.v-a.v);
+  } else groups=items.map(it=>({id:it.c.id,name:it.c.name,color:catColor(it.c.id),v:it.v,cats:[it]}));
+  if(pieSel && !groups.find(g=>g.id===pieSel)) pieSel=null;
+  const R=78, CIRC=2*Math.PI*R, GAP=groups.length>1?2:0; let off=0, segs="";
+  groups.forEach((g,i)=>{ const len=g.v/spend*CIRC, draw=Math.max(.5,len-GAP);
+    segs+=`<circle class="seg" data-i="${i}" cx="110" cy="110" r="${R}" fill="none" stroke="${g.color}" stroke-width="26" stroke-dasharray="${draw} ${CIRC-draw}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)"></circle>`; off+=len; });
+  P.innerHTML=`<div class="ovhead"><div><div class="ovk">${PARENTS.length?"By parent category":"By category"}</div><div class="ovv num">${rp(spend)}</div></div><span class="ovpill">Total</span></div>
+   <div class="pwrap"><svg class="donut pie" viewBox="0 0 220 220" role="img" aria-label="Spending by parent category">
+    <circle cx="110" cy="110" r="${R}" fill="none" stroke="var(--track)" stroke-width="26"></circle>${segs}
+    <text x="110" y="104" text-anchor="middle" class="pcl"></text><text x="110" y="126" text-anchor="middle" class="pcv num"></text><text x="110" y="144" text-anchor="middle" class="pcl pcp"></text>
+   </svg></div><div class="plist"></div>`;
+  const svg=P.querySelector("svg"), segEls=[...svg.querySelectorAll(".seg")], [tl,tv,tp]=svg.querySelectorAll("text"), list=P.querySelector(".plist");
+  const draw=()=>{
+    const i=groups.findIndex(g=>g.id===pieSel);
+    segEls.forEach((el,k)=>el.classList.toggle("on",k===i)); svg.classList.toggle("act",i>=0);
+    if(i>=0){ const g=groups[i]; tl.textContent=g.name; tl.style.fill=g.color; tv.textContent=plain(g.v); tp.textContent=Math.round(g.v/spend*100)+"%"; }
+    else { tl.textContent="Total spent"; tl.style.fill=""; tv.textContent=plain(spend); tp.textContent=""; }
+    list.innerHTML="";
+    if(i>=0){
+      const g=groups[i];
+      const back=document.createElement("button"); back.type="button"; back.className="pback"; back.innerHTML='<span>‹ All</span><b></b>'; back.querySelector("b").textContent=g.name; back.onclick=()=>{ pieSel=null; draw(); }; list.appendChild(back);
+      g.cats.sort((a,b)=>b.v-a.v).forEach(({c,v})=>{ const r=document.createElement("button"); r.type="button"; r.className="prow";
+        r.innerHTML=`<span class="av mini" style="--cc:${catColor(c.id)}">${catIcon(c.id)}</span><span class="pn"></span><span class="pa num">${plain(v)}</span><span class="pp num">${Math.round(v/g.v*100)}%</span>`;
+        r.querySelector(".pn").textContent=c.name; r.onclick=()=>openCatList(c.id,null,false,true); list.appendChild(r); });
+    } else groups.forEach(g=>{ const r=document.createElement("button"); r.type="button"; r.className="prow";
+        r.innerHTML=`<i class="pdot" style="background:${g.color}"></i><span class="pn"></span><span class="pa num">${plain(g.v)}</span><span class="pp num">${Math.round(g.v/spend*100)}%</span>`;
+        r.querySelector(".pn").textContent=g.name; r.onclick=()=>{ pieSel=g.id; draw(); }; list.appendChild(r); });
+  };
+  segEls.forEach((el,k)=>el.addEventListener("click",()=>{ pieSel = pieSel===groups[k].id ? null : groups[k].id; draw(); }));
+  draw();
+}
+// ===== Rincian hari yang dipilih di grafik harian
+function showDay(d, txs){
+  const B=$("dayDetail"), list=txs.filter(t=>t.date===d && !isIncome(t) && !isSave(t)).sort((a,b)=>b.amount-a.amount);
+  const tot=list.reduce((a,t)=>a+t.amount,0);
+  B.hidden = (_hSlide||0)!==0;
+  B.innerHTML='<div class="ddh"><b></b><span class="num">'+rp(tot)+'</span></div>'+(list.length?'':'<div class="ddn">No spending on this day.</div>');
+  B.querySelector("b").textContent=dayLabel(d);
+  list.forEach(t=>{ const r=document.createElement("div"); r.className="ddr";
+    r.innerHTML=`<span class="av mini" style="--cc:${catColor(t.cat)}">${catIcon(t.cat)}</span><span class="ddc"><b></b><small></small></span><span class="num">${plain(t.amount)}</span>`;
+    r.querySelector("b").textContent=catName(t.cat); r.querySelector("small").textContent=t.note||""; B.appendChild(r); });
+}
+// ===== Geser antar grafik
+var _hSlide=0;
+(function(){
+  const S=$("hSlides"), dots=[...$("hDots").children];
+  const fit=()=>{ const sl=S.children[_hSlide||0]; if(sl) S.style.height=sl.offsetHeight+"px"; };
+  window.fitSlides=fit;
+  const set=i=>{ _hSlide=i; dots.forEach((d,k)=>d.classList.toggle("on",k===i)); const dd=$("dayDetail"); if(dd.innerHTML) dd.hidden = i!==0; fit(); };
+  new ResizeObserver(fit).observe(S.children[0]); new ResizeObserver(fit).observe(S.children[1]);
+  S.addEventListener("scroll",()=>{ const i=Math.round(S.scrollLeft/Math.max(1,S.clientWidth)); if(i!==_hSlide) set(i); },{passive:true});
+  dots.forEach((d,k)=>d.onclick=()=>S.scrollTo({left:k*S.clientWidth,behavior:"smooth"}));
+})();
 </script>
 
 </body>
